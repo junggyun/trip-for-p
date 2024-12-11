@@ -6,5 +6,5 @@ import team.seventhmile.tripforp.domain.place.entity.Place;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
-    Optional<Place> findByMapPlaceId(Long id);
+    Optional<Place> findByMapPlaceId(String id);
 }

@@ -11,7 +11,7 @@ import team.seventhmile.tripforp.domain.place.entity.Place;
 public class PlaceDto {
 
     private Long id;
-    private Long mapPlaceId;
+    private String mapPlaceId;
 
     public PlaceDto(Place place) {
         this.id = place.getId();

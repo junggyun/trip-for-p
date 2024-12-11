@@ -14,10 +14,10 @@ public class Place extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_id")
     private Long id;
-    private Long mapPlaceId;
+    private String mapPlaceId;
 
     @Builder
-    public Place(Long mapPlaceId) {
+    public Place(String mapPlaceId) {
         this.mapPlaceId = mapPlaceId;
     }
 }

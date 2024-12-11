@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CreatePlaceRequest {
 
-    private Long mapPlaceId;
+    private String mapPlaceId;
 
     @Builder
-    public CreatePlaceRequest(Long mapPlaceId) {
+    public CreatePlaceRequest(String mapPlaceId) {
         this.mapPlaceId = mapPlaceId;
     }
 }
