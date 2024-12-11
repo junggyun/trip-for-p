@@ -1,0 +1,78 @@
+package team.seventhmile.tripforp.domain.spot.service;
+
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import team.seventhmile.tripforp.domain.spot.dto.CreateSpotRequest;
+import team.seventhmile.tripforp.domain.place.dto.GetPlaceCountResponse;
+import team.seventhmile.tripforp.domain.spot.dto.UpdateSpotRequest;
+import team.seventhmile.tripforp.domain.place.entity.Place;
+import team.seventhmile.tripforp.domain.course.entity.Course;
+import team.seventhmile.tripforp.domain.place.service.PlaceService;
+import team.seventhmile.tripforp.domain.spot.entity.Spot;
+import team.seventhmile.tripforp.domain.spot.repository.SpotRepository;
+import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class SpotService {
+
+    private final PlaceService placeService;
+    private final SpotRepository spotRepository;
+
+    @Transactional
+    public void createSpot(Course course, CreateSpotRequest request) {
+        Place place = placeService.findOrCreatePlace(request.getPlace());
+        Spot spot = Spot.builder()
+            .place(place)
+            .sequence(request.getSequence())
+            .tripDate(request.getTripDate())
+            .memo(request.getMemo())
+            .build();
+        course.addSpot(spot);
+    }
+
+    @Transactional
+    public void manageSpots(Course course, List<UpdateSpotRequest> requests) {
+
+        requests.stream()
+            .filter(req -> req.getAction().equals("delete"))
+            .forEach(req -> {
+                Spot spot = spotRepository.findById(req.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(Spot.class, req.getId()));
+                course.removeSpot(spot);
+            });
+        spotRepository.flush();
+
+        requests.stream()
+            .filter(req -> req.getAction().equals("update"))
+            .forEach(req -> {
+                Place place = placeService.findOrCreatePlace(req.getPlace());
+                Spot spot = spotRepository.findById(req.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(Spot.class, req.getId()));
+                spot.updateSpot(place, req);
+            });
+        spotRepository.flush();
+
+        requests.stream()
+            .filter(req -> req.getAction().equals("create"))
+            .forEach(req -> {
+                Place place = placeService.findOrCreatePlace(req.getPlace());
+                Spot saveSpot = Spot.builder()
+                    .place(place)
+                    .sequence(req.getSequence())
+                    .tripDate(req.getTripDate())
+                    .memo(req.getMemo())
+                    .build();
+                course.addSpot(saveSpot);
+            });
+    }
+
+    public List<GetPlaceCountResponse> getPlaceCount() {
+        return spotRepository.getPlaceCount(PageRequest.of(0, 6));
+    }
+
+}
