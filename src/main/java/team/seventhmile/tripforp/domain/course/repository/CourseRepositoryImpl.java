@@ -1,5 +1,6 @@
 package team.seventhmile.tripforp.domain.course.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,7 +27,7 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
     private final QCourseLike qCourseLike = QCourseLike.courseLike;
 
     @Override
-    public Page<GetCourseListResponse> getCourses(String area, Pageable pageable) {
+    public Page<GetCourseListResponse> getCourses(String title, Pageable pageable) {
         List<GetCourseListResponse> courses = queryFactory
             .select(new QGetCourseListResponse(
                 qCourse,
@@ -36,6 +37,7 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
                     .where(qCourseLike.course.eq(qCourse))
             ))
             .from(qCourse)
+            .where(containsTitle(title))
             .leftJoin(qCourse.creator).fetchJoin()
             .orderBy(qCourse.createdAt.desc())
             .limit(pageable.getPageSize())
@@ -44,7 +46,8 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
 
         JPAQuery<Long> count = queryFactory
             .select(qCourse.count())
-            .from(qCourse);
+            .from(qCourse)
+            .where(containsTitle(title));
 
         return PageableExecutionUtils.getPage(courses, pageable, count::fetchOne);
     }
@@ -85,5 +88,12 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
             .leftJoin(qSpot.place).fetchJoin()
             .where(qCourse.id.eq(id))
             .fetchOne();
+    }
+
+    private BooleanExpression containsTitle(String title) {
+        if (title == null || title.isEmpty()) {
+            return null;
+        }
+        return qCourse.title.contains(title);
     }
 }

@@ -23,6 +23,7 @@ import team.seventhmile.tripforp.domain.spot.dto.CreateSpotRequest;
 import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.domain.user.repository.UserRepository;
+import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
 import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
 import team.seventhmile.tripforp.global.exception.UnauthorizedAccessException;
 
@@ -38,7 +39,7 @@ public class CourseService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CreateCourseResponse createCourse(CreateCourseRequest request, UserDetails user) {
+    public CreateCourseResponse createCourse(CreateCourseRequest request, CustomUserDetails user) {
 
         User findUser = userRepository.findByEmail(user.getUsername())
             .orElseThrow(() -> new ResourceNotFoundException(User.class));
@@ -83,17 +84,20 @@ public class CourseService {
     }
 
     @Transactional
-    public GetCourseResponse getCourseById(Long CourseId) {
+    public GetCourseResponse getCourseById(Long id) {
 
-        Course course = courseRepository.findCourse(CourseId);
-        int likeCount = courseLikeRepository.countByCourseId(CourseId);
+        Course course = courseRepository.findCourse(id);
+        if (course == null) {
+            throw new ResourceNotFoundException(Course.class, id);
+        }
+        int likeCount = courseLikeRepository.countByCourseId(id);
         course.increaseViews();
 
         return new GetCourseResponse(course, likeCount);
     }
 
-    public Page<GetCourseListResponse> getCourseList(String area, Pageable pageable) {
-        return courseRepository.getCourses(area, pageable);
+    public Page<GetCourseListResponse> getCourseList(String title, Pageable pageable) {
+        return courseRepository.getCourses(title, pageable);
     }
 
     public Page<GetCourseListResponse> getMyCourseList(UserDetails user, Pageable pageable) {

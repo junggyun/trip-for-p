@@ -31,11 +31,6 @@ public class CreateCourseRequest {
     @Size(min = 1, max = 100, message = "제목은 1자 이상 100자 이하여야 합니다.")
     private String title;
 
-    @NotBlank(message = "지역은 필수입니다.")
-    @Pattern(regexp = "^(서울|경기|인천|강원|충북|충남|대전|경북|경남|대구|울산|부산|전북|전남|광주|제주|세종)$",
-        message = "유효하지 않은 지역입니다.")
-    private String area;
-
     @NotEmpty(message = "최소 하나의 여행 코스 항목이 필요합니다.")
     @Size(max = 30, message = "최대 30개의 계획 항목만 허용됩니다.")
     @Valid
@@ -47,7 +42,6 @@ public class CreateCourseRequest {
         this.startDate = startDate;
         this.endDate = endDate;
         this.title = title;
-        this.area = area;
         this.spots = spots;
     }
 

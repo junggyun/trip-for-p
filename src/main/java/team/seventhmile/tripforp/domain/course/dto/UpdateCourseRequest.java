@@ -14,16 +14,14 @@ public class UpdateCourseRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private String title;
-    private String area;
     private List<UpdateSpotRequest> spots;
 
     @Builder
-    public UpdateCourseRequest(LocalDate startDate, LocalDate endDate, String title, String area,
+    public UpdateCourseRequest(LocalDate startDate, LocalDate endDate, String title,
         List<UpdateSpotRequest> spots) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.title = title;
-        this.area = area;
         this.spots = spots;
     }
 }

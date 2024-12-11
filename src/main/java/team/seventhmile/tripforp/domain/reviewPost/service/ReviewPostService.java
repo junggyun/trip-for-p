@@ -48,6 +48,9 @@ public class ReviewPostService {
 		// 리뷰 게시글 생성
 		ReviewPost reviewPost = reviewPostDto.convertToEntity(user, course);
 
+
+
+		reviewPostRepository.save(reviewPost);
 		// 첨부 파일 처리
 		if (files != null && !files.isEmpty()) {
 			for (MultipartFile file : files) {
@@ -55,8 +58,6 @@ public class ReviewPostService {
 				reviewPost.addFile(reviewFile);
 			}
 		}
-
-		reviewPostRepository.save(reviewPost);
 
 		return ReviewPostDto.convertToDto(reviewPost);
 	}

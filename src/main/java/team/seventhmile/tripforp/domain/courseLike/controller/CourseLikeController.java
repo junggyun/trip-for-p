@@ -24,14 +24,14 @@ public class CourseLikeController {
   }
 
   // 좋아요 또는 좋아요 취소를 처리하는 엔드포인트
-  @PostMapping
+  @PostMapping("/courses/{id}")
   public ResponseEntity<CourseLikeResponseDto> toggleLikeCourse(
       @AuthenticationPrincipal UserDetails userDetails,
-      @RequestBody CourseLikeDto requestDto) {
+      @PathVariable(name = "id") Long id) {
 
     // userDetails에서 이메일을 추출하여 서비스에 전달
     CourseLikeResponseDto responseDto = courseLikeService.toggleLikeCourse(userDetails.getUsername(),
-        requestDto.getCourseId());
+        id);
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 

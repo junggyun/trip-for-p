@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.seventhmile.tripforp.domain.course.dto.CreateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.CreateCourseResponse;
-import team.seventhmile.tripforp.domain.place.dto.GetPlaceCountResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseListResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseResponse;
-import team.seventhmile.tripforp.domain.course.dto.GetPopularCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseResponse;
-import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.course.service.CourseService;
+import team.seventhmile.tripforp.domain.place.dto.GetPlaceCountResponse;
+import team.seventhmile.tripforp.domain.spot.service.SpotService;
+import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
 
 @Slf4j
 @RestController
@@ -51,7 +51,7 @@ public class CourseController {
     @PostMapping
     public ResponseEntity<CreateCourseResponse> createCourse(
         @Valid @RequestBody CreateCourseRequest request,
-        @AuthenticationPrincipal UserDetails user) {
+        @AuthenticationPrincipal CustomUserDetails user) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(courseService.createCourse(request, user));
@@ -81,10 +81,10 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<Page<GetCourseListResponse>> getCourseList(
-        @RequestParam(value = "area", required = false) String area,
+        @RequestParam(value = "title", required = false) String title,
         Pageable pageable
     ) {
-        return ResponseEntity.ok(courseService.getCourseList(area, pageable));
+        return ResponseEntity.ok(courseService.getCourseList(title, pageable));
     }
 
     @GetMapping("/{id}")
