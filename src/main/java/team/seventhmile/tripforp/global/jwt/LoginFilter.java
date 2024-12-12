@@ -70,7 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		tokenService.saveRefreshToken(username, refresh);
 
 		//응답 설정
-		response.setHeader("access", access);
+		response.setHeader("access", "Bearer " + access);
 		response.addCookie(createCookie("refresh", refresh));
 		response.setStatus(HttpStatus.OK.value());
 
