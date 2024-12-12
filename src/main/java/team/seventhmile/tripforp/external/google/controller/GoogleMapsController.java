@@ -1,13 +1,17 @@
 package team.seventhmile.tripforp.external.google.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
+import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiRequest;
-import team.seventhmile.tripforp.external.google.dto.SearchPlacesRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesResponse;
 import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
 
@@ -18,10 +22,19 @@ public class GoogleMapsController {
 
     private final GoogleMapsService googleMapsService;
 
-    @PostMapping("/search")
-    public Mono<SearchPlacesResponse> searchPlaces(
-        @RequestBody SearchPlacesRequest request
+    @GetMapping("/search")
+    public ResponseEntity<Mono<SearchPlacesResponse>> searchPlaces(
+        @ModelAttribute SearchPlacesApiRequest request
     ) {
-        return googleMapsService.searchPlacesApi(request);
+        return ResponseEntity.ok(googleMapsService.searchPlacesApi(request));
     }
+
+    @GetMapping("/detail")
+    public ResponseEntity<Mono<DetailPlaceResponse>> detailPlace(
+        @ModelAttribute DetailPlaceApiRequest request
+    ) {
+        return ResponseEntity.ok(googleMapsService.detailPlaceApi(request));
+    }
+
+
 }
