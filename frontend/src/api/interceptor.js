@@ -1,7 +1,7 @@
 import store from "@/store";
 import router from "@/router";
 import jwtDecoder from 'vue-jwt-decode';
-import {refreshTokenAPI} from "@/api/index";
+import {refreshTokenAPI} from "@/api/user.js";
 
 const setInterceptors = function (instance) {
     instance.interceptors.request.use(
