@@ -81,10 +81,10 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<Page<GetCourseListResponse>> getCourseList(
-        @RequestParam(value = "title", required = false) String title,
+        @RequestParam(value = "keyword", required = false) String keyword,
         Pageable pageable
     ) {
-        return ResponseEntity.ok(courseService.getCourseList(title, pageable));
+        return ResponseEntity.ok(courseService.getCourseList(keyword, pageable));
     }
 
     @GetMapping("/{id}")

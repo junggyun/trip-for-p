@@ -75,7 +75,7 @@ watch(nickname, (newValue, oldValue) => {
 
 // 비밀번호 검증
 const validatePassword = () => {
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+  const regex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
   return regex.test(password.value);
 };
 
@@ -83,7 +83,7 @@ watch([password, passwordCheck], () => {
   if (password.value || passwordCheck.value) {
     if (!validatePassword()) {
       isPasswordValid.value = false;
-      passwordVerificationMessage.value = '영문 대/소문자 + 숫자 + 특수문자 조합의 8~16자리로만 가능합니다.';
+      passwordVerificationMessage.value = '비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.';
     } else if (password.value !== passwordCheck.value) {
       isPasswordValid.value = false;
       passwordVerificationMessage.value = '비밀번호가 일치하지 않습니다.';
@@ -110,7 +110,7 @@ const updateUserInfo = async () => {
 
     if (password.value) {
       if (!validatePassword()) {
-        alert('영문 대/소문자 + 숫자 + 특수문자 조합의 8~16자리로만 가능합니다.');
+        alert('비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.');
         return;
       }
       if (password.value !== passwordCheck.value) {
@@ -126,7 +126,7 @@ const updateUserInfo = async () => {
     }
     const response = await axios.patch('/api/users/me', updateUserRequest, {
       headers: {
-        access: `${store.getters.getAccessToken}`,
+        Authorization: `Bearer ${store.getters.getAccessToken}`,
       },
     });
 

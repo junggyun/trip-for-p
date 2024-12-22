@@ -16,6 +16,8 @@ public class GetCourseResponse {
     private Long id;
     private String writer;
     private String title;
+    private String province;
+    private String city;
     private LocalDate startDate;
     private LocalDate endDate;
     private int views;
@@ -28,6 +30,8 @@ public class GetCourseResponse {
         this.id = course.getId();
         this.writer = course.getCreator().getNickname();
         this.title = course.getTitle();
+        this.province = course.getRegion().getProvince().getName();
+        this.city = course.getRegion().getCity();
         this.startDate = course.getStartDate();
         this.endDate = course.getEndDate();
         this.views = course.getViews();

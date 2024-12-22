@@ -114,7 +114,7 @@ public class JwtUtil {
 		tokenService.saveRefreshToken(username, newRefresh);
 
 		// 응답 설정
-		response.setHeader("access", newAccess);
+		response.setHeader("access", "Bearer " + newAccess);
 		response.addCookie(createCookie("refresh", newRefresh));
 
 		return new ResponseEntity<>(HttpStatus.OK);

@@ -12,6 +12,17 @@ const searchPlacesAPI = function (request) {
     )
 }
 
+const detailPlaceAPI = function (id) {
+    return authInstance.get(
+        `/api/google-maps/detail`, {
+            params: {
+                id: id
+            }
+        }
+    )
+};
+
 export {
-    searchPlacesAPI
+    searchPlacesAPI,
+    detailPlaceAPI
 }

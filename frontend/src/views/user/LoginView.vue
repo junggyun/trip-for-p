@@ -7,7 +7,6 @@ import store from "@/store";
 const email = ref("");
 const password = ref("");
 
-// 버튼 활성화 여부를 computed로 계산
 const isFormValid = computed(() => {
     return email.value && password.value;
 });
@@ -15,12 +14,9 @@ const isFormValid = computed(() => {
 const goSignup = function () {
     router.push("/signup");
 }
-//비밀번호 재설정 화면 이동
+
 const goResetPassword = function () {
-  router.push("/resetpassword");
-}
-const goHome = function () {
-    router.push("/");
+    router.push("/resetpassword");
 }
 
 const login = async function () {
@@ -40,7 +36,6 @@ const login = async function () {
         console.log('Login failed: ', error);
     }
 }
-
 
 onMounted(() => {
     const inputs = document.querySelectorAll('.login-email, .login-password');
@@ -65,199 +60,193 @@ onMounted(() => {
 
 <template>
     <div class="login-wrap">
-        <div class="login-title">
-            <img src="../../assets/biglogo.png" alt="흠으로 이동" @click="goHome">
-        </div>
         <div class="login-content">
+            <h1 class="login-title">
+                <router-link to="/">
+                    <span class="title-main">Trip For P</span>
+                    <span class="title-sub">Just Set Your Direction</span>
+                </router-link>
+
+            </h1>
             <div class="login-form" @keyup.enter="login">
                 <input type="email" class="login-email" placeholder="이메일" v-model="email">
                 <input type="password" class="login-password" placeholder="비밀번호" v-model="password">
                 <button @click="login" :disabled="!isFormValid">로그인</button>
-
             </div>
-<!--            <div class="go-signup-button" @click="goSignup">
-                <img src="@/assets/signup.png" alt="">
-                <span>회원가입</span>
-            </div>-->
-          <div class="login-actions">
-            <div class="go-signup-button" @click="goSignup">
-              <img src="../../assets/signup.png" alt="">
-              <span>회원가입</span>
+            <div class="login-actions">
+                <div class="go-signup-button" @click="goSignup">
+                    <span>회원가입</span>
+                </div>
+                <div class="divider"></div>
+                <div class="find-password-button" @click="goResetPassword">
+                    <span>비밀번호 찾기</span>
+                </div>
             </div>
-            <div class="find-password-button" @click="goResetPassword">
-              <span>비밀번호 찾기</span>
-            </div>
-          </div>
         </div>
-
     </div>
 </template>
 
 <style scoped>
-/* 공통 스타일 */
 .login-wrap {
-    width: 100%;
+    width: 100vw;
+    min-height: calc(100vh - 120px);
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-}
-
-.login-title img {
-    width: 100%;
-    max-width: 450px;
-    height: auto;
-    cursor: pointer;
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.1) 0%, rgba(135, 148, 216, 0.1) 100%);
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
 }
 
 .login-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     width: 100%;
-    margin-bottom: 100px;
+    max-width: 450px;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+.login-title a:hover {
+    opacity: 0.8;
+}
+
+.title-main {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #5c6ac4;
+    margin-bottom: 0.5rem;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-sub {
+    display: block;
+    font-size: 1rem;
+    color: #888;
+    letter-spacing: 0.5px;
 }
 
 .login-form {
     width: 100%;
-    max-width: 450px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1rem;
 }
 
-/* 입력 필드 공통 스타일 */
 .login-email,
 .login-password {
     width: 100%;
-    height: 60px;
-    border: 1px solid #C5CCD2;
-    border-radius: 10px;
-    padding-left: 50px;
-    font-family: 'Pretendard Variable', sans-serif;
-    font-size: 16px;
-    background-repeat: no-repeat;
-    background-position: 20px center;
-    margin-top: 10px;
+    height: 54px;
+    border: 1px solid rgba(197, 204, 210, 0.8);
+    border-radius: 12px;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* 특정 입력 필드 스타일 */
-.login-email {
-    background-image: url("@/assets/email.png");
-    margin-top: 0;
-}
-
-.login-password {
-    background-image: url("@/assets/password.png");
-}
-
-/* 포커스 스타일 */
 .login-email:focus,
 .login-password:focus {
     outline: none;
-    border: 2px solid #333333;
-    box-shadow: 0 0 5px rgba(51, 51, 51, 0.5);
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 4px rgba(92, 106, 196, 0.1);
 }
 
-/* 버튼 스타일 */
 .login-form button {
-    background-color: #000000;
-    width: 100%;
-    height: 50px;
-    color: #FFFFFF;
-    font-family: 'Pretendard Variable', sans-serif;
-    font-size: 16px;
-    border-radius: 10px;
-    border: 1px solid #000000;
+    margin-top: 0.5rem;
+    height: 54px;
+    border-radius: 12px;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    margin: 25px 0;
+    transition: all 0.3s ease;
+}
+
+.login-form button:not(:disabled) {
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+}
+
+.login-form button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .login-form button:disabled {
-    background-color: #D9D9D9;
-    border: 1px solid #D9D9D9;
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
-/* 회원가입 버튼 */
-.go-signup-button {
-    cursor: pointer;
+.login-actions {
+    margin-top: 1.5rem;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
-}
-
-.go-signup-button span {
-    font-family: 'Pretendard Variable', sans-serif;
-    font-size: 15px;
-    color: #888888;
-    margin-left: 5px;
-    line-height: 16px;
-}
-
-/* 플레이스홀더 스타일 */
-.login-email::placeholder,
-.login-password::placeholder {
-    font-size: 15px;
-    color: #C5CCD2;
-    font-family: 'Pretendard Variable', sans-serif;
-}
-/* 회원가입과 비밀번호 찾기 버튼 컨테이너 */
-.login-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* 회원가입 버튼과 비밀번호 찾기 버튼 공통 스타일 */
-.go-signup-button,
-.find-password-button {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  margin: 0 10px;
+    align-items: center;
+    gap: 1rem;
 }
 
 .go-signup-button span,
 .find-password-button span {
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 15px;
-  color: #888888;
-  margin-left: 5px;
-  line-height: 16px;
+    color: #888;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
-/* 반응형 스타일 */
+
+.go-signup-button span:hover,
+.find-password-button span:hover {
+    color: #5c6ac4;
+}
+
+.divider {
+    width: 1px;
+    height: 14px;
+    background-color: #E0E0E0;
+}
+
 @media (max-width: 768px) {
-    .login-email,
-    .login-password {
-        height: 50px;
-        font-size: 14px;
+    .login-content {
+        max-width: 400px;
+        padding: 2rem 1.5rem;
     }
-    .login-form button {
-        height: 45px;
-        font-size: 14px;
+
+    .title-main {
+        font-size: 2rem;
     }
 }
 
 @media (max-width: 480px) {
-  .login-email,
-  .login-password {
-        height: 45px;
-        font-size: 12px;
-        padding-left: 40px;
-  }
-  .login-form button {
-    height: 40px;
-    font-size: 12px;
-  }
-  .login-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  .go-signup-button,
-  .find-password-button {
-    margin: 5px 0;
-  }
-}
+    .login-wrap {
+        min-height: calc(100vh - 100px);
+        padding: 1rem;
+    }
 
+    .login-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .title-main {
+        font-size: 1.8rem;
+    }
+
+    .title-sub {
+        font-size: 0.9rem;
+    }
+
+    .login-email,
+    .login-password,
+    .login-form button {
+        height: 48px;
+    }
+}
 </style>

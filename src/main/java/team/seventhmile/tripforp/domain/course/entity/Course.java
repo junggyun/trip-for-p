@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.courseLike.entity.CourseLike;
+import team.seventhmile.tripforp.domain.region.entity.Region;
 import team.seventhmile.tripforp.domain.spot.entity.Spot;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.global.common.BaseEntity;
@@ -45,6 +46,10 @@ public class Course extends BaseEntity {
     @Column(nullable = false)
     private LocalDate endDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
+
     @Column(nullable = false)
     private String title;
 
@@ -61,8 +66,9 @@ public class Course extends BaseEntity {
      * 생성 메서드
      */
     @Builder
-    public Course(User user, LocalDate startDate, LocalDate endDate, String title) {
+    public Course(User user, Region region, LocalDate startDate, LocalDate endDate, String title) {
         this.creator = user;
+        this.region = region;
         this.startDate = startDate;
         this.endDate = endDate;
         this.title = title;
@@ -86,18 +92,6 @@ public class Course extends BaseEntity {
     public void removeSpot(Spot spot) {
         this.spots.remove(spot);
         spot.setCourse(null);
-    }
-
-    public void addSpots(List<Spot> spots) {
-        for (Spot spot : spots) {
-            addSpot(spot);
-        }
-    }
-
-    public void removeSpots(List<Spot> spots) {
-        for (Spot spot : spots) {
-            removeSpot(spot);
-        }
     }
 
     public void increaseViews() {

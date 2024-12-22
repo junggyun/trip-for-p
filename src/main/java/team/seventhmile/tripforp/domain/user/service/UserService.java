@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -155,7 +156,7 @@ public class UserService {
 
 	//개인정보 수정
 	@Transactional
-	public UserInfoResponse updateInfo(UserDetails userDetails, UserInfoRequest userInfoReq) {
+	public UserInfoResponse updateInfo(@AuthenticationPrincipal CustomUserDetails userDetails, UserInfoRequest userInfoReq) {
 		log.info("userService : userinfoReq {}", userInfoReq);
 		User updatedUser = userRepository.findByEmail(userDetails.getUsername())
 			.orElseThrow(() -> new AuthCustomException(ErrorCode.USER_NOT_FOUND));

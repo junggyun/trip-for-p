@@ -80,7 +80,7 @@ const resetpw = async function () {
             alert("올바르지 않은 이메일 형식입니다.")
             return;
         } else if (!validatePassword()) {
-            alert("영문 대/소문자 + 숫자 + 특수문자 조합의 8~16자리로만 가능합니다.");
+            alert("비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.");
             return;
         } else if (!isSamePassword()) {
             alert("비밀번호가 다릅니다.")
@@ -107,7 +107,7 @@ const validateEmail = function () {
 }
 
 const validatePassword = function () {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+    const regex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
     return regex.test(password.value)
 }
 

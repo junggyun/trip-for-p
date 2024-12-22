@@ -47,6 +47,16 @@ public class SpotService {
             });
         spotRepository.flush();
 
+        int tempSequence = 100;
+        for (UpdateSpotRequest request : requests) {
+            if (request.getAction().equals("update")) {
+                Spot spot = spotRepository.findById(request.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(Spot.class, request.getId()));
+                spot.initSequence(tempSequence++);
+            }
+        }
+        spotRepository.flush();
+
         requests.stream()
             .filter(req -> req.getAction().equals("update"))
             .forEach(req -> {

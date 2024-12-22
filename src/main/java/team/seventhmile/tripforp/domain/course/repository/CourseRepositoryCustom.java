@@ -7,7 +7,7 @@ import team.seventhmile.tripforp.domain.course.entity.Course;
 
 public interface CourseRepositoryCustom {
 
-    Page<GetCourseListResponse> getCourses(String title, Pageable pageable);
+    Page<GetCourseListResponse> getCourses(String keyword, Pageable pageable);
 
     Page<GetCourseListResponse> getMyCourses(String email, Pageable pageable);
 

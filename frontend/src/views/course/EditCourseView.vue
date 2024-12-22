@@ -6,10 +6,14 @@ import {useRoute} from "vue-router";
 
 const route = useRoute();
 
-const selectedRegion = ref(null);
+
+const title = ref('');
 const startDate = ref(null);
 const endDate = ref(null);
-const planItems = ref([]);
+const province = ref('');
+const city = ref('');
+const spots = ref([]);
+const spotsData = history.state.spots;
 const isLoading = ref(true);
 
 const formatDate = (date) => {
@@ -24,10 +28,11 @@ const formatDate = (date) => {
 
 const getPlan = async function () {
     try {
-        const response = await getCourseAPI(route.params.planId);
+        const response = await getCourseAPI(route.params.courseId);
         const plan = response.data;
-        selectedRegion.value = plan.area;
-        // `startDate`와 `endDate`를 Date 객체로 변환
+        title.value = plan.title;
+        province.value = plan.province
+        city.value = plan.city;
         const start = new Date(plan.startDate);
         const end = plan.endDate ? new Date(plan.endDate) : start;
 
@@ -35,15 +40,15 @@ const getPlan = async function () {
         startDate.value = formatDate(start);
         endDate.value = formatDate(end);
 
-        planItems.value = plan.planItems.map(item => ({
+        spots.value = spotsData.map(item => ({
             id: item.id,
             place: {
                 id: item.place.id,
-                place_name: item.place.placeName,
-                address_name: item.place.addressName,
-                category_name: item.place.categoryName,
-                x: item.place.x,
-                y: item.place.y
+                name: item.place.name,
+                address: item.place.address,
+                category: item.place.category,
+                lat: item.place.latitude,
+                lng: item.place.longitude
             },
             tripDate: item.tripDate,
             sequence: item.sequence,
@@ -66,11 +71,12 @@ onMounted(() => {
         <div v-if="isLoading">Loading...</div>
         <SelectPlaceComponent
             v-else
-            :key="selectedRegion"
+            :title="title"
+            :province="province"
+            :city="city"
             :startDate="startDate"
             :endDate="endDate"
-            :selectedRegion="selectedRegion"
-            :planItems="planItems"
+            :spots="spotsData || []"
             mode="update"
         />
     </div>

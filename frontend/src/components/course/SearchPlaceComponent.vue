@@ -11,6 +11,9 @@ const searchComponentRef = ref(null);
 const isSearching = ref(false);
 const emit = defineEmits(['place-selected']);
 
+/**
+ * 장소 검색
+ */
 const searchPlace = async () => {
     if (!searchQuery.value) return;
     if (searchedQuery.value === searchQuery.value) {
@@ -39,6 +42,9 @@ const searchPlace = async () => {
     }
 };
 
+/**
+ * 장소 선택
+ */
 const selectPlace = (place) => {
     // place 객체 구조 변환
     const formattedPlace = {
@@ -61,12 +67,9 @@ const selectPlace = (place) => {
     showResults.value = false;
 };
 
-// const scrollToInput = () => {
-//     if (searchInputRef.value) {
-//         searchInputRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-//     }
-// };
-
+/**
+ * 검색창 바깥쪽 클릭
+ */
 const handleClickOutside = (event) => {
     if (searchComponentRef.value && !searchComponentRef.value.contains(event.target)) {
         showResults.value = false;
@@ -129,34 +132,37 @@ onUnmounted(() => {
     font-size: 16px;
     border: 2px solid #ddd;
     border-radius: 4px 0 0 4px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #4CAF50;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 4px rgba(92, 106, 196, 0.1);
 }
 
 .search-button {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
     border: none;
     border-radius: 0 4px 4px 0;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .search-button:hover {
-    background-color: #45a049;
+    background: linear-gradient(135deg, #4f5bb4 0%, #7683c7 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(92, 106, 196, 0.2);
 }
 
 .search-results {
     position: absolute;
     width: 100%;
     background-color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.15);
     border-radius: 4px;
     z-index: 1001;
     max-height: 300px;
@@ -172,9 +178,9 @@ onUnmounted(() => {
 
 .search-results li {
     cursor: pointer;
-    padding: 10px;
+    padding: 12px;
     border-bottom: 1px solid #eee;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .search-results li:last-child {
@@ -182,7 +188,7 @@ onUnmounted(() => {
 }
 
 .search-results li:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(92, 106, 196, 0.05);
 }
 
 .place-name {
@@ -192,7 +198,7 @@ onUnmounted(() => {
 
 .place-category {
     font-size: 0.8em;
-    color: #4CAF50;
+    color: #5c6ac4;
     margin-bottom: 2px;
 }
 

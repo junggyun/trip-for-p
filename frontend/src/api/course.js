@@ -27,6 +27,7 @@ const getCourseListAPI = function (request) {
     return instance.get(
         `/api/courses`, {
             params: {
+                keyword: request.keyword,
                 size: request.size,
                 page: request.page
             }
@@ -49,8 +50,8 @@ const getPopularPlaceListAPI = function () {
 };
 
 // 코스 좋아요
-const likeCourseAPI = function (request) {
-    return authInstance.post(`/api/course-likes`, request);
+const likeCourseAPI = function (id) {
+    return authInstance.post(`/api/course-likes/courses/${id}`);
 };
 
 // 코스 좋아요 유무 체크
@@ -72,6 +73,22 @@ const getMyLikedCoursesAPI = function (request) {
     });
 }
 
+/**
+ * Region API
+ */
+// 상위지역 조회
+const getProvinceListAPI = function () {
+    return authInstance.get('/api/regions/provinces');
+}
+// 하위지역 조회
+const getCityListByProvinceAPI = function (province) {
+    return authInstance.get(`/api/regions/cities`, {
+        params: {
+            province: province
+        }
+    })
+}
+
 export {
     createCourseAPI,
     updateCourseAPI,
@@ -82,5 +99,7 @@ export {
     getPopularPlaceListAPI,
     likeCourseAPI,
     checkCourseLikeAPI,
-    getMyLikedCoursesAPI
+    getMyLikedCoursesAPI,
+    getProvinceListAPI,
+    getCityListByProvinceAPI
 }

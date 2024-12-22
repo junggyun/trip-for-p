@@ -64,10 +64,6 @@ const onEnd = (event) => {
 const totalDuration = computed(() => {
     return props.routeInfo?.summary?.duration ?? 0;
 });
-
-const getSectionDuration = (index) => {
-    return props.routeInfo?.sections?.[index]?.duration ?? null;
-};
 </script>
 
 <template>
@@ -114,10 +110,6 @@ const getSectionDuration = (index) => {
                             </div>
                         </div>
                     </div>
-                    <div v-if="index < places.length - 1" class="duration-info">
-                        <span class="duration-icon">⏱</span>
-                        예상 소요 시간: {{ formatDuration(getSectionDuration(index)) }}
-                    </div>
                 </div>
             </template>
         </draggable>
@@ -142,25 +134,27 @@ const getSectionDuration = (index) => {
     display: flex;
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(92, 106, 196, 0.1);
     overflow: hidden;
-    transition: box-shadow 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .place-item:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.15);
+    transform: translateY(-2px);
 }
 
 .drag-handle {
     padding: 16px 12px;
-    color: #9ca3af;
+    color: #8794d8;
     cursor: move;
-    background-color: #f9fafb;
-    transition: color 0.2s ease;
+    background-color: rgba(92, 106, 196, 0.05);
+    transition: all 0.2s ease;
 }
 
 .drag-handle:hover {
-    color: #6b7280;
+    color: #5c6ac4;
+    background-color: rgba(92, 106, 196, 0.1);
 }
 
 .place-content {
@@ -184,7 +178,7 @@ const getSectionDuration = (index) => {
 .sequence {
     font-size: 20px;
     font-weight: 600;
-    color: #4f46e5;
+    color: #5c6ac4;
     margin-right: 16px;
     min-width: 24px;
 }
@@ -214,8 +208,8 @@ const getSectionDuration = (index) => {
 }
 
 .category {
-    background-color: #f3f4f6;
-    color: #4b5563;
+    background-color: rgba(92, 106, 196, 0.1);
+    color: #5c6ac4;
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.875rem;
@@ -230,7 +224,7 @@ const getSectionDuration = (index) => {
 }
 
 .rating-stars {
-    color: #fbbf24;
+    color: #5c6ac4;
 }
 
 .review-count {
@@ -255,9 +249,9 @@ const getSectionDuration = (index) => {
 
 .memo-input:focus {
     outline: none;
-    border-color: #4f46e5;
+    border-color: #5c6ac4;
     background-color: white;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.1);
 }
 
 .memo-input::placeholder {
@@ -268,7 +262,7 @@ const getSectionDuration = (index) => {
     padding: 4px 8px;
     font-size: 1.25rem;
     line-height: 1;
-    color: #ef4444;
+    color: #8794d8;
     background: transparent;
     border: none;
     border-radius: 4px;
@@ -277,15 +271,16 @@ const getSectionDuration = (index) => {
 }
 
 .delete-btn:hover {
-    background-color: #fee2e2;
+    color: #5c6ac4;
+    background-color: rgba(92, 106, 196, 0.1);
 }
 
 .duration-info {
     margin: 12px 0;
     padding: 12px;
-    background-color: #f0f9ff;
+    background-color: rgba(92, 106, 196, 0.05);
     border-radius: 6px;
-    color: #0369a1;
+    color: #5c6ac4;
     font-size: 0.925rem;
     display: flex;
     align-items: center;
@@ -294,21 +289,22 @@ const getSectionDuration = (index) => {
 
 .duration-icon {
     font-size: 1.125rem;
+    color: #8794d8;
 }
 
 .total-duration {
     margin-top: 24px;
     padding: 16px;
-    background-color: #f8fafc;
+    background-color: rgba(92, 106, 196, 0.05);
     border-radius: 8px;
     font-weight: 600;
     text-align: right;
-    color: #0f172a;
+    color: #5c6ac4;
 }
 
 .ghost {
     opacity: 0.5;
-    background: #e0f2fe;
+    background: rgba(92, 106, 196, 0.1);
 }
 
 @media (max-width: 640px) {
