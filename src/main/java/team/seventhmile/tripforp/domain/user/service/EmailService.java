@@ -1,10 +1,13 @@
 package team.seventhmile.tripforp.domain.user.service;
 
+import jakarta.mail.internet.InternetAddress;
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,6 +25,8 @@ public class EmailService {
     private final UserRepository userRepository;
     private final JavaMailSender javaMailSender;
     private final RedisTemplate<String, Object> redisTemplate;
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
     //이메일  코드 전송(회원가입시)
     public void sendVerificationEmail(String recipient) {
@@ -86,11 +91,12 @@ public class EmailService {
     }
 
     // 이메일 인증 코드 생성 및 발송
-    private void emailGenerateAndSend(String email){
+    private void emailGenerateAndSend(String email) {
         String emailCode = generateEmailCode().trim();
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(String.format("%s <%s>", "Trip For P", fromEmail));
         message.setTo(email); //수신자 설정
-        message.setSubject("이메일 인증"); //제목 설정
+        message.setSubject("[Trip For P] 회원가입 인증코드 발송 안내"); //제목 설정
         message.setText("귀하의 인증 코드는 " + emailCode + "입니다.\n인증 코드는 5분 간 유지됩니다."); //내용 설정
         try {
             javaMailSender.send(message);
