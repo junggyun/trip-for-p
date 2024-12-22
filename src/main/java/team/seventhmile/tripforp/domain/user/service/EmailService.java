@@ -47,7 +47,7 @@ public class EmailService {
     //이메일 인증코드 생성
     public String generateEmailCode() {
         int codeLength = 6;  // 코드자리 6자리로 설정
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String chars = "0123456789";
         StringBuilder sb = new StringBuilder(codeLength);
         Random random = new Random();
 
