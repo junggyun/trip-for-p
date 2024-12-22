@@ -27,7 +27,7 @@ public class GoogleMapsService {
             .uri(":searchText")
             .headers(headers -> {
                 headers.add("X-Goog-FieldMask",
-                    "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,nextPageToken");
+                    "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.location,nextPageToken");
             })
             .bodyValue(request)
             .retrieve()

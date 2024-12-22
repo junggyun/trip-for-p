@@ -11,8 +11,10 @@ public class SearchPlaceResponse {
     private String name;
     private String category;
     private String address;
-    private int rating;
+    private double rating;
     private int reviewCount;
+    private double latitude;
+    private double longitude;
 
     public SearchPlaceResponse(GoogleMapsPlaceApiDto place) {
         this.id = place.getId();
@@ -21,5 +23,7 @@ public class SearchPlaceResponse {
         this.address = place.getFormattedAddress();
         this.rating = place.getRating();
         this.reviewCount = place.getUserRatingCount();
+        this.latitude = place.getLocation().getLatitude();
+        this.longitude = place.getLocation().getLongitude();
     }
 }

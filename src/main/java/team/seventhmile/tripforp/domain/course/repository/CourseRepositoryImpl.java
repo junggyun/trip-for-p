@@ -15,6 +15,7 @@ import team.seventhmile.tripforp.domain.course.dto.QGetCourseListResponse;
 import team.seventhmile.tripforp.domain.course.entity.Course;
 import team.seventhmile.tripforp.domain.course.entity.QCourse;
 import team.seventhmile.tripforp.domain.courseLike.entity.QCourseLike;
+import team.seventhmile.tripforp.domain.region.entity.Province;
 import team.seventhmile.tripforp.domain.spot.entity.QSpot;
 
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
     private final QCourseLike qCourseLike = QCourseLike.courseLike;
 
     @Override
-    public Page<GetCourseListResponse> getCourses(String title, Pageable pageable) {
+    public Page<GetCourseListResponse> getCourses(String keyword, Pageable pageable) {
         List<GetCourseListResponse> courses = queryFactory
             .select(new QGetCourseListResponse(
                 qCourse,
@@ -37,8 +38,9 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
                     .where(qCourseLike.course.eq(qCourse))
             ))
             .from(qCourse)
-            .where(containsTitle(title))
+            .where(eqRegion(keyword.trim()))
             .leftJoin(qCourse.creator).fetchJoin()
+            .leftJoin(qCourse.region).fetchJoin()
             .orderBy(qCourse.createdAt.desc())
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())
@@ -47,9 +49,21 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
         JPAQuery<Long> count = queryFactory
             .select(qCourse.count())
             .from(qCourse)
-            .where(containsTitle(title));
+            .where(eqRegion(keyword.trim()));
 
         return PageableExecutionUtils.getPage(courses, pageable, count::fetchOne);
+    }
+
+    private BooleanExpression eqRegion(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return null;
+        }
+        Province province = Province.findByNameOptional(keyword)
+            .orElse(null);
+        if (province == null) {
+            return qCourse.region.city.eq(keyword);
+        }
+        return qCourse.region.province.eq(province);
     }
 
     @Override
@@ -65,7 +79,6 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
             .from(qCourse)
             .where(qCourse.creator.email.eq(email))
             .leftJoin(qCourse.creator).fetchJoin()
-            .leftJoin(qCourse.courseLikes)
             .orderBy(qCourse.createdAt.desc())
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())
@@ -86,14 +99,9 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
             .leftJoin(qCourse.creator).fetchJoin()
             .leftJoin(qCourse.spots, qSpot).fetchJoin()
             .leftJoin(qSpot.place).fetchJoin()
+            .leftJoin(qCourse.region).fetchJoin()
             .where(qCourse.id.eq(id))
             .fetchOne();
     }
 
-    private BooleanExpression containsTitle(String title) {
-        if (title == null || title.isEmpty()) {
-            return null;
-        }
-        return qCourse.title.contains(title);
-    }
 }

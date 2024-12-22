@@ -1,8 +1,9 @@
 <script setup>
 import {computed, onMounted, ref} from 'vue';
-import {getMagazineListAPI, getPopularPlaceListAPI, getPopularPlanListAPI} from "@/api";
+import {getPopularPlaceListAPI} from "@/api/course";
 import locationImage from '@/assets/location.png'
 import router from "@/router";
+import {getMagazineListAPI} from "@/api/magazine";
 
 const magazines = ref([]);
 const places = ref([]);
@@ -31,15 +32,6 @@ const getPopularPlaceList = async function () {
     }
 };
 
-const getPopularPlanList = async function () {
-    try {
-        const response = await getPopularPlanListAPI();
-        plans.value = response.data;
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 const getImageSrc = computed(() => (imageUrl) => {
     return imageUrl && imageUrl.trim() !== '' ? imageUrl : locationImage;
 });
@@ -55,7 +47,6 @@ const goToPlanDetail = (id) => {
 onMounted(() => {
     getMagazineList();
     getPopularPlaceList();
-    getPopularPlanList();
 })
 </script>
 

@@ -1,7 +1,7 @@
 import store from "@/store";
 import router from "@/router";
 import jwtDecoder from 'vue-jwt-decode';
-import {refreshTokenAPI} from "@/api/index";
+import {refreshTokenAPI} from "@/api/user.js";
 
 const setInterceptors = function (instance) {
     instance.interceptors.request.use(
@@ -15,7 +15,7 @@ const setInterceptors = function (instance) {
                         const response = await refreshTokenAPI();
                         const newToken = response.headers.access;
                         store.commit('setAccessToken', newToken);
-                        config.headers.access = newToken;
+                        config.headers.Authorization = 'Bearer ' + newToken;
                     } catch (error) {
                         store.commit('clearData');
                         alert('세션이 만료되었습니다. 다시 로그인해주세요.');
@@ -24,7 +24,7 @@ const setInterceptors = function (instance) {
                     }
                 } else {
                     // 토큰이 유효하면 Authorization 헤더에 추가
-                    config.headers.access = token;
+                    config.headers.Authorization = 'Bearer ' + token;
                 }
             }
 

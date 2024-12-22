@@ -1,7 +1,7 @@
 import { createStore } from "vuex";
 import createPersistedState from 'vuex-persistedstate';
 import jwtDecoder from 'vue-jwt-decode';
-import {refreshTokenAPI} from "@/api";
+import {refreshTokenAPI} from "@/api/user.js";
 
 
 

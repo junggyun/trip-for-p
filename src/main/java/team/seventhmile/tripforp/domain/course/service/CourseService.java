@@ -1,10 +1,8 @@
 package team.seventhmile.tripforp.domain.course.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,12 +11,14 @@ import team.seventhmile.tripforp.domain.course.dto.CreateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.CreateCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseListResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseResponse;
-import team.seventhmile.tripforp.domain.course.dto.GetPopularCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseResponse;
 import team.seventhmile.tripforp.domain.course.entity.Course;
 import team.seventhmile.tripforp.domain.course.repository.CourseRepository;
 import team.seventhmile.tripforp.domain.courseLike.repository.CourseLikeRepository;
+import team.seventhmile.tripforp.domain.region.entity.Province;
+import team.seventhmile.tripforp.domain.region.entity.Region;
+import team.seventhmile.tripforp.domain.region.repository.RegionRepository;
 import team.seventhmile.tripforp.domain.spot.dto.CreateSpotRequest;
 import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.entity.User;
@@ -37,6 +37,7 @@ public class CourseService {
     private final SpotService spotService;
     private final CourseLikeRepository courseLikeRepository;
     private final UserRepository userRepository;
+    private final RegionRepository regionRepository;
 
     @Transactional
     public CreateCourseResponse createCourse(CreateCourseRequest request, CustomUserDetails user) {
@@ -44,10 +45,16 @@ public class CourseService {
         User findUser = userRepository.findByEmail(user.getUsername())
             .orElseThrow(() -> new ResourceNotFoundException(User.class));
 
+        Region region = regionRepository.findByProvinceAndCity(
+                Province.findByName(request.getProvince()),
+                request.getCity())
+            .orElseThrow(() -> new ResourceNotFoundException(Region.class));
+
         Course course = Course.builder()
             .user(findUser)
             .startDate(request.getStartDate())
             .endDate(request.getEndDate())
+            .region(region)
             .title(request.getTitle())
             .build();
         courseRepository.save(course);
@@ -59,7 +66,8 @@ public class CourseService {
     }
 
     @Transactional
-    public UpdateCourseResponse updateCourse(Long id, UpdateCourseRequest request, UserDetails user) {
+    public UpdateCourseResponse updateCourse(Long id, UpdateCourseRequest request,
+        UserDetails user) {
 
         Course course = courseRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(Course.class, id));
@@ -96,8 +104,8 @@ public class CourseService {
         return new GetCourseResponse(course, likeCount);
     }
 
-    public Page<GetCourseListResponse> getCourseList(String title, Pageable pageable) {
-        return courseRepository.getCourses(title, pageable);
+    public Page<GetCourseListResponse> getCourseList(String keyword, Pageable pageable) {
+        return courseRepository.getCourses(keyword, pageable);
     }
 
     public Page<GetCourseListResponse> getMyCourseList(UserDetails user, Pageable pageable) {
@@ -115,7 +123,8 @@ public class CourseService {
     }
 
     private void checkDeleteAuthorization(UserDetails user, Course course) {
-        if (!user.getUsername().equals(course.getCreator().getEmail()) && !user.getAuthorities().contains("ROLE_ADMIN")) {
+        if (!user.getUsername().equals(course.getCreator().getEmail()) && !user.getAuthorities()
+            .contains("ROLE_ADMIN")) {
             throw new UnauthorizedAccessException(Course.class);
         }
     }

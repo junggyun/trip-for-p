@@ -66,4 +66,8 @@ public class Spot {
 
         return id;
     }
+
+    public void initSequence(int sequence) {
+        this.sequence = sequence;
+    }
 }

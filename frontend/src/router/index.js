@@ -1,26 +1,26 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import WritePlanView from "@/views/WritePlanView.vue";
-import LoginView from "@/views/LoginView.vue";
-import SignupView from "@/views/SignupView.vue";
-import PlanDetailView from "@/views/PlanDetailView.vue";
-import FreePostListView from "@/views/FreePostListView.vue";
+import WriteCourseView from "@/views/course/WriteCourseView.vue";
+import LoginView from "@/views/user/LoginView.vue";
+import SignupView from "@/views/user/SignupView.vue";
+import CourseDetailView from "@/views/course/CourseDetailView.vue";
+import FreePostListView from "@/views/free/FreePostListView.vue";
 import HomeView from "@/views/HomeView.vue";
-import MypageView from "@/views/MypageView.vue";
-import PlanListView from "@/views/PlanListView.vue";
-import ReviewPostListView from "@/views/ReviewPostListView.vue";
+import MypageView from "@/views/user/MypageView.vue";
+import ReviewPostListView from "@/views/review/ReviewPostListView.vue";
 import store from "@/store";
-import WriteFreePostView from "@/views/WriteFreePostView.vue";
-import FreePostDetailView from "@/views/FreePostDetailView.vue";
-import EditFreePostView from "@/views/EditFreePostView.vue";
-import EditPlanView from "@/views/EditPlanView.vue";
-import ResetPasswordView from "@/views/ResetPasswordView.vue";
+import WriteFreePostView from "@/views/free/WriteFreePostView.vue";
+import FreePostDetailView from "@/views/free/FreePostDetailView.vue";
+import EditFreePostView from "@/views/free/EditFreePostView.vue";
+import ResetPasswordView from "@/views/user/ResetPasswordView.vue";
 import AdminView from "@/views/AdminView.vue";
-import WriteMagazineView from "@/views/WriteMagazineView.vue";
-import MagazineDetailView from "@/views/MagazineDetailView.vue";
-import EditMagazineView from "@/views/EditMagazineView.vue";
-import WriteReviewPostView from "@/views/WriteReviewPostView.vue";
-import ReviewPostDetailView from "@/views/ReviewPostDetailView.vue";
-import EditReviewPostView from "@/views/EditReviewPostView.vue";
+import WriteMagazineView from "@/views/magazine/WriteMagazineView.vue";
+import MagazineDetailView from "@/views/magazine/MagazineDetailView.vue";
+import EditMagazineView from "@/views/magazine/EditMagazineView.vue";
+import WriteReviewPostView from "@/views/review/WriteReviewPostView.vue";
+import ReviewPostDetailView from "@/views/review/ReviewPostDetailView.vue";
+import EditReviewPostView from "@/views/review/EditReviewPostView.vue";
+import CourseListView from "@/views/course/CourseListView.vue";
+import EditCourseView from "@/views/course/EditCourseView.vue";
 
 const routes = [
     {
@@ -45,26 +45,26 @@ const routes = [
         component: SignupView
     },
     {
-        path: '/plan/list/:area?',
-        name: 'PlanList',
-        component: PlanListView
+        path: '/course/search/:keyword?',
+        name: 'CourseList',
+        component: CourseListView
     },
     {
-        path: '/plan/write',
-        name: 'WritePlan',
-        component: WritePlanView,
+        path: '/course/write',
+        name: 'WriteCourse',
+        component: WriteCourseView,
         meta: { requiresAuth: true }
     },
     {
-        path: '/plan/:planId/edit',
-        name: 'EditPlan',
-        component: EditPlanView,
+        path: '/course/:courseId/edit',
+        name: 'EditCourse',
+        component: EditCourseView,
         meta: { requiresAuth: true }
     },
     {
-        path: '/plan/:planId',
-        name: 'PlanDetail',
-        component: PlanDetailView
+        path: '/course/:courseId',
+        name: 'CourseDetail',
+        component: CourseDetailView
     },
     {
         path: '/free-post',

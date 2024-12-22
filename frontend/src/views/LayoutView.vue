@@ -8,41 +8,50 @@ const route = useRoute();
 </script>
 
 <template>
-    <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/resetpassword'" class="app-header" :key="$route.path">
-        <HeaderComponent/>
-    </div>
-    <div class="app-content">
-        <RouterView :key="$router.path"/>
-    </div>
-    <div v-if="route.path !== '/signup' && route.path !== '/login'" class="app-footer">
-        <FooterComponent/>
+    <div class="app-wrapper">
+        <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/resetpassword'" class="app-header" :key="$route.path">
+            <HeaderComponent/>
+        </div>
+        <div class="app-content" :class="{ 'no-padding': route.path === '/signup' || route.path === '/login' }">
+            <RouterView :key="$router.path"/>
+        </div>
+        <div v-if="route.path !== '/signup' && route.path !== '/login'" class="app-footer">
+            <FooterComponent/>
+        </div>
     </div>
 </template>
 
 <style scoped>
-.app-header {
+.app-wrapper {
     display: flex;
-    justify-content: center;
-    width: 100%;
-    flex-shrink: 0;
-    border-bottom: 1px solid #ccc; /* 테스트용 경계선 */
+    flex-direction: column;
+    width: 100vw;
+    min-height: 100vh;
 }
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1002;
+}
+
 .app-content {
     flex: 1;
     width: 60%;
     max-width: 1200px;
-    height: auto;
+    margin: 0 auto;
+    padding: calc(6rem + 5.5rem) 0 5rem 0;
     display: flex;
     justify-content: center;
 }
-.app-footer {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    flex-shrink: 0;
-    margin-top: 50px;
-    border-top: 1px solid #ccc; /* 테스트용 경계선 */
+
+/* login, signup 페이지용 no-padding 클래스 추가 */
+.app-content.no-padding {
+    padding: 0;
 }
+
 @media (max-width: 1024px) {
     .app-content {
         width: 80%;
@@ -52,13 +61,20 @@ const route = useRoute();
 @media (max-width: 768px) {
     .app-content {
         width: 90%;
+        padding: calc(3rem + 5rem) 0 5rem 0;
+    }
+    .app-content.no-padding {
+        padding: 0;
     }
 }
 
 @media (max-width: 480px) {
     .app-content {
         width: 95%;
-        padding: 10px;
+        padding: calc(3rem + 5rem) 10px 5rem 10px;
+    }
+    .app-content.no-padding {
+        padding: 0;
     }
 }
 </style>

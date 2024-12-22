@@ -11,7 +11,7 @@ public class DetailPlaceResponse {
     private String name;
     private String category;
     private String address;
-    private int rating;
+    private double rating;
     private int reviewCount;
     private double latitude;
     private double longitude;

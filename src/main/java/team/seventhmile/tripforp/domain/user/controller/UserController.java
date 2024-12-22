@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import team.seventhmile.tripforp.domain.user.dto.ModifyPasswordRequest;
 import team.seventhmile.tripforp.domain.user.dto.UserDto;
 import team.seventhmile.tripforp.domain.user.dto.UserInfoRequest;
 import team.seventhmile.tripforp.domain.user.dto.UserInfoResponse;
+import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
 import team.seventhmile.tripforp.domain.user.service.UserService;
 import team.seventhmile.tripforp.global.exception.AuthCustomException;
 import team.seventhmile.tripforp.global.exception.ErrorCode;
@@ -71,9 +73,10 @@ public class UserController {
 	}
 
 	//개인정보 수정
+	@PreAuthorize("hasRole('USER')")
 	@PatchMapping("/me")
 	public ResponseEntity<UserInfoResponse> updateUser(
-		@AuthenticationPrincipal UserDetails userDetails,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@Valid @RequestBody UserInfoRequest userInfoReq) {
 		log.info("userController : userinfoReq {}", userInfoReq);
 		return ResponseEntity.ok(userService.updateInfo(userDetails, userInfoReq));

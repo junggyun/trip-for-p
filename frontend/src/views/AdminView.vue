@@ -1,6 +1,6 @@
 <script setup>
 import {ref, onMounted} from 'vue';
-import {getMagazineListAPI} from "@/api";
+import {getMagazineListAPI} from "@/api/magazine";
 import router from "@/router";
 
 const magazines = ref([]);
