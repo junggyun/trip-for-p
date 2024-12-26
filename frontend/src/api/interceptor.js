@@ -47,7 +47,7 @@ const setInterceptors = function (instance) {
                     const response = await refreshTokenAPI();
                     const newToken = response.headers.access;
                     store.commit('setAccessToken', newToken);
-                    instance.defaults.headers.common['access'] = newToken;
+                    originalRequest.headers.Authorization = 'Bearer ' + newToken;
                     return instance(originalRequest);
                 } catch (refreshError) {
                     store.commit('clearData');

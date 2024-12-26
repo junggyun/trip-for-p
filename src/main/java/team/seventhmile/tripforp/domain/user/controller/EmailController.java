@@ -1,8 +1,8 @@
 package team.seventhmile.tripforp.domain.user.controller;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +15,13 @@ import team.seventhmile.tripforp.domain.user.service.EmailService;
 @Slf4j
 @RestController
 @RequestMapping("/api/mails")
-@RequiredArgsConstructor
 public class EmailController {
 
     private final EmailService emailService;
+
+    public EmailController(@Qualifier("memoryEmailService") EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @PostMapping("/send-verification")
     public ResponseEntity<?> sendVerificationEmail(@Valid @RequestBody EmailCodeRequest emailCodeReq) {

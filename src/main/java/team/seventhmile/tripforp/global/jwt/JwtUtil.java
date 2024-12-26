@@ -15,14 +15,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import team.seventhmile.tripforp.domain.user.service.TokenService;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
 
 	private SecretKey secretKey;
-	private final TokenService tokenService;
+	private final RefreshService refreshService;
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -100,7 +100,7 @@ public class JwtUtil {
 		String nickname = getNickname(refresh);
 
 		// 리프레시 토큰이 유효한지 확인
-		String redisRefreshToken = tokenService.getRefreshToken(username);
+		String redisRefreshToken = refreshService.getRefreshToken(username);
 
 		if (!refresh.equals(redisRefreshToken)) {
 			return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
@@ -111,7 +111,7 @@ public class JwtUtil {
 		String newRefresh = createJwt("refresh", username, nickname, role, 86400000L);
 
 		// Redis에 새로운 Refresh Token 저장 (기존 토큰 대체)
-		tokenService.saveRefreshToken(username, newRefresh);
+		refreshService.saveRefreshToken(username, newRefresh, 86400000L);
 
 		// 응답 설정
 		response.setHeader("access", "Bearer " + newAccess);

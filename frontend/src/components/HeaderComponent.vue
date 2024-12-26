@@ -1,12 +1,14 @@
 <script setup>
 import {computed, ref} from "vue";
 import store from "@/store";
+import {logoutAPI} from "@/api/user";
 
 const isAccessTokenValid = computed(() => store.getters.isAccessTokenValid);
 const isAdmin = computed(() => store.getters.getRole==='ADMIN');
 const isSubmenuVisible = ref(false);
 
 const logout = function () {
+    logoutAPI();
     store.commit('clearData');
 };
 

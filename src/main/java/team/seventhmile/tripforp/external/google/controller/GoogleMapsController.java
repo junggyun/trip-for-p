@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
+import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesResponse;
 import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
@@ -34,6 +35,13 @@ public class GoogleMapsController {
         @ModelAttribute DetailPlaceApiRequest request
     ) {
         return ResponseEntity.ok(googleMapsService.detailPlaceApi(request));
+    }
+
+    @GetMapping("/photo")
+    public ResponseEntity<PhotoPlaceResponse> photoPlace(
+        @ModelAttribute DetailPlaceApiRequest request
+    ) {
+        return ResponseEntity.ok(googleMapsService.photoPlaceApi(request));
     }
 
 

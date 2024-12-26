@@ -45,6 +45,10 @@ const loginAPI = function (formData) {
         })
 };
 
+const logoutAPI = function () {
+    return instance.post(`/api/users/signout`);
+}
+
 // 회원 탈퇴
 const withdrawUserAPI = function () {
     return authInstance.patch('/api/users/deletion');
@@ -129,7 +133,8 @@ export {
     sendPasswordResetEmailAPI,
     resetPasswordAPI,
     sendVerificationEmailAPI,
-    verifyEmailAPI
+    verifyEmailAPI,
+    logoutAPI
 }
 
 

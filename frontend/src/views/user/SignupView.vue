@@ -15,14 +15,20 @@ const isVerificationFailed = ref(false);
 const isNicknameVerified = ref(false);
 const nicknameVerificationMessage = ref("");
 const isNicknameVerificationFailed = ref(false);
+const isEmailVerificationLoading = ref(false);
 
 const sendVerificationEmail = async () => {
+    if (isEmailVerificationLoading.value) return;
+
+    isEmailVerificationLoading.value = true;
     try {
         await sendVerificationEmailAPI({ email: email.value });
         alert("인증 이메일이 전송되었습니다.");
         showVerificationInput.value = true;
     } catch (error) {
         alert(error.message);
+    } finally {
+        isEmailVerificationLoading.value = false;
     }
 };
 
@@ -173,7 +179,14 @@ onMounted(() => {
             <div class="signup-form" @keyup.enter="signup">
                 <div class="email-verification-container">
                     <input type="email" class="signup-email" placeholder="이메일" v-model="email">
-                    <button @click="sendVerificationEmail" :disabled="!email" class="verification-button">인증</button>
+                    <button
+                        @click="sendVerificationEmail"
+                        :disabled="!email || isEmailVerificationLoading"
+                        class="verification-button"
+                    >
+                        <span v-if="isEmailVerificationLoading" class="loading-spinner"></span>
+                        <span>{{ isEmailVerificationLoading ? '처리 중...' : '인증' }}</span>
+                    </button>
                 </div>
                 <div v-if="showVerificationInput" class="verification-code-container">
                     <input type="text" class="signup-verification" placeholder="인증 코드" v-model="verificationCode">
@@ -343,6 +356,29 @@ onMounted(() => {
 .verification-message {
     font-size: 0.875rem;
     margin-top: 0.25rem;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.verification-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .verification-success {

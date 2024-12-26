@@ -11,13 +11,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
-import team.seventhmile.tripforp.domain.user.service.TokenService;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
 
 	private final JwtUtil jwtUtil;
-	private final TokenService tokenService;
+	private final RefreshService refreshService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -83,7 +83,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
 		//refresh 토큰이 저장되어 있는지 확인
 		String username = jwtUtil.getUsername(refresh);
-		Boolean isKeyExist = tokenService.isKeyExists(username);
+		Boolean isKeyExist = refreshService.isKeyExists(username);
 		if (!isKeyExist) {
 
 			//response status code
@@ -93,7 +93,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
 		//로그아웃 진행
 		//redis 에서 refresh 토큰 제거
-		tokenService.deleteRefreshToken(username);
+		refreshService.deleteRefreshToken(username);
 
 		//Refresh 토큰 Cookie 값 0
 		Cookie cookie = new Cookie("refresh", null);

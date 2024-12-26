@@ -12,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import team.seventhmile.tripforp.domain.user.service.TokenService;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 import team.seventhmile.tripforp.global.jwt.CustomLogoutFilter;
 import team.seventhmile.tripforp.global.jwt.JwtFilter;
 import team.seventhmile.tripforp.global.jwt.JwtUtil;
@@ -28,7 +28,7 @@ public class SecurityConfig {
 
 	private final JwtUtil jwtUtil;
 
-	private final TokenService tokenService;
+	private final RefreshService refreshService;
 
 	//AuthenticationManager Bean 등록
 	@Bean
@@ -46,7 +46,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		LoginFilter loginFilter = new LoginFilter(
-			authenticationManager(authenticationConfiguration), jwtUtil, tokenService);
+			authenticationManager(authenticationConfiguration), jwtUtil, refreshService);
 		loginFilter.setFilterProcessesUrl("/api/users/signin");
 
 		http
@@ -77,7 +77,7 @@ public class SecurityConfig {
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		http
-			.addFilterBefore(new CustomLogoutFilter(jwtUtil, tokenService), LogoutFilter.class);
+			.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshService), LogoutFilter.class);
 
 		return http.build();
 	}

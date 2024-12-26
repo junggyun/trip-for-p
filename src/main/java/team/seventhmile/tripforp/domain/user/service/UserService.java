@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 import team.seventhmile.tripforp.domain.user.dto.UserDto;
 import team.seventhmile.tripforp.domain.user.dto.UserInfoRequest;
 import team.seventhmile.tripforp.domain.user.dto.UserInfoResponse;
@@ -37,7 +38,7 @@ public class UserService {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtUtil jwtUtil;
-	private final TokenService tokenService;
+    private final RefreshService refreshService;
 
 	// 회원가입
 	@Transactional
@@ -212,14 +213,14 @@ public class UserService {
 	public void deleteUser(UserDetails userDetails, HttpServletResponse response) {
 		User user = userRepository.findByEmail(userDetails.getUsername())
 				.orElseThrow(() -> new AuthCustomException(ErrorCode.USER_NOT_FOUND));
-		user.withdrawalUser();
+		user.withdrawUser();
 		//리프레시 토큰 삭제 (클라이언트도 access 토큰 삭제해야함)
-		tokenService.deleteRefreshToken(userDetails.getUsername());
+		refreshService.deleteRefreshToken(userDetails.getUsername());
 		//Refresh 토큰 Cookie 값 0
 		Cookie cookie = new Cookie("refresh", null);
 		cookie.setMaxAge(0);
 		cookie.setPath("/api/users");
 		response.addCookie(cookie);
-		log.info("withdrawal tkservice {}", tokenService.getRefreshToken(userDetails.getUsername()));
+		log.info("withdraw refreshService {}", refreshService.getRefreshToken(userDetails.getUsername()));
 	}
 }
