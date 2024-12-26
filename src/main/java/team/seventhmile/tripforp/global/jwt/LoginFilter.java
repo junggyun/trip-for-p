@@ -15,8 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
-import team.seventhmile.tripforp.domain.user.service.TokenService;
 
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
@@ -25,7 +25,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	//JWTUtil 주입
 	private final JwtUtil jwtUtil;
 	// Redis 접근
-	private final TokenService tokenService;
+	private final RefreshService refreshService;
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
@@ -67,7 +67,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		String refresh = jwtUtil.createJwt("refresh", username, nickname, role, 86400000L);
 
 		// Redis에 Refresh Token 저장
-		tokenService.saveRefreshToken(username, refresh);
+		refreshService.saveRefreshToken(username, refresh, 86400000L);
 
 		//응답 설정
 		response.setHeader("access", "Bearer " + access);

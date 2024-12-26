@@ -67,7 +67,7 @@ public class User extends BaseEntity {
 	}
 
 	//[마이페이지] - 회원탈퇴
-	public void withdrawalUser(){
+	public void withdrawUser(){
 		this.isDeleted = true;
 	}
 }

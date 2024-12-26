@@ -8,6 +8,7 @@ public enum ErrorCode {
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "400001", "잘못된 인증 코드입니다."),
     REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "400002", "필수 입력 항목이 누락되었습니다."),
     EMAIL_NOT_FOUND_IN_TOKEN(HttpStatus.BAD_REQUEST, "400003", "이메일을 찾을 수 없습니다."),
+    VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "400004", "인증 코드가 만료되었습니다."),
     ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "401001", "액세스 토큰을 찾을 수 없습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "401002", "액세스 토큰이 만료되었습니다."),
     WITHDRAWN_USER(HttpStatus.FORBIDDEN, "403002", "탈퇴한 사용자입니다."),
