@@ -13,7 +13,7 @@ public class WebClientConfig {
     @Bean
     public WebClient googleWebClient() {
         return WebClient.builder()
-            .baseUrl("https://places.googleapis.com/v1/places")
+            .baseUrl("https://places.googleapis.com/v1")
             .defaultHeader("X-Goog-Api-Key", key)
             .build();
     }

@@ -28,6 +28,7 @@ import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseResponse;
 import team.seventhmile.tripforp.domain.course.service.CourseService;
 import team.seventhmile.tripforp.domain.place.dto.GetPlaceCountResponse;
+import team.seventhmile.tripforp.domain.spot.dto.GetPopularPlaceResponse;
 import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
 
@@ -104,7 +105,7 @@ public class CourseController {
     }
 
     @GetMapping("/popular-places")
-    public ResponseEntity<List<GetPlaceCountResponse>> getPopularPlaces() {
+    public ResponseEntity<List<GetPopularPlaceResponse>> getPopularPlaces() {
         return ResponseEntity.ok(spotService.getPlaceCount());
     }
 

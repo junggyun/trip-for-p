@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import team.seventhmile.tripforp.domain.spot.dto.GetPopularPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
+import team.seventhmile.tripforp.external.google.dto.GoogleMapsPhotoApiDto;
 import team.seventhmile.tripforp.external.google.dto.GoogleMapsPlaceApiDto;
+import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiResponse;
@@ -24,7 +27,7 @@ public class GoogleMapsService {
     public Mono<SearchPlacesResponse> searchPlacesApi(SearchPlacesApiRequest request) {
 
         return webClient.post()
-            .uri(":searchText")
+            .uri("/places:searchText")
             .headers(headers -> {
                 headers.add("X-Goog-FieldMask",
                     "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.location,nextPageToken");
@@ -47,7 +50,7 @@ public class GoogleMapsService {
 
         return webClient.get()
             .uri(uriBuilder -> uriBuilder
-                .path("/" + request.getId())
+                .path("/places/" + request.getId())
                 .queryParam("languageCode", request.getLanguageCode())
                 .queryParam("regionCode", request.getRegionCode())
                 .build())
@@ -58,5 +61,36 @@ public class GoogleMapsService {
             .retrieve()
             .bodyToMono(GoogleMapsPlaceApiDto.class)
             .map(DetailPlaceResponse::new);
+    }
+
+    public PhotoPlaceResponse photoPlaceApi(DetailPlaceApiRequest request) {
+
+        PhotoPlaceResponse response = webClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/places/" + request.getId())
+                .queryParam("languageCode", request.getLanguageCode())
+                .queryParam("regionCode", request.getRegionCode())
+                .build())
+            .headers(headers -> {
+                headers.add("X-Goog-FieldMask",
+                    "id,displayName,formattedAddress,photos,googleMapsLinks");
+            })
+            .retrieve()
+            .bodyToMono(GoogleMapsPlaceApiDto.class)
+            .map(PhotoPlaceResponse::new)
+            .block();
+
+        GoogleMapsPhotoApiDto uriResponse = webClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/" + response.getPhotoUri() + "/media")
+                .queryParam("maxWidthPx", 350)
+                .queryParam("maxHeightPx", 250)
+                .queryParam("skipHttpRedirect", true)
+                .build())
+            .retrieve()
+            .bodyToMono(GoogleMapsPhotoApiDto.class)
+            .block();
+        response.setPhotoUri(uriResponse.getPhotoUri());
+        return response;
     }
 }
