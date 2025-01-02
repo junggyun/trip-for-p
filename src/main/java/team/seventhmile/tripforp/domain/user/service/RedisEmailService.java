@@ -28,9 +28,9 @@ public class RedisEmailService implements EmailService {
 
     //이메일  코드 전송(회원가입시)
     @Override
-    public void sendVerificationEmail(String recipient) {
+    public void sendVerificationEmail(String email) {
         // 이메일 중복 체크, 탈퇴된 이메일 확인
-        Optional<User> existingUser = userRepository.findByEmail(recipient);
+        Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
             if (user.getIsDeleted()) { //탈퇴
@@ -40,7 +40,7 @@ public class RedisEmailService implements EmailService {
             throw new AuthCustomException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
-        emailGenerateAndSend(recipient);
+        emailGenerateAndSend(email);
     }
 
     @Override

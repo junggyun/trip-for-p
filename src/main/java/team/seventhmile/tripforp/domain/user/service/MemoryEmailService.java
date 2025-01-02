@@ -1,18 +1,18 @@
 package team.seventhmile.tripforp.domain.user.service;
 
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.Cache.ValueWrapper;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.seventhmile.tripforp.domain.user.dto.VerificationCode;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.domain.user.repository.UserRepository;
 import team.seventhmile.tripforp.global.exception.AuthCustomException;
@@ -28,12 +28,12 @@ public class MemoryEmailService implements EmailService {
     private final JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
     private String fromEmail;
-    private final Map<String, VerificationCode> verificationCodes;
+    private final CacheManager cacheManager;
 
     @Override
-    public void sendVerificationEmail(String recipient) {
+    public void sendVerificationEmail(String email) {
         // 이메일 중복 체크, 탈퇴된 이메일 확인
-        Optional<User> existingUser = userRepository.findByEmail(recipient);
+        Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
             if (user.getIsDeleted()) { //탈퇴
@@ -43,7 +43,7 @@ public class MemoryEmailService implements EmailService {
             throw new AuthCustomException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
 
-        emailGenerateAndSend(recipient);
+        emailGenerateAndSend(email);
     }
 
     @Override
@@ -63,19 +63,16 @@ public class MemoryEmailService implements EmailService {
 
     @Override
     public void verifyEmailCode(String email, String code) {
-        VerificationCode saved = verificationCodes.get(email);
-        if (saved == null) {
+        Cache cache = cacheManager.getCache("emailCodes");
+        ValueWrapper wrapper = cache.get(email);
+        if (wrapper == null) {
             throw new AuthCustomException(ErrorCode.VERIFICATION_CODE_NOT_FOUND);
         }
-        String storedCode = saved.getCode();
-        if (LocalDateTime.now().isAfter(saved.getExp())) {
-            verificationCodes.remove(email);
-            throw new AuthCustomException(ErrorCode.VERIFICATION_CODE_EXPIRED);
-        }
-        if (!storedCode.equals(code)) {
+        String saved = (String) wrapper.get();
+        if (!saved.equals(code)) {
             throw new AuthCustomException(ErrorCode.INVALID_VERIFICATION_CODE);
         }
-        verificationCodes.remove(email);
+        cache.evict(email);
     }
 
     @Override
@@ -103,8 +100,8 @@ public class MemoryEmailService implements EmailService {
         message.setText("귀하의 인증 코드는 " + emailCode + "입니다.\n인증 코드는 5분 간 유지됩니다."); //내용 설정
         try {
             javaMailSender.send(message);
-            verificationCodes.put(email,
-                new VerificationCode(emailCode, LocalDateTime.now().plusMinutes(5)));
+            cacheManager.getCache("emailCodes").put(email, emailCode);
+            log.info("캐시: {}", cacheManager.getCache("emailCodes").get(email).get());
         } catch (Exception e) {
             log.error("이메일 전송 중 오류 발생", e);
             throw new AuthCustomException(ErrorCode.EMAIL_SEND_ERROR);
