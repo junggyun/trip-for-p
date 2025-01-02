@@ -31,7 +31,15 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
     public Page<GetCourseListResponse> getCourses(String keyword, Pageable pageable) {
         List<GetCourseListResponse> courses = queryFactory
             .select(new QGetCourseListResponse(
-                qCourse,
+                qCourse.id,
+                qCourse.creator.nickname,
+                qCourse.title,
+                qCourse.region.province,
+                qCourse.region.city,
+                qCourse.startDate,
+                qCourse.endDate,
+                qCourse.createdAt,
+                qCourse.views,
                 JPAExpressions
                     .select(qCourseLike.count())
                     .from(qCourseLike)
@@ -39,8 +47,6 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
             ))
             .from(qCourse)
             .where(eqRegion(keyword.trim()))
-            .leftJoin(qCourse.creator).fetchJoin()
-            .leftJoin(qCourse.region).fetchJoin()
             .orderBy(qCourse.createdAt.desc())
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())
@@ -53,6 +59,7 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
 
         return PageableExecutionUtils.getPage(courses, pageable, count::fetchOne);
     }
+
 
     private BooleanExpression eqRegion(String keyword) {
         if (keyword == null || keyword.isEmpty()) {
@@ -70,7 +77,15 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
     public Page<GetCourseListResponse> getMyCourses(String email, Pageable pageable) {
         List<GetCourseListResponse> courses = queryFactory
             .select(new QGetCourseListResponse(
-                qCourse,
+                qCourse.id,
+                qCourse.creator.nickname,
+                qCourse.title,
+                qCourse.region.province,
+                qCourse.region.city,
+                qCourse.startDate,
+                qCourse.endDate,
+                qCourse.createdAt,
+                qCourse.views,
                 JPAExpressions
                     .select(qCourseLike.count())
                     .from(qCourseLike)
