@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,12 +32,16 @@ import team.seventhmile.tripforp.global.jwt.JwtUtil;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
 
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
+
+	public UserController(@Qualifier("memoryUserService") UserService userService, JwtUtil jwtUtil) {
+		this.userService = userService;
+		this.jwtUtil = jwtUtil;
+	}
 
 	// 회원가입
 	@PostMapping("/registration")
