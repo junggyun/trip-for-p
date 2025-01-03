@@ -13,7 +13,7 @@ const setInterceptors = function (instance) {
                 if (decodedToken.exp < currentTime) {
                     try {
                         const response = await refreshTokenAPI();
-                        const newToken = response.headers.access;
+                        const newToken = response.headers.access.split(" ")[1];
                         store.commit('setAccessToken', newToken);
                         config.headers.Authorization = 'Bearer ' + newToken;
                     } catch (error) {

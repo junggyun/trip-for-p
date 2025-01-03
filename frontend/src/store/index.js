@@ -24,7 +24,7 @@ const store = createStore({
                     return true;
                 }
                 refreshTokenAPI().then(response => {
-                    const newToken = response.headers.access
+                    const newToken = response.headers.access.split(" ")[1]
                     store.commit('setAccessToken', newToken);
                 });
 
