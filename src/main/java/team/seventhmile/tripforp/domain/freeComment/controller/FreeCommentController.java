@@ -81,7 +81,6 @@ public class FreeCommentController {
 		return ResponseEntity.noContent().build();
 	}
 
-	//[마이페이지]자유게시글 내가 작성한 댓글 목록 조회
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/me")
 	public ResponseEntity<Page<FreeCommentDto>> getMyFreeComments(

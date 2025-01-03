@@ -27,23 +27,19 @@ import team.seventhmile.tripforp.global.common.BaseEntity;
 @Table(name = "review_post_comments")
 public class ReviewComment extends BaseEntity {
 
-	// 댓글 id (pk)
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
 	private Long id;
 
-	// 리뷰 게시글 id (fk)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "review_post_id", nullable = false)
 	private ReviewPost reviewPost;
 
-	// 회원 id (fk)
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User author;
 
-	// 내용
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 

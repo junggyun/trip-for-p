@@ -19,22 +19,6 @@ public class MagazineRepositoryImpl implements MagazineRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 	private final QMagazine qMagazine = QMagazine.magazine;
 
-	// 모든 매거진 게시글 조회 (페이징)
-	@Override
-	public Page<Magazine> getMagazinePosts(Pageable pageable) {
-		List<Magazine> magazines = queryFactory.selectFrom(qMagazine)
-			.limit(pageable.getPageSize())
-			.offset(pageable.getOffset())
-			.fetch();
-
-		JPAQuery<Long> countQuery = queryFactory
-			.select(qMagazine.count())
-			.from(qMagazine);
-
-		return PageableExecutionUtils.getPage(magazines, pageable, countQuery::fetchOne);
-	}
-
-	// 키워드를 통한 매거진 게시글 검색 (제목, 내용 기준)
 	@Override
 	public Page<Magazine> getMagazineKeywordContaining(String keyword, Pageable pageable) {
 		BooleanExpression searchKeyword = qMagazine.title.containsIgnoreCase(keyword)

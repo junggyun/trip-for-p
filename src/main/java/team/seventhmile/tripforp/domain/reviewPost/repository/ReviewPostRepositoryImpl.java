@@ -3,18 +3,15 @@ package team.seventhmile.tripforp.domain.reviewPost.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-import team.seventhmile.tripforp.domain.course.entity.Course;
 import team.seventhmile.tripforp.domain.course.entity.QCourse;
 import team.seventhmile.tripforp.domain.reviewPost.entity.QReviewPost;
 import team.seventhmile.tripforp.domain.reviewPost.entity.ReviewPost;
-
-import java.util.List;
-import team.seventhmile.tripforp.domain.user.entity.User;
 
 @RequiredArgsConstructor
 @Repository
@@ -60,15 +57,6 @@ public class ReviewPostRepositoryImpl implements ReviewPostRepositoryCustom {
         return PageableExecutionUtils.getPage(reviewPosts, pageable, count::fetchOne);
     }
 
-    // 사용자가 작성한 Course 조회
-    @Override
-    public List<Course> findUserCourses(User user) {
-        return queryFactory.selectFrom(qCourse)
-            .where(qCourse.creator.eq(user))
-            .fetch();
-    }
-
-    //[마이페이지] 내가 작성한 게시글 목록 조회
     @Override
     public Page<ReviewPost> getMyReviews(String email, Pageable pageable) {
         List<ReviewPost> myReview = queryFactory

@@ -112,9 +112,6 @@ public class CourseService {
         return courseRepository.getMyCourses(user.getUsername(), pageable);
     }
 
-    /**
-     * 수정, 삭제 시 작성자 본인이 맞는지 검증
-     */
     private void checkUpdateAuthorization(UserDetails user, Course course) {
         if (!user.getUsername().equals(course.getCreator().getEmail())) {
             System.out.println(user.getAuthorities());
@@ -128,8 +125,4 @@ public class CourseService {
             throw new UnauthorizedAccessException(Course.class);
         }
     }
-
-//    public List<GetPopularCourseResponse> getPopularCourseList() {
-//        return courseRepository.findPopularCourses(PageRequest.of(0, 6));
-//    }
 }

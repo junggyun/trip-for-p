@@ -35,7 +35,6 @@ public class FreePostDto {
 
 	private List<GetFreeCommentDto> comments = new ArrayList<>();
 
-	// DTO -> Entity
 	public FreePost convertToEntity(User user) {
 		return FreePost.builder()
 			.id(this.id)
@@ -45,7 +44,6 @@ public class FreePostDto {
 			.build();
 	}
 
-	// Entity -> DTO
 	public static FreePostDto convertToDto(FreePost freePost) {
 		return FreePostDto.builder()
 			.id(freePost.getId())

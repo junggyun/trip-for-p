@@ -2,7 +2,6 @@ package team.seventhmile.tripforp.domain.course.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.Getter;

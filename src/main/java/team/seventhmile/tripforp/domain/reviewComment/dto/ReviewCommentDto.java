@@ -28,7 +28,6 @@ public class ReviewCommentDto {
 	private Long authorId;
 	private ZonedDateTime createdAt;
 
-	// Entity -> Dto 변환
 	public static ReviewCommentDto convertToDto(ReviewComment reviewComment) {
 		return ReviewCommentDto.builder()
 				.id(reviewComment.getId())

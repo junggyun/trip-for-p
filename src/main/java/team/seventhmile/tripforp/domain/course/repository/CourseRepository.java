@@ -10,6 +10,5 @@ public interface CourseRepository extends JpaRepository<Course, Long>, CourseRep
     @EntityGraph(attributePaths = {"spots.place", "spots", "courseLikes"})
     Optional<Course> findById(Long id);
 
-    // 사용자별 Course 가져오기
     Optional<Course> findByIdAndCreator(Long id, User user);
 }

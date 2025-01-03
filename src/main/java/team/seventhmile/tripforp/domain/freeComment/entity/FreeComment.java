@@ -27,23 +27,19 @@ import team.seventhmile.tripforp.global.common.BaseEntity;
 @Table(name = "free_post_comments")
 public class FreeComment extends BaseEntity {
 
-	// 댓글 id (pk)
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
 	private Long id;
 
-	// 자유 게시글 id (fk)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "free_post_id", nullable = false)
 	private FreePost freePost;
 
-	// 회원 id (fk)
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User author;
 
-	// 내용
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 

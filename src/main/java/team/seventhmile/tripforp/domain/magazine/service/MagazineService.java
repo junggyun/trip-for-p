@@ -28,8 +28,6 @@ public class MagazineService {
     private final UserRepository userRepository;
     private final MagazineFileService magazineFileService;
 
-
-    // 매거진 글 작성하기
     @Transactional
     public MagazineDto createMagazinePost(MagazineDto magazineDto, String userEmail,
         List<MultipartFile> files) throws IOException {
@@ -54,7 +52,6 @@ public class MagazineService {
         return MagazineDto.convertToDto(magazine);
     }
 
-    // 매거진 글 수정하기
     @Transactional
     public MagazineDto updateMagazinePost(Long id, MagazineDto magazineDto, String userEmail,
         List<MultipartFile> files) throws IOException {
@@ -69,7 +66,6 @@ public class MagazineService {
         Magazine magazine = magazineRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(Magazine.class));
 
-        // 업데이트
         magazine.update(magazineDto.getTitle(), magazineDto.getContent());
         if (magazine.getFiles() != null) {
             for (MagazineFile file : magazine.getFiles()) {
@@ -88,18 +84,15 @@ public class MagazineService {
         return MagazineDto.convertToDto(magazine);
     }
 
-    // 매거진 글 삭제
     @Transactional
     public void deleteMagazinePost(Long id, String userEmail) {
 
         Magazine magazine = magazineRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(Magazine.class));
 
-        // 현재 로그인된 사용자 가져오기
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new ResourceNotFoundException(User.class));
 
-        // 권한 확인
         if (user.getRole() != Role.ADMIN) {
             throw new UnauthorizedAccessException(Magazine.class);
         }
@@ -113,7 +106,6 @@ public class MagazineService {
         magazineRepository.delete(magazine);
     }
 
-    // 매거진 글 목록 조회
     @Transactional(readOnly = true)
     public Page<MagazineDto> getAllMagazineList(Pageable pageable) {
 
@@ -121,19 +113,16 @@ public class MagazineService {
             .map(MagazineDto::convertToDto);
     }
 
-    // 매거진 글 상세 조회
     @Transactional
     public MagazineDto getMagazineDetail(Long id) {
         Magazine magazine = magazineRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(Magazine.class));
 
-        // 조회 수 증가
         magazine.incrementViews();
 
         return MagazineDto.convertToDto(magazine);
     }
 
-    // 리뷰 게시글 검색(제목, 내용) 조회
     @Transactional(readOnly = true)
     public Page<MagazineDto> getMagazineSearch(String keyword, Pageable pageable) {
 

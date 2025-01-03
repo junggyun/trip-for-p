@@ -19,7 +19,6 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
     private final QSpot qSpot = QSpot.spot;
     private final QPlace qPlace = QPlace.place;
 
-
     @Override
     @Cacheable(value = "places", key = "'popular'")
     public List<GetPlaceCountResponse> getPlaceCount(Pageable pageable) {

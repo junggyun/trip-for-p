@@ -3,7 +3,6 @@ package team.seventhmile.tripforp.domain.place.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import team.seventhmile.tripforp.domain.place.entity.Place;
 
 @NoArgsConstructor
 @Getter

@@ -13,7 +13,6 @@ import team.seventhmile.tripforp.domain.file.entity.ReviewFile;
 import team.seventhmile.tripforp.domain.reviewComment.entity.ReviewComment;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.global.common.BaseEntity;
-
 import java.util.List;
 
 @Entity
@@ -55,8 +54,6 @@ public class ReviewPost extends BaseEntity {
 	@Builder.Default
 	private List<ReviewFile> files = new ArrayList<>();
 
-
-	// 수정 로직 (더티 체킹 방식)
 	public void update(String title, String content) {
 		validateField(title, "Title");
 		validateField(content, "Content");
@@ -74,12 +71,10 @@ public class ReviewPost extends BaseEntity {
 		this.files.clear();
 	}
 
-	// 조회 수 증가 로직
 	public void incrementViews() {
 		this.views += 1;
 	}
 
-	// Not Null 예외 처리 로직
 	public static void validateField(String field, String fieldName) {
 		if (field == null || field.isEmpty()) {
 			throw new IllegalArgumentException(fieldName + "은(는) 필수 입력 항목입니다.");

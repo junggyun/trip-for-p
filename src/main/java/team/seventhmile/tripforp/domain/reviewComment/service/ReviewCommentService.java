@@ -32,13 +32,11 @@ public class ReviewCommentService {
 		this.userRepository = userRepository;
 	}
 
-	// 리뷰 게시판 댓글 조회
 	public Page<GetReviewCommentDto> getCommentsByPost(ReviewPost reviewPost, Pageable pageable) {
 		Page<ReviewComment> comments = reviewCommentRepository.findByReviewPost(reviewPost, pageable);
 		return comments.map(GetReviewCommentDto::new);
 	}
 
-	// 리뷰 게시판 댓글 작성
 	@Transactional
 	public ReviewCommentDto createComment(ReviewPost reviewPost, ReviewCommentDto reviewCommentDto,
 		UserDetails user) {
@@ -50,7 +48,6 @@ public class ReviewCommentService {
 		return mapToDto(savedComment);
 	}
 
-	// 리뷰 게시판 댓글 수정
 	@Transactional
 	public ReviewCommentDto updateComment(Long id, ReviewCommentDto updatedCommentDto, UserDetails user) {
 		User findUser = getUser(user);
@@ -65,7 +62,6 @@ public class ReviewCommentService {
 		return mapToDto(updatedComment);
 	}
 
-	// 리뷰 게시판 댓글 삭제
 	@Transactional
 	public void deleteComment(Long id, UserDetails user) {
 		User findUser = getUser(user);
@@ -79,8 +75,6 @@ public class ReviewCommentService {
 		reviewCommentRepository.delete(reviewComment);
 	}
 
-
-	// Entity -> Dto 변환
 	private ReviewCommentDto mapToDto(ReviewComment reviewComment) {
 		return ReviewCommentDto.builder()
 			.id(reviewComment.getId())
@@ -90,7 +84,6 @@ public class ReviewCommentService {
 			.build();
 	}
 
-	// Dto -> Entity 변환
 	private ReviewComment mapToEntity(ReviewCommentDto reviewCommentDto) {
 		ReviewComment reviewComment = new ReviewComment();
 		reviewComment.setContent(reviewCommentDto.getContent());
@@ -102,9 +95,8 @@ public class ReviewCommentService {
 			.orElseThrow(() -> new ResourceNotFoundException(User.class));
 	}
 
-	//[마이페이지] 리뷰게시글 내가 작성한 댓글 목록 조회
 	@Transactional(readOnly = true)
-    public Page<ReviewCommentDto> getMyreviewCommentList(UserDetails user, Pageable pageable) {
+    public Page<ReviewCommentDto> getMyReviewCommentList(UserDetails user, Pageable pageable) {
 		return reviewCommentRepository.findByAuthor_Email(user.getUsername(), pageable)
 				.map(ReviewCommentDto::convertToDto);
     }
