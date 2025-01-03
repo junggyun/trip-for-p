@@ -27,15 +27,15 @@ import team.seventhmile.tripforp.domain.user.entity.User;
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "course_id"}))
 public class CourseLike {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id; // 좋아요 엔티티의 고유 ID
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user; // 좋아요한 사용자에 대한 외래 키
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "course_id", nullable = false)
-  private Course course; // 좋아요된 여행 코스에 대한 외래 키
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 }

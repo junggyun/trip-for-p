@@ -45,7 +45,6 @@ public class ReviewPostDto {
 
 	private List<GetReviewCommentDto> comments;
 
-	// DTO -> Entity 변환
 	public ReviewPost convertToEntity(User user, Course course) {
 		return ReviewPost.builder()
 			.id(this.id)
@@ -53,11 +52,10 @@ public class ReviewPostDto {
 			.user(user)
 			.title(this.title)
 			.content(this.content)
-			.views(0) // 게시글 작성 시 조회수는 항상 0으로 초기화
+			.views(0)
 			.build();
 	}
 
-	// Entity -> DTO 변환
 	public static ReviewPostDto convertToDto(ReviewPost reviewPost) {
 		return ReviewPostDto.builder()
 			.id(reviewPost.getId())

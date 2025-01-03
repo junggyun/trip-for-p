@@ -29,7 +29,6 @@ public class MagazineController {
 
 	private final MagazineService magazineService;
 
-	// 매거진 게시글 작성
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public MagazineDto createMagazinePost(
@@ -40,7 +39,6 @@ public class MagazineController {
 		return magazineService.createMagazinePost(magazineDto, user.getUsername(), files);
 	}
 
-	// 매거진 게시글 수정
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public MagazineDto updateMagazinePost(
@@ -52,7 +50,6 @@ public class MagazineController {
 		return magazineService.updateMagazinePost(id, magazineDto, user.getUsername(), files);
 	}
 
-	// 매거진 게시글 삭제
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteMagazinePost(@PathVariable("id") Long id,
@@ -60,7 +57,6 @@ public class MagazineController {
 		magazineService.deleteMagazinePost(id, user.getUsername());
 	}
 
-	// 매거진 게시글 목록 조회
 	@GetMapping
 	public ResponseEntity<Page<MagazineDto>> getAllMagazineList(
 		@RequestParam(value = "page", defaultValue = "0") int page,
@@ -74,7 +70,6 @@ public class MagazineController {
 		}
 	}
 
-	// 매거진 게시글 상세 조회
 	@GetMapping("/{id}")
 	public MagazineDto getMagazineDetail(@PathVariable("id") Long id) {
 		return magazineService.getMagazineDetail(id);

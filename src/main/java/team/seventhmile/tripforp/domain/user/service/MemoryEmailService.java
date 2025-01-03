@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -32,23 +31,20 @@ public class MemoryEmailService implements EmailService {
 
     @Override
     public void sendVerificationEmail(String email) {
-        // 이메일 중복 체크, 탈퇴된 이메일 확인
         Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
-            if (user.getIsDeleted()) { //탈퇴
+            if (user.getIsDeleted()) {
                 throw new AuthCustomException(ErrorCode.WITHDRAWN_USER);
             }
-            //중복
             throw new AuthCustomException(ErrorCode.EMAIL_ALREADY_IN_USE);
         }
-
         emailGenerateAndSend(email);
     }
 
     @Override
     public String generateEmailCode() {
-        int codeLength = 6;  // 코드자리 6자리로 설정
+        int codeLength = 6;
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(codeLength);
         Random random = new Random();
@@ -80,7 +76,7 @@ public class MemoryEmailService implements EmailService {
         Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
-            if (user.getIsDeleted()) { //탈퇴
+            if (user.getIsDeleted()) {
                 throw new AuthCustomException(ErrorCode.WITHDRAWN_USER);
             }
         } else {
@@ -95,9 +91,9 @@ public class MemoryEmailService implements EmailService {
         String emailCode = generateEmailCode();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(String.format("%s <%s>", "Trip For P", fromEmail));
-        message.setTo(email); //수신자 설정
+        message.setTo(email);
         message.setSubject("[Trip For P] 인증코드 발송 안내"); //제목 설정
-        message.setText("귀하의 인증 코드는 " + emailCode + "입니다.\n인증 코드는 5분 간 유지됩니다."); //내용 설정
+        message.setText("귀하의 인증 코드는 " + emailCode + "입니다.\n인증 코드는 5분 간 유지됩니다.");
         try {
             javaMailSender.send(message);
             cacheManager.getCache("emailCodes").put(email, emailCode);
@@ -106,6 +102,5 @@ public class MemoryEmailService implements EmailService {
             log.error("이메일 전송 중 오류 발생", e);
             throw new AuthCustomException(ErrorCode.EMAIL_SEND_ERROR);
         }
-
     }
 }

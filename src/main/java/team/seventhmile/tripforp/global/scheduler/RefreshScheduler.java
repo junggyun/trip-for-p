@@ -1,7 +1,5 @@
 package team.seventhmile.tripforp.global.scheduler;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,8 +17,6 @@ public class RefreshScheduler {
 
     @Scheduled(cron = "0 0 2 * * *")
     public void cleanExpiredCodes() {
-        LocalDateTime now = LocalDateTime.now();
-
         long initialSize = refreshRepository.count();
 
         try {

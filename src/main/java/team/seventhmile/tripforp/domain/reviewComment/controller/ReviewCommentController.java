@@ -78,14 +78,13 @@ public class ReviewCommentController {
 		return ResponseEntity.noContent().build();
 	}
 
-	//[마이페이지]내가 작성한 리뷰 댓글 목록 조회
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/me")
 	public ResponseEntity<Page<ReviewCommentDto>> getMyReviewComments(
 			@AuthenticationPrincipal UserDetails user,
 			Pageable pageable,
 			@PathVariable("postId") Long postId){
-		return ResponseEntity.ok(reviewCommentService.getMyreviewCommentList(user, pageable));
+		return ResponseEntity.ok(reviewCommentService.getMyReviewCommentList(user, pageable));
 	}
 
 }

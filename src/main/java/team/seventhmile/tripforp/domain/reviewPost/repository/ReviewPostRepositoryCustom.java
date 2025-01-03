@@ -1,11 +1,8 @@
 package team.seventhmile.tripforp.domain.reviewPost.repository;
 
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import team.seventhmile.tripforp.domain.course.entity.Course;
 import team.seventhmile.tripforp.domain.reviewPost.entity.ReviewPost;
-import team.seventhmile.tripforp.domain.user.entity.User;
 
 public interface ReviewPostRepositoryCustom {
 
@@ -13,9 +10,6 @@ public interface ReviewPostRepositoryCustom {
 
 	Page<ReviewPost> getReviewPostKeywordContaining(String keyword, Pageable pageable);
 
-	// 사용자가 작성한 Course 조회
-	List<Course> findUserCourses(User user);
 
-	//[마이페이지] 내가 작성한 리뷰 게시글 목록 조회
 	Page<ReviewPost> getMyReviews(String email, Pageable pageable);
 }

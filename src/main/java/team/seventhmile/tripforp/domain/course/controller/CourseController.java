@@ -27,7 +27,6 @@ import team.seventhmile.tripforp.domain.course.dto.GetCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseResponse;
 import team.seventhmile.tripforp.domain.course.service.CourseService;
-import team.seventhmile.tripforp.domain.place.dto.GetPlaceCountResponse;
 import team.seventhmile.tripforp.domain.spot.dto.GetPopularPlaceResponse;
 import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
@@ -41,13 +40,6 @@ public class CourseController {
     private final CourseService courseService;
     private final SpotService spotService;
 
-    /**
-     * 여행 코스를 등록합니다.
-     *
-     * @param request 여행 코스 생성에 필요한 세부 정보가 포함된 요청 본문
-     * @param user 여행 코스를 생성하는 인증된 사용자
-     * @return 생성된 여행 코스의 id를 포함한 ResponseEntity
-     */
     @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<CreateCourseResponse> createCourse(
@@ -108,9 +100,4 @@ public class CourseController {
     public ResponseEntity<List<GetPopularPlaceResponse>> getPopularPlaces() {
         return ResponseEntity.ok(spotService.getPlaceCount());
     }
-
-//    @GetMapping("/popular-Courses")
-//    public ResponseEntity<List<GetPopularCourseResponse>> getPopularCourses() {
-//        return ResponseEntity.ok(courseService.getPopularCourseList());
-//    }
 }

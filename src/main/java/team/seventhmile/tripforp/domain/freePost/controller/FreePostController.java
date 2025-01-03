@@ -20,7 +20,6 @@ public class FreePostController {
 
 	private final FreePostService freePostService;
 
-	// 자유 게시글 생성
 	@PreAuthorize("hasRole('USER')")
 	@PostMapping
 	public FreePostDto createFreePost(
@@ -29,7 +28,6 @@ public class FreePostController {
 		return freePostService.createFreePost(freePostDto, user.getUsername());
 	}
 
-	// 자유 게시글 수정
 	@PreAuthorize("hasRole('USER')")
 	@PutMapping("/{id}")
 	public FreePostDto updateFreePost(@PathVariable("id") Long id,
@@ -38,7 +36,6 @@ public class FreePostController {
 		return freePostService.updateFreePost(id, freePostDto, user.getUsername());
 	}
 
-	// 자유 게시글 삭제
 	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@DeleteMapping("/{id}")
 	public void deleteFreePost(@PathVariable("id") Long id,
@@ -46,7 +43,6 @@ public class FreePostController {
 		freePostService.deleteFreePost(id, user.getUsername());
 	}
 
-	// 자유 게시글 목록 조회
 	@GetMapping
 	public Page<FreePostDto> getFreePosts(
 		@RequestParam(value = "page", defaultValue = "0") int page,
@@ -60,13 +56,11 @@ public class FreePostController {
 		}
 	}
 
-	// 자유 게시글 상세 조회
 	@GetMapping("/{id}")
 	public FreePostDto getFreePostDetail(@PathVariable("id") Long id) {
 		return freePostService.getFreePostDetail(id);
 	}
 
-	// [마이페이지] 작성한 자유게시글 목록 조회
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/me")
 	public ResponseEntity<Page<FreePostDto>> getMyFreePostList(

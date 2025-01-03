@@ -22,7 +22,6 @@ public class ReviewPostController {
 
 	private final ReviewPostService reviewPostService;
 
-	// 리뷰 게시글 작성
 	@PreAuthorize("hasRole('USER')")
 	@PostMapping
 	public ReviewPostDto createReviewPost(
@@ -33,7 +32,6 @@ public class ReviewPostController {
 		return reviewPostService.createReviewPost(reviewPostDto, user.getUsername(), files);
 	}
 
-	// 리뷰 게시글 수정
 	@PreAuthorize("hasRole('USER')")
 	@PutMapping("/{id}")
 	public ReviewPostDto updateReviewPost(@PathVariable("id") Long id,
@@ -44,7 +42,6 @@ public class ReviewPostController {
 		return reviewPostService.updateReviewPost(id, reviewPostDto, user.getUsername(), files);
 	}
 
-	// 리뷰 게시글 삭제
 	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@DeleteMapping("/{id}")
 	public void deleteReviewPost(@PathVariable("id") Long id,
@@ -52,7 +49,6 @@ public class ReviewPostController {
 		reviewPostService.deleteReviewPost(id, user.getUsername());
 	}
 
-	// 리뷰 게시글 목록 조회
 	@GetMapping
 	public Page<ReviewPostDto> getReviewPosts(
 		@RequestParam(value = "page", defaultValue = "0") int page,
@@ -66,13 +62,11 @@ public class ReviewPostController {
 		}
 	}
 
-	// 리뷰 게시글 상세 조회
 	@GetMapping("/{id}")
 	public ReviewPostDto getReviewPostDetail(@PathVariable("id") Long id) {
 		return reviewPostService.getReviewPostDetail(id);
 	}
 
-	//마이페이지 - 사용자가 작성한 리뷰 게시글 목록 조회
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/me")
 	public ResponseEntity<Page<ReviewPostDto>> getMyReviewPostList(@AuthenticationPrincipal UserDetails user,

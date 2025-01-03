@@ -35,7 +35,7 @@ public class FreeCommentDto {
 		this.authorId = freeComment.getAuthor().getId();
 		this.createdAt = freeComment.getCreatedAt();
 	}
-	// Entity -> Dto 변환
+
 	public static FreeCommentDto convertToDto(FreeComment freeComment) {
 		return FreeCommentDto.builder()
 				.id(freeComment.getId())

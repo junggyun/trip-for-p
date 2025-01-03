@@ -10,6 +10,5 @@ import team.seventhmile.tripforp.domain.freePost.entity.FreePost;
 @Repository
 public interface FreePostRepository extends JpaRepository<FreePost, Long>, FreePostRepositoryCustom {
 
-    //[마이페이지]내가 작성한 자유게시글 조회
     Page<FreePost> findByUserEmailOrderByCreatedAtDesc(String email, Pageable pageable);
 }

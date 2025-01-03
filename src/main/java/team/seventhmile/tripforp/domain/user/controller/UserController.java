@@ -3,8 +3,6 @@ package team.seventhmile.tripforp.domain.user.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +28,6 @@ import team.seventhmile.tripforp.global.exception.AuthCustomException;
 import team.seventhmile.tripforp.global.exception.ErrorCode;
 import team.seventhmile.tripforp.global.jwt.JwtUtil;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -43,7 +40,6 @@ public class UserController {
 		this.jwtUtil = jwtUtil;
 	}
 
-	// 회원가입
 	@PostMapping("/registration")
 	public ResponseEntity<?> signup(@Valid @RequestBody UserDto userDto) {
 
@@ -52,7 +48,6 @@ public class UserController {
 		return ResponseEntity.ok(new ApiResponse("success", "회원 가입 성공했습니다."));
 	}
 
-	// 닉네임 중복체크(중복 시 true 반환)
 	@GetMapping("/nickname-verification")
 	public ResponseEntity<?> checkDuplicatedNickname(@RequestParam("nickname") String nickname) {
 		boolean isDuplicated = userService.isDuplicatedNickname(nickname);
@@ -63,45 +58,38 @@ public class UserController {
 		}
 	}
 
-	// refresh 토큰 재발급
 	@PostMapping("/reissue")
 	public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
 		return jwtUtil.reissueToken(request, response);
 	}
 
-	//(마이페이지)개인정보 조회
 	@GetMapping("/me")
 	public ResponseEntity<UserInfoResponse> getUserInfo(
 		@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userService.getUserInfo(userDetails));
 	}
 
-	//개인정보 수정
 	@PreAuthorize("hasRole('USER')")
 	@PatchMapping("/me")
 	public ResponseEntity<UserInfoResponse> updateUser(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@Valid @RequestBody UserInfoRequest userInfoReq) {
-		log.info("userController : userinfoReq {}", userInfoReq);
 		return ResponseEntity.ok(userService.updateInfo(userDetails, userInfoReq));
 	}
 
-	//비밀번호 변경
 	@PatchMapping("/me/password")
 	public ResponseEntity<?> modifyPassword(HttpServletRequest request,
 		@Valid @RequestBody ModifyPasswordRequest modifyPasswordRequest) {
 		return userService.modifyPassword(request, modifyPasswordRequest.getNewPassword());
 	}
 
-	//비밀번호 찾기(비밀번호 재설정)
 	@PostMapping("/password/renewal")
 	public ResponseEntity<?> resetPassword(@Valid @RequestBody FindPasswordRequest findPasswordRequest) {
-		log.info("controller : {}", findPasswordRequest.getNewPassword());
 		return userService.findPassword(findPasswordRequest.getEmail(),
 			findPasswordRequest.getNewPassword());
 	}
-	//회원 탈퇴
+
 	@PatchMapping("/deletion")
 	public ResponseEntity<?> deleteUser(
 			@AuthenticationPrincipal UserDetails userDetails,
