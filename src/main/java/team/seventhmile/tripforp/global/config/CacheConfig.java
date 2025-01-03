@@ -20,6 +20,7 @@ public class CacheConfig {
         List<CaffeineCache> caches = new ArrayList<>();
         caches.add(buildRegionCache());
         caches.add(buildEmailCodeCache());
+        caches.add(buildPlaceCache());
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(caches);
@@ -38,6 +39,14 @@ public class CacheConfig {
             Caffeine.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .recordStats()
+                .build());
+    }
+
+    private CaffeineCache buildPlaceCache() {
+        return new CaffeineCache("places",
+            Caffeine.newBuilder()
+                .expireAfterWrite(1, TimeUnit.HOURS)
+                .maximumSize(6)
                 .build());
     }
 }
