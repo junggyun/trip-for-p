@@ -93,7 +93,6 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
             ))
             .from(qCourse)
             .where(qCourse.creator.email.eq(email))
-            .leftJoin(qCourse.creator).fetchJoin()
             .orderBy(qCourse.createdAt.desc())
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())

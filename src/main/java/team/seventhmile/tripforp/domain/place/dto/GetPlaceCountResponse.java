@@ -13,8 +13,8 @@ public class GetPlaceCountResponse {
     private Long count;
 
     @QueryProjection
-    public GetPlaceCountResponse(Place place, Long count) {
-        this.place = new PlaceDto(place);
+    public GetPlaceCountResponse(Long id, String mapPlaceId, Long count) {
+        this.place = new PlaceDto(id, mapPlaceId);
         this.count = count;
     }
 }

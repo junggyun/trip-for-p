@@ -72,7 +72,7 @@ public class MemoryEmailService implements EmailService {
         if (!saved.equals(code)) {
             throw new AuthCustomException(ErrorCode.INVALID_VERIFICATION_CODE);
         }
-        cache.evict(email);
+        cache.put(email, "verified");
     }
 
     @Override

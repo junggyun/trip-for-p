@@ -65,7 +65,7 @@ public class GoogleMapsService {
 
     public PhotoPlaceResponse photoPlaceApi(DetailPlaceApiRequest request) {
 
-        PhotoPlaceResponse response = webClient.get()
+        return webClient.get()
             .uri(uriBuilder -> uriBuilder
                 .path("/places/" + request.getId())
                 .queryParam("languageCode", request.getLanguageCode())
@@ -77,20 +77,23 @@ public class GoogleMapsService {
             })
             .retrieve()
             .bodyToMono(GoogleMapsPlaceApiDto.class)
-            .map(PhotoPlaceResponse::new)
-            .block();
+            .flatMap(placeDto -> {
+                PhotoPlaceResponse response = new PhotoPlaceResponse(placeDto);
 
-        GoogleMapsPhotoApiDto uriResponse = webClient.get()
-            .uri(uriBuilder -> uriBuilder
-                .path("/" + response.getPhotoUri() + "/media")
-                .queryParam("maxWidthPx", 350)
-                .queryParam("maxHeightPx", 250)
-                .queryParam("skipHttpRedirect", true)
-                .build())
-            .retrieve()
-            .bodyToMono(GoogleMapsPhotoApiDto.class)
+                return webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                        .path("/" + response.getPhotoUri() + "/media")
+                        .queryParam("maxWidthPx", 350)
+                        .queryParam("maxHeightPx", 250)
+                        .queryParam("skipHttpRedirect", true)
+                        .build())
+                    .retrieve()
+                    .bodyToMono(GoogleMapsPhotoApiDto.class)
+                    .map(photoDto -> {
+                        response.setPhotoUri(photoDto.getPhotoUri());
+                        return response;
+                    });
+            })
             .block();
-        response.setPhotoUri(uriResponse.getPhotoUri());
-        return response;
     }
 }
