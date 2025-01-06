@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import createPersistedState from 'vuex-persistedstate';
 import jwtDecoder from 'vue-jwt-decode';
 import {refreshTokenAPI} from "@/api/user.js";
+import router from "@/router";
 
 
 
@@ -13,7 +14,7 @@ const store = createStore({
         getAccessToken: function (state) {
             return state.accessToken;
         },
-        isAccessTokenValid: function (state) {
+        isAccessTokenValid: async function (state) {
             if (!state.accessToken) {
                 return false;
             }
@@ -23,10 +24,16 @@ const store = createStore({
                 if (decodedToken.exp > currentTime) {
                     return true;
                 }
-                refreshTokenAPI().then(response => {
-                    const newToken = response.headers.access.split(" ")[1]
+                try {
+                    const response = await refreshTokenAPI();
+                    const newToken = response.headers.access.split(" ")[1];
                     store.commit('setAccessToken', newToken);
-                });
+                } catch (error) {
+                    store.commit('clearData');
+                    alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+                    await router.push('/login');
+                    return Promise.reject('Token expired');
+                }
 
                 return true;
             } catch (error) {
