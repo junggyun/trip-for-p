@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import team.seventhmile.tripforp.domain.region.entity.Province;
 import team.seventhmile.tripforp.domain.region.entity.Region;
 
-public interface RegionRepository extends JpaRepository<Region, Long> {
+public interface RegionRepository extends JpaRepository<Region, Long>, RegionRepositoryCustom {
 
     Optional<Region> findByProvinceAndCity(Province province, String city);
 

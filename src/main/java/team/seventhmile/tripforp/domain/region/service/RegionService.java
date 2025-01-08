@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.seventhmile.tripforp.domain.region.dto.CreateRegionRequest;
+import team.seventhmile.tripforp.domain.region.dto.GetPopularRegionsResponse;
 import team.seventhmile.tripforp.domain.region.entity.Province;
 import team.seventhmile.tripforp.domain.region.entity.Region;
 import team.seventhmile.tripforp.domain.region.repository.RegionRepository;
@@ -61,6 +62,11 @@ public class RegionService {
             result.add(region.getCity());
         }
         return result;
+    }
+
+    @Cacheable(value = "popularRegions", key = "'popular'")
+    public List<GetPopularRegionsResponse> getPopularRegions(int size) {
+        return regionRepository.getPopularRegions(size);
     }
 
 }
