@@ -424,7 +424,6 @@ onMounted(async () => {
     flex-direction: column;
     gap: 20px;
     max-width: 500px;
-    overflow-y: auto;
 }
 
 .google-map-component {

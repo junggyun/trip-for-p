@@ -88,6 +88,14 @@ const getCityListByProvinceAPI = function (province) {
         }
     })
 }
+// 인기지역 조회
+const getPopularRegionsAPI = function (size) {
+    return instance.get(`/api/regions/popular`, {
+        params: {
+            size: size
+        }
+    })
+};
 
 export {
     createCourseAPI,
@@ -101,5 +109,6 @@ export {
     checkCourseLikeAPI,
     getMyLikedCoursesAPI,
     getProvinceListAPI,
-    getCityListByProvinceAPI
+    getCityListByProvinceAPI,
+    getPopularRegionsAPI
 }

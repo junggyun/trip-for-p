@@ -3,6 +3,8 @@ package team.seventhmile.tripforp.domain.magazine.service;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class MagazineService {
     private final MagazineFileService magazineFileService;
 
     @Transactional
+    @CacheEvict(value = "magazines", allEntries = true)
     public MagazineDto createMagazinePost(MagazineDto magazineDto, String userEmail,
         List<MultipartFile> files) throws IOException {
 
@@ -53,6 +56,7 @@ public class MagazineService {
     }
 
     @Transactional
+    @CacheEvict(value = "magazines", allEntries = true)
     public MagazineDto updateMagazinePost(Long id, MagazineDto magazineDto, String userEmail,
         List<MultipartFile> files) throws IOException {
 
@@ -85,6 +89,7 @@ public class MagazineService {
     }
 
     @Transactional
+    @CacheEvict(value = "magazines", allEntries = true)
     public void deleteMagazinePost(Long id, String userEmail) {
 
         Magazine magazine = magazineRepository.findById(id)
@@ -106,13 +111,6 @@ public class MagazineService {
         magazineRepository.delete(magazine);
     }
 
-    @Transactional(readOnly = true)
-    public Page<MagazineDto> getAllMagazineList(Pageable pageable) {
-
-        return magazineRepository.findAllByOrderByCreatedAtDesc(pageable)
-            .map(MagazineDto::convertToDto);
-    }
-
     @Transactional
     public MagazineDto getMagazineDetail(Long id) {
         Magazine magazine = magazineRepository.findById(id)
@@ -124,6 +122,15 @@ public class MagazineService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "magazines")
+    public Page<MagazineDto> getAllMagazineList(Pageable pageable) {
+
+        return magazineRepository.findAllByOrderByCreatedAtDesc(pageable)
+            .map(MagazineDto::convertToDto);
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = "magazines")
     public Page<MagazineDto> getMagazineSearch(String keyword, Pageable pageable) {
 
         if (keyword == null || keyword.trim().isEmpty()) {

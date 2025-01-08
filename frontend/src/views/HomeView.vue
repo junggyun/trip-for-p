@@ -1,26 +1,25 @@
 <script setup>
-import {computed, onMounted, ref, onUnmounted} from 'vue';
-import {getPopularPlaceListAPI} from "@/api/course";
+import {computed, onMounted, onUnmounted, ref} from 'vue';
+import {getPopularRegionsAPI} from "@/api/course";
 import locationImage from '@/assets/location.png'
 import router from "@/router";
 import {getMagazineListAPI} from "@/api/magazine";
 
 const magazines = ref([]);
-const places = ref([]);
+const regions = ref([]);
 const plans = ref([]);
-const isLoadingPlaces = ref(true);
 
 // 각 섹션별 현재 슬라이드 인덱스 관리
 const magazineSlideIndex = ref(0);
-const placeSlideIndex = ref(0);
+const regionSlideIndex = ref(0);
 const planSlideIndex = ref(0);
 
 // 각 섹션별 interval 저장
 let magazineInterval;
-let placeInterval;
+let regionInterval;
 let planInterval;
 
-const getMagazineList = async function() {
+const getMagazineList = async function () {
     try {
         const request = {
             size: 6,
@@ -34,17 +33,14 @@ const getMagazineList = async function() {
     }
 }
 
-const getPopularPlaceList = async function () {
+const getPopularRegionList = async function () {
     try {
-        isLoadingPlaces.value = true;
-        const response = await getPopularPlaceListAPI();
-        places.value = response.data;
+        const response = await getPopularRegionsAPI(10);
+        regions.value = response.data;
     } catch (error) {
-        console.log(error);
-    } finally {
-        isLoadingPlaces.value = false;
+        console.log(error)
     }
-};
+}
 
 const getImageSrc = computed(() => (imageUrl) => {
     return imageUrl && imageUrl.trim() !== '' ? imageUrl : locationImage;
@@ -54,46 +50,49 @@ const goToMagazineDetail = (id) => {
     router.push(`/magazine/${id}`)
 };
 
+const goToCourseListByRegion = (city) => {
+    router.push(`/course/search?keyword=${city}`)
+}
+
 const goToPlanDetail = (id) => {
     router.push(`/plan/${id}`)
-};
-
-const goToPlaceUri = (uri) => {
-    window.open(uri, '_blank');
 };
 
 const moveSlide = (direction, section) => {
     const gridElement = document.querySelector(`.${section}-section .grid`);
     const items = gridElement.querySelectorAll('.item');
-    if (!items.length) return;
+    if (!items.length) {
+        return;
+    }
+
+    const isMobile = window.innerWidth <= 768;
 
     // 아이템의 전체 너비 (gap 포함)
-    const itemWidth = items[0].offsetWidth + 32; // 32px는 gap 2rem
+    const itemWidth = items[0].offsetWidth + (isMobile ? 20 : 32);
     let currentIndex;
     let maxIndex;
     let slideIndex;
 
-    switch(section) {
+    switch (section) {
         case 'magazine':
             currentIndex = magazineSlideIndex.value;
-            // 3개씩 보이므로 maxIndex는 전체 길이 - 2
-            maxIndex = Math.max(0, magazines.value.length - 2);
+            maxIndex = magazines.value.length - (isMobile ? 0 : 2);
             magazineSlideIndex.value = direction === 'next'
                 ? (currentIndex + 1) % maxIndex
                 : (currentIndex - 1 + maxIndex) % maxIndex;
             slideIndex = magazineSlideIndex.value;
             break;
-        case 'popular-places':
-            currentIndex = placeSlideIndex.value;
-            maxIndex = Math.max(0, places.value.length - 2);
-            placeSlideIndex.value = direction === 'next'
+        case 'popular-regions':
+            currentIndex = regionSlideIndex.value;
+            maxIndex = regions.value.length - (isMobile ? 0 : 2);
+            regionSlideIndex.value = direction === 'next'
                 ? (currentIndex + 1) % maxIndex
                 : (currentIndex - 1 + maxIndex) % maxIndex;
-            slideIndex = placeSlideIndex.value;
+            slideIndex = regionSlideIndex.value;
             break;
         case 'popular-plans':
             currentIndex = planSlideIndex.value;
-            maxIndex = Math.max(0, plans.value.length - 2);
+            maxIndex = plans.value.length - (isMobile ? 0 : 2);
             planSlideIndex.value = direction === 'next'
                 ? (currentIndex + 1) % maxIndex
                 : (currentIndex - 1 + maxIndex) % maxIndex;
@@ -101,32 +100,26 @@ const moveSlide = (direction, section) => {
             break;
     }
 
-    // 슬라이드 전환 애니메이션 적용
-    if (direction === 'next' && slideIndex === 0) {
-        // 마지막에서 처음으로 돌아갈 때
-        gridElement.style.transition = 'transform 0.5s ease';
-        gridElement.style.transform = `translateX(0)`;
-    } else if (direction === 'prev' && slideIndex === maxIndex - 1) {
-        // 처음에서 마지막으로 갈 때
-        gridElement.style.transition = 'transform 0.5s ease';
-        gridElement.style.transform = `translateX(-${slideIndex * itemWidth}px)`;
-    } else {
-        // 일반적인 슬라이드 전환
-        gridElement.style.transition = 'transform 0.5s ease';
-        gridElement.style.transform = `translateX(-${slideIndex * itemWidth}px)`;
-    }
+    gridElement.style.transition = 'transform 0.5s ease';
+    gridElement.style.transform = `translateX(-${slideIndex * itemWidth}px)`;
 };
 
 const startAutoSlides = () => {
     magazineInterval = setInterval(() => moveSlide('next', 'magazine'), 3000);
-    placeInterval = setInterval(() => moveSlide('next', 'popular-places'), 3000);
+    regionInterval = setInterval(() => moveSlide('next', 'popular-regions'), 3000);
     planInterval = setInterval(() => moveSlide('next', 'popular-plans'), 3000);
 };
 
 const stopAutoSlides = () => {
-    if (magazineInterval) clearInterval(magazineInterval);
-    if (placeInterval) clearInterval(placeInterval);
-    if (planInterval) clearInterval(planInterval);
+    if (magazineInterval) {
+        clearInterval(magazineInterval);
+    }
+    if (regionInterval) {
+        clearInterval(regionInterval);
+    }
+    if (planInterval) {
+        clearInterval(planInterval);
+    }
 };
 
 const resumeAutoSlides = () => {
@@ -134,24 +127,32 @@ const resumeAutoSlides = () => {
     startAutoSlides();
 };
 
+const handleResize = () => {
+    moveSlide('next', 'magazine');
+    moveSlide('next', 'popular-regions');
+    moveSlide('next', 'popular-plans');
+};
+
 onMounted(() => {
     getMagazineList().then(() => {
-        if (magazines.value.length) startAutoSlides();
+        if (magazines.value.length) {
+            startAutoSlides();
+        }
     });
-    getPopularPlaceList();
+    getPopularRegionList();
+    // 저장된 함수를 이벤트 리스너로 등록
+    window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
     stopAutoSlides();
+    // 동일한 함수를 이벤트 리스너에서 제거
+    window.removeEventListener('resize', handleResize);
 });
 </script>
 
 <template>
-    <div v-if="isLoadingPlaces" class="loading-container">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">페이지 불러오는 중...</p>
-    </div>
-    <div v-else class="container">
+    <div class="container">
         <section class="magazine-section">
             <h1 class="section-title">매거진</h1>
             <div class="slider-container">
@@ -164,7 +165,8 @@ onUnmounted(() => {
                              class="item"
                              @click="goToMagazineDetail(magazine.id)">
                             <div class="image-container">
-                                <img :src="magazine.fileUrls[0]" :alt="magazine.title" class="item-image">
+                                <img :src="magazine.fileUrls[0]" :alt="magazine.title"
+                                     class="item-image">
                             </div>
                             <div class="item-content">
                                 <h2 class="item-title">{{ magazine.title }}</h2>
@@ -177,38 +179,11 @@ onUnmounted(() => {
             </div>
         </section>
 
-        <section class="popular-places-section">
-            <h1 class="section-title">인기 방문지</h1>
-            <div class="slider-container">
-                <button class="nav-button prev" @click="moveSlide('prev', 'popular-places')">&lt;</button>
-                <div class="grid-wrapper">
-                    <div class="grid"
-                         @mouseenter="stopAutoSlides"
-                         @mouseleave="resumeAutoSlides">
-                        <div v-for="place in places" :key="place.place.id"
-                             class="item"
-                             @click="goToPlaceUri(place.place.placeUri)">
-                            <div class="image-container">
-                                <img :src="getImageSrc(place.place.photoUri)"
-                                     :alt="place.place.name"
-                                     class="item-image">
-                            </div>
-                            <div class="item-content">
-                                <h2 class="item-title">{{ place.place.name }}</h2>
-                                <p class="item-address">{{ place.place.address }}</p>
-                                <p class="item-description">방문 횟수: {{ place.count }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="nav-button next" @click="moveSlide('next', 'popular-places')">&gt;</button>
-            </div>
-        </section>
-
         <section class="popular-plans-section">
             <h1 class="section-title">인기 코스</h1>
             <div class="slider-container">
-                <button class="nav-button prev" @click="moveSlide('prev', 'popular-plans')">&lt;</button>
+                <button class="nav-button prev" @click="moveSlide('prev', 'popular-plans')">&lt;
+                </button>
                 <div class="grid-wrapper">
                     <div class="grid"
                          @mouseenter="stopAutoSlides"
@@ -228,7 +203,40 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </div>
-                <button class="nav-button next" @click="moveSlide('next', 'popular-plans')">&gt;</button>
+                <button class="nav-button next" @click="moveSlide('next', 'popular-plans')">&gt;
+                </button>
+            </div>
+        </section>
+        <section class="popular-regions-section">
+            <h1 class="section-title">인기 여행지</h1>
+            <div class="slider-container">
+                <button class="nav-button prev" @click="moveSlide('prev', 'popular-regions')">&lt;
+                </button>
+                <div class="grid-wrapper">
+                    <div class="grid"
+                         @mouseenter="stopAutoSlides"
+                         @mouseleave="resumeAutoSlides">
+                        <div v-for="region in regions" :key="region.id"
+                             class="item region-item"
+                            @click="goToCourseListByRegion(region.city)">
+                            <div class="region-content">
+                                <div class="region-info">
+                                    <h2 class="region-name">{{ region.city }}</h2>
+                                    <p class="region-province">{{ region.province }}</p>
+                                    <div class="region-stats">
+                                        <div class="stats-item">
+                                            <span class="stats-icon">📍</span>
+                                            <span class="stats-value">{{ region.count }}개의 코스</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="region-gradient"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="nav-button next" @click="moveSlide('next', 'popular-regions')">&gt;
+                </button>
             </div>
         </section>
     </div>
@@ -239,7 +247,7 @@ onUnmounted(() => {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 5rem 1rem 0 1rem;
+    padding: 2rem 1rem 0 1rem;
 }
 
 .section-title {
@@ -347,65 +355,180 @@ onUnmounted(() => {
     margin: 0;
 }
 
-.item-address {
-    font-size: 0.85rem;
-    color: #666;
-    margin: 0;
-    line-height: 1.4;
-}
-
 .item-description {
     font-size: 0.9rem;
     color: #444;
     margin: 0.5rem 0 0 0;
 }
 
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 0;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-.loading-text {
-    margin-top: 1rem;
-    color: #666;
-    font-size: 1rem;
-}
-
 .popular-plans-section {
     display: none;
 }
 
+.region-item {
+    position: relative;
+    height: 200px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+}
+
+.region-content {
+    position: relative;
+    height: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 2;
+}
+
+.region-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    z-index: 1;
+}
+
+.region-info {
+    color: white;
+}
+
+.region-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    margin-bottom: 0.25rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.region-province {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+.region-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-icon {
+    font-size: 1.2rem;
+}
+
+.stats-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* 각 지역별로 다른 그라데이션 배경을 주기 위한 스타일 */
+.region-item:nth-child(3n + 1) {
+    background-image: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
+}
+
+.region-item:nth-child(3n + 2) {
+    background-image: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.region-item:nth-child(3n + 3) {
+    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+}
+
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 768px) {
+    .container {
+        padding: 1rem 0.5rem 0 0.5rem;
+    }
+
     .section-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
+        margin-bottom: 0;
     }
 
     .item {
-        min-width: 85%;
-        flex: 0 0 85%;
+        min-width: calc(100% - 20px);  /* 한 화면에 하나의 아이템만 */
+        flex: 0 0 calc(100% - 20px);
+        margin: 0 10px;
+    }
+    .grid-wrapper {
+        margin: 0 40px;  /* 좌우 여백 줄임 */
+    }
+    .grid {
+        gap: 0;
+    }
+    .nav-button {
+        width: 32px;   /* 버튼 크기 줄임 */
+        height: 32px;
+        font-size: 1.2rem;
+    }
+
+    .item-content {
+        padding: 1rem;
+    }
+
+    .item-title {
+        font-size: 1.1rem;
+    }
+
+    .item-description {
+        font-size: 0.85rem;
+    }
+
+    /* 지역 카드 스타일 수정 */
+    .region-item {
+        height: 150px;  /* 높이 줄임 */
+    }
+
+    .region-content {
+        padding: 1rem;
+    }
+
+    .region-name {
+        font-size: 1.3rem;
+    }
+
+    .region-province {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-value {
+        font-size: 0.8rem;
+    }
+    .slider-container {
+        margin-bottom: 2rem;
     }
 }
 
 @media (max-width: 480px) {
     .section-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+    }
+
+    .nav-button {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
     }
 }
 </style>

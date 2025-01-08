@@ -129,7 +129,7 @@ watch(
             <div class="search-box">
                 <input
                     v-model="searchKeyword"
-                    placeholder="여행 코스 검색"
+                    placeholder="시/도 또는 구/군 이름으로 검색"
                     @keyup.enter="handleSearch"
                     class="search-input"
                 />

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.seventhmile.tripforp.domain.region.dto.CreateRegionRequest;
+import team.seventhmile.tripforp.domain.region.dto.GetPopularRegionsResponse;
 import team.seventhmile.tripforp.domain.region.service.RegionService;
 
 @RestController
@@ -52,5 +53,13 @@ public class RegionController {
     ) {
         return ResponseEntity
             .ok(regionService.getCityListByProvince(province));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<List<GetPopularRegionsResponse>> getPopularRegions(
+        int size
+    ) {
+        return ResponseEntity
+            .ok(regionService.getPopularRegions(size));
     }
 }

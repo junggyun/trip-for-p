@@ -1,11 +1,13 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, defineEmits, onMounted, ref} from "vue";
 import store from "@/store";
 import {logoutAPI} from "@/api/user";
 
 const isAccessTokenValid = computed(() => store.getters.isAccessTokenValid);
 const isAdmin = computed(() => store.getters.getRole==='ADMIN');
 const isSubmenuVisible = ref(false);
+const emit = defineEmits(['submenu-expanded']);
+
 
 const logout = function () {
     logoutAPI();
@@ -14,7 +16,11 @@ const logout = function () {
 
 const toggleSubmenu = () => {
     isSubmenuVisible.value = !isSubmenuVisible.value;
+    emit('submenu-expanded', isSubmenuVisible.value);
 };
+onMounted(() => {
+    console.log(isAccessTokenValid)
+})
 </script>
 
 <template>
@@ -59,10 +65,10 @@ const toggleSubmenu = () => {
 
             <!-- v-show로 토글 기능 추가 -->
             <ul class="submenu" :class="{ 'submenu-visible': isSubmenuVisible }">
-                <li><router-link to="/course/search?keyword="  @click="isSubmenuVisible = false">코스 찾기</router-link></li>
-                <li><router-link to="/course/write" @click="isSubmenuVisible = false">코스 등록</router-link></li>
-                <li><router-link to="/free-post" @click="isSubmenuVisible = false">자유게시판</router-link></li>
-                <li><router-link to="/review-post" @click="isSubmenuVisible = false">리뷰게시판</router-link></li>
+                <li><router-link to="/course/search?keyword="  @click="toggleSubmenu">코스 찾기</router-link></li>
+                <li><router-link to="/course/write" @click="toggleSubmenu">코스 등록</router-link></li>
+                <li><router-link to="/free-post" @click="toggleSubmenu">자유게시판</router-link></li>
+                <li><router-link to="/review-post" @click="toggleSubmenu">리뷰게시판</router-link></li>
             </ul>
 
         </nav>
@@ -255,7 +261,7 @@ header {
 
     .header-container {
         position: relative;
-        padding: 1rem;
+        padding: 1rem 1rem 2rem 1rem;
     }
 
     .submenu-toggle {
