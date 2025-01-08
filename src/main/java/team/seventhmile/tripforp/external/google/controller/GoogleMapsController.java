@@ -2,6 +2,7 @@ package team.seventhmile.tripforp.external.google.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/google-maps")
 public class GoogleMapsController {
 
