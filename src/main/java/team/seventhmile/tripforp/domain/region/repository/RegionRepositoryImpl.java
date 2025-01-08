@@ -27,7 +27,7 @@ public class RegionRepositoryImpl implements RegionRepositoryCustom {
             qRegion.id.count()
         ))
             .from(qRegion)
-            .leftJoin(qCourse)
+            .innerJoin(qCourse)
             .on(qCourse.region.id.eq(qRegion.id))
             .groupBy(qRegion.id)
             .orderBy(qRegion.id.count().desc())
