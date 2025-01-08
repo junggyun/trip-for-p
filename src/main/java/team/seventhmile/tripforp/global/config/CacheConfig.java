@@ -20,8 +20,8 @@ public class CacheConfig {
         List<CaffeineCache> caches = new ArrayList<>();
         caches.add(buildRegionCache());
         caches.add(buildPopularRegionCache());
+        caches.add(buildMagazineCache());
         caches.add(buildEmailCodeCache());
-        caches.add(buildPlaceCache());
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(caches);
@@ -43,19 +43,18 @@ public class CacheConfig {
                 .build());
     }
 
+    private CaffeineCache buildMagazineCache() {
+        return new CaffeineCache("magazines",
+            Caffeine.newBuilder()
+                .maximumSize(20)
+                .build());
+    }
+
     private CaffeineCache buildEmailCodeCache() {
         return new CaffeineCache("emailCodes",
             Caffeine.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .recordStats()
-                .build());
-    }
-
-    private CaffeineCache buildPlaceCache() {
-        return new CaffeineCache("places",
-            Caffeine.newBuilder()
-                .expireAfterWrite(1, TimeUnit.HOURS)
-                .maximumSize(6)
                 .build());
     }
 }
