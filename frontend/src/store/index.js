@@ -14,7 +14,7 @@ const store = createStore({
         getAccessToken: function (state) {
             return state.accessToken;
         },
-        isAccessTokenValid: async function (state) {
+        isAccessTokenValid: function (state) {
             if (!state.accessToken) {
                 return false;
             }
@@ -25,13 +25,13 @@ const store = createStore({
                     return true;
                 }
                 try {
-                    const response = await refreshTokenAPI();
+                    const response = refreshTokenAPI();
                     const newToken = response.headers.access.split(" ")[1];
                     store.commit('setAccessToken', newToken);
                 } catch (error) {
                     store.commit('clearData');
                     alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-                    await router.push('/login');
+                    router.push('/login');
                     return Promise.reject('Token expired');
                 }
 
