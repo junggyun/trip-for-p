@@ -32,7 +32,12 @@ const handleSelectPlace = (place) => {
                 <button @click="$emit('close')" class="delete-btn" title="닫기">&times;</button>
             </div>
             <div class="places-list">
-                <div v-for="place in popularPlaces" :key="place.place.id" class="place-item">
+                <div v-if="popularPlaces.length === 0" class="empty-state">
+                    <div class="empty-icon">📍</div>
+                    <p class="empty-text">등록된 핫플레이스가 없습니다</p>
+                    <p class="empty-subtext">{{city}}의 첫 코스를 등록해주세요!</p>
+                </div>
+                <div v-else v-for="place in popularPlaces" :key="place.place.id" class="place-item">
                     <div class="place-content">
                         <div class="place-header">
                             <div class="place-info">
@@ -40,13 +45,13 @@ const handleSelectPlace = (place) => {
                                     <h3>{{ place.place.name }}</h3>
                                     <p class="address">{{ place.place.address }}</p>
                                     <div class="place-details">
-                                        <span class="category">{{ place.place.category }}</span>
+                                        <span v-if="place.place.category !== null" class="category">{{ place.place.category }}</span>
                                         <span class="rating">
                       <span class="rating-stars">★</span>
                       {{ place.place.rating.toFixed(1) }}
                       <span class="review-count">({{ place.place.reviewCount }})</span>
                     </span>
-                                        <span class="registration-count">{{ place.count }}명이 등록</span>
+                                        <span class="registration-count">{{ place.count }}번 방문</span>
                                     </div>
                                 </div>
                             </div>
@@ -235,6 +240,33 @@ const handleSelectPlace = (place) => {
     background-color: rgba(92, 106, 196, 0.1);
 }
 
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.empty-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
+}
+
+.empty-subtext {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
@@ -261,6 +293,9 @@ const handleSelectPlace = (place) => {
 
     .button-section {
         padding: 0 12px 12px 12px;
+    }
+    .empty-state {
+        padding: 32px 16px;
     }
 }
 </style>

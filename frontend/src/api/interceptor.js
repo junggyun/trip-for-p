@@ -18,8 +18,8 @@ const setInterceptors = function (instance) {
                         config.headers.Authorization = 'Bearer ' + newToken;
                     } catch (error) {
                         store.commit('clearData');
-                        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-                        await router.push('/login');
+                        alert('세션이 만료되었습니다.');
+                        await router.push('/');
                         return Promise.reject('Token expired');
                     }
                 } else {
@@ -51,9 +51,9 @@ const setInterceptors = function (instance) {
                     return instance(originalRequest);
                 } catch (refreshError) {
                     store.commit('clearData');
-                    alert('인증에 실패했습니다. 다시 로그인해주세요.');
-                    await router.push('/login');
-                    return Promise.reject(refreshError);
+                    alert('세션이 만료되었습니다.');
+                    await router.push('/');
+                    return Promise.reject('Token expired');
                 }
             }
 
