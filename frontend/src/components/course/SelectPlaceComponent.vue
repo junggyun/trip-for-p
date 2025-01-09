@@ -6,11 +6,13 @@ import router from "@/router";
 import {useRoute} from "vue-router";
 import {
     createCourseAPI,
-    getCityListByProvinceAPI,
+    getCityListByProvinceAPI, getPopularPlaceListAPI,
     getProvinceListAPI,
     updateCourseAPI
 } from "@/api/course";
 import GoogleMapComponent from "@/components/course/GoogleMapComponent.vue";
+import PopularPlacesSideBar from "@/components/course/PopularPlacesSideBar.vue";
+import SidebarToggleButton from "@/components/course/SidebarToggleButton.vue";
 
 const route = useRoute();
 
@@ -40,6 +42,8 @@ const currentDateIndex = ref(0);
 const deletedPlaces = ref([]);
 const GOOGLE_MAP_API_KEY = process.env.VUE_APP_GOOGLE_MAP_API_KEY;
 const emit = defineEmits(['back-to-day']);
+const popularPlaces = ref([]);
+const isSidebarOpen = ref(false);
 
 /**
  * 날짜 목록
@@ -243,6 +247,28 @@ const isSaveButtonEnabled = computed(() => {
         (props.mode === 'update' && hasPlaces);
 });
 
+// 인기 장소 처음 보여주기
+const showPopularPlaces = async () => {
+    try {
+        if (!city.value) return;
+
+        const request = {
+            city: city.value,
+            size: 5
+        }
+        const response = await getPopularPlaceListAPI(request);
+        popularPlaces.value = response.data;
+        isSidebarOpen.value = true;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// 토글 버튼으로 사이드바 열기/닫기
+const toggleSidebar = () => {
+    isSidebarOpen.value = !isSidebarOpen.value;
+};
+
 const getProvinceList = async function () {
     try {
         return await getProvinceListAPI();
@@ -341,6 +367,13 @@ onMounted(async () => {
                     {{ cty }}
                 </option>
             </select>
+            <button
+                @click="showPopularPlaces"
+                class="recommend-button"
+                :disabled="!city"
+            >
+                핫플 추천
+            </button>
         </div>
         <div class="date-navigation">
             <button @click="goToPreviousDate" :disabled="currentDateIndex === 0"
@@ -351,6 +384,19 @@ onMounted(async () => {
                     class="nav-button next-button">다음 &gt;
             </button>
         </div>
+        <SidebarToggleButton
+            v-if="popularPlaces.length > 0"
+            :is-open="isSidebarOpen"
+            @toggle="toggleSidebar"
+        />
+        <PopularPlacesSideBar
+            v-if="city"
+            :is-open="isSidebarOpen"
+            :popular-places="popularPlaces"
+            :city="city"
+            @close="isSidebarOpen = false"
+            @select-place="place => addPlace(place, dates[currentDateIndex])"
+        />
         <div class="main-content">
             <div class="map-section">
                 <GoogleMapComponent
@@ -562,9 +608,36 @@ onMounted(async () => {
     cursor: not-allowed;
 }
 
+.recommend-button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.recommend-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4f5bb4 0%, #7683c7 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(92, 106, 196, 0.2);
+}
+
+.recommend-button:disabled {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    cursor: not-allowed;
+}
+
 @media (max-width: 600px) {
     .location-selectors {
         flex-direction: column;
+    }
+    .recommend-button {
+        width: 100%;
     }
 }
 

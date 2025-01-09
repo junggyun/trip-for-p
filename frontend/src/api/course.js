@@ -44,9 +44,14 @@ const getMyCourseListAPI = function (request) {
         });
 };
 
-// 인기 장소 조회
-const getPopularPlaceListAPI = function () {
-    return instance.get(`/api/courses/popular-places`);
+// 지역별 인기 장소 조회
+const getPopularPlaceListAPI = function (request) {
+    return authInstance.get(`/api/courses/popular-places`, {
+        params: {
+            city: request.city,
+            size: request.size
+        }
+    });
 };
 
 // 코스 좋아요

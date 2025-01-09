@@ -20,6 +20,7 @@ public class CacheConfig {
         List<CaffeineCache> caches = new ArrayList<>();
         caches.add(buildRegionCache());
         caches.add(buildPopularRegionCache());
+        caches.add(buildPopularPlaceCache());
         caches.add(buildMagazineCache());
         caches.add(buildEmailCodeCache());
 
@@ -40,6 +41,14 @@ public class CacheConfig {
             Caffeine.newBuilder()
                 .maximumSize(20)
                 .expireAfterWrite(1, TimeUnit.DAYS)
+                .build());
+    }
+
+    private CaffeineCache buildPopularPlaceCache() {
+        return new CaffeineCache("popularPlaces",
+            Caffeine.newBuilder()
+                .expireAfterWrite(1, TimeUnit.DAYS)
+                .maximumSize(1500)
                 .build());
     }
 

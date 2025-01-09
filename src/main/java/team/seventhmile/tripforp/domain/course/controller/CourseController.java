@@ -97,7 +97,10 @@ public class CourseController {
     }
 
     @GetMapping("/popular-places")
-    public ResponseEntity<List<GetPopularPlaceResponse>> getPopularPlaces() {
-        return ResponseEntity.ok(spotService.getPlaceCount());
+    public ResponseEntity<List<GetPopularPlaceResponse>> getPopularPlaces(
+        String city,
+        Integer size
+    ) {
+        return ResponseEntity.ok(spotService.getPopularPlaces(city, size));
     }
 }

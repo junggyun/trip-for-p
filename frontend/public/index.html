@@ -14,11 +14,29 @@
         font-family: "Pretendard Variable", sans-serif;
         list-style: none;
       }
+      /* 스크롤바 스타일링 */
+      ::-webkit-scrollbar {
+        width: 8px;  /* 스크롤바 너비 */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);  /* 스크롤바 트랙 배경색 */
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);  /* 스크롤바 썸네일 색상 */
+        border-radius: 4px;
+        transition: background 0.3s ease;  /* 호버 효과 부드럽게 */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);  /* 호버시 더 진한 색상 */
+      }
       #app {
         display: flex;
         flex-direction: column;
         position: relative;
-        height: 100vh;
         align-items: center;
         overflow-x: hidden;
       }
