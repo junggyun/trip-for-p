@@ -22,8 +22,8 @@ watch(() => route.path, () => {
         <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/forgot-password'" class="app-header" :key="$route.path">
             <HeaderComponent @submenu-expanded="checkSubmenu"/>
         </div>
-        <div class="app-content" :class="{ 'no-padding': route.path === '/signup' || route.path === '/login' || route.path === '/forgot-password', 'submenu-expanded': isSubmenuVisible }">
-            <RouterView :key="$router.path"/>
+        <div class="app-content" :class="{ 'my-page': route.path === '/mypage', 'no-padding': route.path === '/signup' || route.path === '/login' || route.path === '/forgot-password', 'submenu-expanded': isSubmenuVisible }">
+            <RouterView :key="$router.path" :isSubmenuVisible="isSubmenuVisible"/>
         </div>
         <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/forgot-password'" class="app-footer">
             <FooterComponent/>
@@ -51,7 +51,7 @@ watch(() => route.path, () => {
     width: 60%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: calc(6rem + 5.5rem) 0 1rem 0;
+    padding: 195.8px 0 1rem 0;
     display: flex;
     justify-content: center;
 }
@@ -74,6 +74,12 @@ watch(() => route.path, () => {
     }
     .app-content.submenu-expanded {
         padding: calc(4rem + 5rem + 228px) 10px 1rem 10px;
+    }
+    .app-content.my-page {
+        padding: calc(4rem + 5rem + 80px) 10px 1rem 10px;
+    }
+    .app-content.submenu-expanded {
+        padding: calc(4rem + 5rem + 228px + 80px) 10px 1rem 10px;
     }
     .app-content.no-padding {
         padding: 0;

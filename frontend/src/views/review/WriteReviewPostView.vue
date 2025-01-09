@@ -29,7 +29,7 @@ const createReviewPost = async function () {
         const request = {
             title: title.value,
             content: content.value,
-            planId: selectedPlanId.value
+            courseId: selectedPlanId.value
         }
         const formData = new FormData();
         formData.append('request', new Blob([JSON.stringify(request)], {
