@@ -2,7 +2,6 @@ package team.seventhmile.tripforp.domain.spot.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.seventhmile.tripforp.domain.course.entity.Course;
@@ -14,7 +13,7 @@ import team.seventhmile.tripforp.domain.spot.dto.UpdateSpotRequest;
 import team.seventhmile.tripforp.domain.spot.entity.Spot;
 import team.seventhmile.tripforp.domain.spot.repository.SpotRepository;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
-import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
+import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
 import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
 import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
 
@@ -85,10 +84,10 @@ public class SpotService {
             });
     }
 
-    public List<GetPopularPlaceResponse> getPlaceCount() {
-        return spotRepository.getPlaceCount(PageRequest.of(0, 6)).stream()
+    public List<GetPopularPlaceResponse> getPopularPlaces(String city, int size) {
+        return spotRepository.getPlaceCount(city, size).stream()
             .map(p -> {
-                PhotoPlaceResponse response = googleMapsService.photoPlaceApi(
+                DetailPlaceResponse response = googleMapsService.detailPlaceApi(
                     DetailPlaceApiRequest.builder().id(p.getPlace().getMapPlaceId()).build());
                 return GetPopularPlaceResponse.builder()
                     .place(response)

@@ -31,7 +31,7 @@ public class GoogleMapsController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<Mono<DetailPlaceResponse>> detailPlace(
+    public ResponseEntity<DetailPlaceResponse> detailPlace(
         @ModelAttribute DetailPlaceApiRequest request
     ) {
         return ResponseEntity.ok(googleMapsService.detailPlaceApi(request));

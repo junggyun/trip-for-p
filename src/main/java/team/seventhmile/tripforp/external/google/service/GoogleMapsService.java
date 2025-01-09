@@ -45,7 +45,7 @@ public class GoogleMapsService {
             });
     }
 
-    public Mono<DetailPlaceResponse> detailPlaceApi(DetailPlaceApiRequest request) {
+    public DetailPlaceResponse detailPlaceApi(DetailPlaceApiRequest request) {
 
         return webClient.get()
             .uri(uriBuilder -> uriBuilder
@@ -59,7 +59,8 @@ public class GoogleMapsService {
             })
             .retrieve()
             .bodyToMono(GoogleMapsPlaceApiDto.class)
-            .map(DetailPlaceResponse::new);
+            .map(DetailPlaceResponse::new)
+            .block();
     }
 
     public PhotoPlaceResponse photoPlaceApi(DetailPlaceApiRequest request) {
