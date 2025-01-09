@@ -93,9 +93,9 @@ public class JwtUtil {
 		String role = getRole(refresh);
 		String nickname = getNickname(refresh);
 
-		String redisRefreshToken = refreshService.getRefreshToken(username);
+		String refreshToken = refreshService.getRefreshToken(username);
 
-		if (!refresh.equals(redisRefreshToken)) {
+		if (!refresh.equals(refreshToken)) {
 			return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
 		}
 
