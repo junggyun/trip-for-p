@@ -19,13 +19,13 @@ watch(() => route.path, () => {
 
 <template>
     <div class="app-wrapper">
-        <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/resetpassword'" class="app-header" :key="$route.path">
+        <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/forgot-password'" class="app-header" :key="$route.path">
             <HeaderComponent @submenu-expanded="checkSubmenu"/>
         </div>
-        <div class="app-content" :class="{ 'no-padding': route.path === '/signup' || route.path === '/login' || route.path === '/resetpassword', 'submenu-expanded': isSubmenuVisible }">
+        <div class="app-content" :class="{ 'no-padding': route.path === '/signup' || route.path === '/login' || route.path === '/forgot-password', 'submenu-expanded': isSubmenuVisible }">
             <RouterView :key="$router.path"/>
         </div>
-        <div v-if="route.path !== '/signup' && route.path !== '/login'" class="app-footer">
+        <div v-if="route.path !== '/signup' && route.path !== '/login' && route.path !== '/forgot-password'" class="app-footer">
             <FooterComponent/>
         </div>
     </div>
