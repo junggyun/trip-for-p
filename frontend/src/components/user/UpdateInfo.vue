@@ -1,6 +1,5 @@
-
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import axios from 'axios';
 import store from '@/store';
 import {getUserInfoAPI, verifyNickNameAPI} from "@/api/user";
@@ -10,296 +9,366 @@ const passwordCheck = ref('');
 const nickname = ref('');
 const userInfo = ref(null);
 const errorMessage = ref('');
-
-// 닉네임 중복 검사 관련 상태
 const isNicknameVerified = ref(false);
 const nicknameVerificationMessage = ref('');
 const isNicknameVerificationFailed = ref(false);
-
-// 비밀번호 검증 상태
 const isPasswordValid = ref(true);
 const passwordVerificationMessage = ref('');
 
-// 사용자 정보 가져오기
 const getUserInfo = async () => {
-  try {
-    const response = await getUserInfoAPI();
-    //console.log(response); // 응답을 확인
-    return response.data;
-  } catch (error) {
-    console.error('API 호출 에러:', error); // 에러 내용 확인
-    throw new Error('Error fetching user info');
-  }
+    try {
+        const response = await getUserInfoAPI();
+        return response.data;
+    } catch (error) {
+        console.error('API 호출 에러:', error);
+        throw new Error('Error fetching user info');
+    }
 };
 
 onMounted(async () => {
-  try {
-    const data = await getUserInfo();
-    userInfo.value = data;
-    nickname.value = data.nickname; // 사용자 정보로 초기화
-  } catch (error) {
-    errorMessage.value = error.message;
-  }
+    try {
+        const data = await getUserInfo();
+        userInfo.value = data;
+        nickname.value = data.nickname;
+    } catch (error) {
+        errorMessage.value = error.message;
+    }
 });
 
-// 닉네임 중복 검사
 const verifyNickname = async () => {
-  try {
-    const response = await verifyNickNameAPI(nickname.value);
-    if (response.status !== 'success') {
-      isNicknameVerified.value = false;
-      nicknameVerificationMessage.value = '이미 사용 중인 닉네임입니다.';
-      isNicknameVerificationFailed.value = true;
-    } else {
-      isNicknameVerified.value = true;
-      nicknameVerificationMessage.value = '사용 가능한 닉네임입니다.';
-      isNicknameVerificationFailed.value = false;
+    try {
+        const response = await verifyNickNameAPI(nickname.value);
+        if (response.status !== 'success') {
+            isNicknameVerified.value = false;
+            nicknameVerificationMessage.value = '이미 사용 중인 닉네임입니다.';
+            isNicknameVerificationFailed.value = true;
+        } else {
+            isNicknameVerified.value = true;
+            nicknameVerificationMessage.value = '사용 가능한 닉네임입니다.';
+            isNicknameVerificationFailed.value = false;
+        }
+    } catch (error) {
+        isNicknameVerified.value = false;
+        nicknameVerificationMessage.value = error.message || '닉네임 중복 검사 중 오류가 발생했습니다.';
+        isNicknameVerificationFailed.value = true;
     }
-  } catch (error) {
-    isNicknameVerified.value = false;
-    nicknameVerificationMessage.value = error.message || '닉네임 중복 검사 중 오류가 발생했습니다.';
-    isNicknameVerificationFailed.value = true;
-  }
 };
 
 watch(nickname, (newValue, oldValue) => {
-  if (newValue === '') {
-    nicknameVerificationMessage.value = ''; // 닉네임이 비었을 때 메시지를 초기화
-    isNicknameVerified.value = false;
-    isNicknameVerificationFailed.value = false;
-  } else if (newValue !== oldValue) {
-    isNicknameVerified.value = false;
-    isNicknameVerificationFailed.value = false;
-  }
+    if (newValue === '') {
+        nicknameVerificationMessage.value = '';
+        isNicknameVerified.value = false;
+        isNicknameVerificationFailed.value = false;
+    } else if (newValue !== oldValue) {
+        isNicknameVerified.value = false;
+        isNicknameVerificationFailed.value = false;
+    }
 });
 
-// 비밀번호 검증
 const validatePassword = () => {
-  const regex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
-  return regex.test(password.value);
+    const regex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
+    return regex.test(password.value);
 };
 
 watch([password, passwordCheck], () => {
-  if (password.value || passwordCheck.value) {
-    if (!validatePassword()) {
-      isPasswordValid.value = false;
-      passwordVerificationMessage.value = '비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.';
-    } else if (password.value !== passwordCheck.value) {
-      isPasswordValid.value = false;
-      passwordVerificationMessage.value = '비밀번호가 일치하지 않습니다.';
-    } else {
-      isPasswordValid.value = true;
-      passwordVerificationMessage.value = '';
+    if (password.value || passwordCheck.value) {
+        if (!validatePassword()) {
+            isPasswordValid.value = false;
+            passwordVerificationMessage.value = '비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.';
+        } else if (password.value !== passwordCheck.value) {
+            isPasswordValid.value = false;
+            passwordVerificationMessage.value = '비밀번호가 일치하지 않습니다.';
+        } else {
+            isPasswordValid.value = true;
+            passwordVerificationMessage.value = '';
+        }
     }
-  }
 });
 
 const isFormValid = computed(() => {
-  const isNicknameValid = nickname.value && isNicknameVerified.value;
-  const isPasswordValid = !password.value || (password.value && passwordCheck.value && password.value === passwordCheck.value);
-  return isNicknameValid || isPasswordValid;
+    const isNicknameValid = nickname.value && isNicknameVerified.value;
+    const isPasswordValid = !password.value || (password.value && passwordCheck.value
+        && password.value === passwordCheck.value);
+    return isNicknameValid || isPasswordValid;
 });
 
 const updateUserInfo = async () => {
-  try {
-    const updateUserRequest = {};
+    try {
+        const updateUserRequest = {};
 
-    if (nickname.value && isNicknameVerified.value && nickname.value !== userInfo.value.nickname) {
-      updateUserRequest.nickname = nickname.value;
+        if (nickname.value && isNicknameVerified.value && nickname.value
+            !== userInfo.value.nickname) {
+            updateUserRequest.nickname = nickname.value;
+        }
+
+        if (password.value) {
+            if (!validatePassword()) {
+                alert('비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.');
+                return;
+            }
+            if (password.value !== passwordCheck.value) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            updateUserRequest.password = password.value;
+        }
+
+        if (Object.keys(updateUserRequest).length === 0) {
+            alert('변경할 정보가 없습니다.');
+            return;
+        }
+
+        await axios.patch('/api/users/me', updateUserRequest, {
+            headers: {
+                Authorization: `Bearer ${store.getters.getAccessToken}`,
+            },
+        });
+
+        alert('회원 정보가 수정되었습니다.');
+        window.location.reload();
+    } catch (error) {
+        console.error('Error updating user info:', error.response || error);
+        if (error.response?.data) {
+            if (error.response.data.errors?.length > 0) {
+                alert(error.response.data.errors[0]);
+            } else {
+                alert(error.response.data.message || '회원 정보 수정 중 오류가 발생했습니다.');
+            }
+        } else {
+            alert('서버와의 통신 중 오류가 발생했습니다.');
+        }
     }
-
-    if (password.value) {
-      if (!validatePassword()) {
-        alert('비밀번호는 8~16자이며 영문 소문자, 숫자를 포함해야 합니다.');
-        return;
-      }
-      if (password.value !== passwordCheck.value) {
-        alert('비밀번호가 일치하지 않습니다.');
-        return;
-      }
-      updateUserRequest.password = password.value;
-    }
-
-    if (Object.keys(updateUserRequest).length === 0) {
-      alert('변경할 정보가 없습니다.');
-      return;
-    }
-    const response = await axios.patch('/api/users/me', updateUserRequest, {
-      headers: {
-        Authorization: `Bearer ${store.getters.getAccessToken}`,
-      },
-    });
-
-    console.log('Server response:', response); // 디버깅용
-
-    alert('회원 정보가 수정되었습니다.');
-    window.location.reload();
-  } catch (error) {
-    console.error('Error updating user info:', error.response || error); // 디버깅용
-    if (error.response && error.response.data) {
-      if(error.response.data.errors.length > 0){
-        alert(error.response.data.errors[0]);
-      }else {
-        alert(error.response.data.message || '회원 정보 수정 중 오류가 발생했습니다.');
-      }
-    } else {
-      alert('서버와의 통신 중 오류가 발생했습니다.');
-    }
-  }
 };
 </script>
 
 <template>
-  <div class="update-info">
-    <div class="update-content">
-      <div class="update-form">
-        <!-- 닉네임 입력 -->
-        <div class="nickname-verification-container">
-          <input type="text" class="update-nickname" placeholder="닉네임" v-model="nickname">
-          <button @click="verifyNickname" :disabled="!nickname" class="verification-button">중복확인</button>
+    <div class="update-info">
+        <div class="update-content">
+            <h2 class="update-title">회원정보 수정</h2>
+
+            <div class="update-form">
+                <!-- 닉네임 섹션 -->
+                <div class="form-section">
+                    <label class="input-label">닉네임</label>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="update-input"
+                            placeholder="닉네임을 입력하세요"
+                            v-model="nickname"
+                        >
+                        <button
+                            @click="verifyNickname"
+                            :disabled="!nickname"
+                            class="verification-button"
+                        >
+                            중복확인
+                        </button>
+                    </div>
+                    <p v-if="nicknameVerificationMessage"
+                       :class="['verification-message',
+               { 'success': isNicknameVerified, 'error': isNicknameVerificationFailed }]"
+                    >
+                        {{ nicknameVerificationMessage }}
+                    </p>
+                </div>
+
+                <!-- 비밀번호 섹션 -->
+                <div class="form-section">
+                    <label class="input-label">비밀번호</label>
+                    <input
+                        type="password"
+                        class="update-input"
+                        placeholder="새 비밀번호 (영문 소문자, 숫자 포함 8~16자)"
+                        v-model="password"
+                    >
+                    <input
+                        type="password"
+                        class="update-input"
+                        placeholder="비밀번호 확인"
+                        v-model="passwordCheck"
+                    >
+                    <p v-if="passwordVerificationMessage"
+                       :class="['verification-message',
+               { 'success': isPasswordValid, 'error': !isPasswordValid }]"
+                    >
+                        {{ passwordVerificationMessage }}
+                    </p>
+                </div>
+
+                <!-- 수정 버튼 -->
+                <button
+                    @click="updateUserInfo"
+                    :disabled="!isFormValid"
+                    class="submit-button"
+                >
+                    수정하기
+                </button>
+            </div>
         </div>
-        <!-- 닉네임 중복 검사 메시지 -->
-        <p v-if="nicknameVerificationMessage" :class="[
-          'verification-message',
-          { 'verification-success': isNicknameVerified, 'verification-failed': isNicknameVerificationFailed }
-        ]">
-          {{ nicknameVerificationMessage }}
-        </p>
-
-        <!-- 비밀번호 입력 -->
-        <input type="password" class="update-password" placeholder="변경할 비밀번호" v-model="password">
-        <input type="password" class="update-password-check" placeholder="비밀번호 확인" v-model="passwordCheck">
-
-        <!-- 비밀번호 검증 메시지 -->
-        <p v-if="passwordVerificationMessage" :class="[
-          'verification-message',
-          { 'verification-success': isPasswordValid, 'verification-failed': !isPasswordValid }
-        ]">
-          {{ passwordVerificationMessage }}
-        </p>
-
-        <button @click="updateUserInfo" :disabled="!isFormValid">수정하기</button>
-      </div>
     </div>
-  </div>
 </template>
 
-
 <style scoped>
+.update-info {
+    width: 100%;
+    height: 100%;
+}
+
 .update-content {
-  width: 100%;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.update-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
 .update-form {
-  width: 100%;
-  max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-/* 입력 필드 공통 스타일 */
-.update-password,
-.update-password-check,
-.update-nickname {
-  width: 100%;
-  height: 45px;
-  border: 1px solid #C5CCD2;
-  border-radius: 10px;
-  padding-left: 50px;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 12px;
-  background-repeat: no-repeat;
-  background-position: 20px center;
-  margin-top: 10px;
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.update-password,
-.update-password-check {
-  background-image: url("@/assets/password.png");
+.input-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
 }
 
-.update-nickname {
-  background-image: url("@/assets/nickname.png");
+.input-group {
+    display: flex;
+    gap: 0.5rem;
 }
 
-/* 포커스 스타일 */
-.update-password:focus,
-.update-password-check:focus,
-.update-nickname:focus {
-  outline: none;
-  border: 2px solid #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+.update-input {
+    width: 100%;
+    height: 54px;
+    border: 1px solid rgba(197, 204, 210, 0.8);
+    border-radius: 12px;
+    padding: 0 1.25rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* 버튼 스타일 */
-.update-form button {
-  background-color: #000000;
-  width: 70px;
-  height: 35px;
-  color: #FFFFFF;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 10px;
-  border-radius: 10px;
-  margin: 10px 0;
-  border: 1px solid #000000;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
+.update-input:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 4px rgba(92, 106, 196, 0.1);
 }
 
-.update-form button:disabled {
-  background-color: #D9D9D9;
-  border: 1px solid #D9D9D9;
-  cursor: not-allowed;
+.verification-button {
+    height: 54px;
+    padding: 0 1.5rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
-/* 닉네임 중복 검사 컨테이너 */
-.nickname-verification-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 10px;
+.verification-button:disabled {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
-/* 인증 메시지 스타일 */
+.verification-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
+}
+
 .verification-message {
-  font-size: 10px;
-  margin-top: 5px;
-  text-align: left;
-  width: 100%;
-}
-/* 인증 메시지 결과에 따른 색상 */
-.verification-success {
-  color: #28a745;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
 }
 
-.verification-failed {
-  color: #dc3545;
+.verification-message.success {
+    color: #5c6ac4;
 }
-/* 반응형 스타일 */
+
+.verification-message.error {
+    color: #dc3545;
+}
+
+.submit-button {
+    width: 100%;
+    height: 54px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submit-button:disabled {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.submit-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
+}
+
 @media (max-width: 768px) {
-  .update-password,
-  .update-password-check,
-  .update-nickname {
-    height: 50px;
-    font-size: 14px;
-  }
-  .update-form button {
-    height: 45px;
-    font-size: 14px;
-  }
+    .update-content {
+        padding: 0 1rem;
+    }
+
+    .update-title {
+        font-size: 1.25rem;
+    }
+
+    .update-input,
+    .verification-button,
+    .submit-button {
+        height: 48px;
+    }
 }
 
 @media (max-width: 480px) {
-  .update-password,
-  .update-password-check,
-  .update-nickname {
-    height: 45px;
-    font-size: 12px;
-    padding-left: 40px;
-  }
-  .update-form button {
-    height: 40px;
-    font-size: 12px;
-  }
-}
+    .update-content {
+        padding: 0 0.5rem;
+    }
 
+    .update-title {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-label {
+        font-size: 0.85rem;
+    }
+
+    .update-input {
+        font-size: 0.9rem;
+    }
+
+    .verification-button {
+        padding: 0 1rem;
+        font-size: 0.85rem;
+    }
+}
 </style>

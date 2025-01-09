@@ -6,42 +6,35 @@ import {sendPasswordResetEmailAPI, verifyEmailAPI, resetPasswordAPI} from "@/api
 const email = ref("");
 const password = ref("");
 const passwordCheck = ref("");
-//이메일 인증코드
 const verificationCode = ref("");
-//이메일 인증여부
 const isEmailVerified = ref(false);
-//인증코드 입력란
 const showVerificationInput = ref(false);
-//인증 결과
 const verificationMessage = ref("");
 const isVerificationFailed = ref(false);
 
-//이메일 인증코드 전송
 const sendPasswordResetEmail = async () => {
-  try {
-    await sendPasswordResetEmailAPI({ email: email.value });
-    alert("인증 이메일이 전송되었습니다.");
-    showVerificationInput.value = true;
-  } catch (error) {
-    alert(error.message);
-  }
+    try {
+        await sendPasswordResetEmailAPI({ email: email.value });
+        alert("인증 이메일이 전송되었습니다.");
+        showVerificationInput.value = true;
+    } catch (error) {
+        alert(error.message);
+    }
 };
 
-//인증코드 검증
 const verifyEmail = async () => {
-  try {
-    await verifyEmailAPI({ email: email.value, code: verificationCode.value.trim() });
-    isEmailVerified.value = true;
-    verificationMessage.value = "이메일이 성공적으로 인증되었습니다.";
-    isVerificationFailed.value = false;
-  } catch (error) {
-    isEmailVerified.value = false;
-    verificationMessage.value = error.message || "인증 코드가 올바르지 않습니다.";
-    isVerificationFailed.value = true;
-  }
+    try {
+        await verifyEmailAPI({ email: email.value, code: verificationCode.value.trim() });
+        isEmailVerified.value = true;
+        verificationMessage.value = "이메일이 성공적으로 인증되었습니다.";
+        isVerificationFailed.value = false;
+    } catch (error) {
+        isEmailVerified.value = false;
+        verificationMessage.value = error.message || "인증 코드가 올바르지 않습니다.";
+        isVerificationFailed.value = true;
+    }
 };
 
-// 버튼 활성화 여부를 computed로 계산
 const isFormValid = computed(() => {
     return email.value && password.value && passwordCheck.value && isEmailVerified.value;
 });
@@ -50,31 +43,15 @@ const goLogin = function () {
     router.push("/login");
 }
 
-const goHome = function () {
-    router.push("/");
-}
-
 const resetpw = async function () {
     try {
         const findPasswordRequest = {
             email: email.value,
             newPassword: password.value,
         }
-        if (!email.value) {
-            document.querySelector('.resetpw-email').focus();
+        if (!email.value || !password.value || !passwordCheck.value || !isEmailVerified.value) {
+            alert("모든 필드를 입력해주세요.");
             return;
-        }
-        if (!password.value) {
-            document.querySelector('.resetpw-password').focus();
-            return;
-        }
-        if (!passwordCheck.value) {
-            document.querySelector('.resetpw-password-check').focus();
-            return;
-        }
-        if (!isEmailVerified.value) {
-          alert("이메일 인증이 필요합니다.");
-          return;
         }
         if (!validateEmail()) {
             alert("올바르지 않은 이메일 형식입니다.")
@@ -97,24 +74,12 @@ const resetpw = async function () {
     }
 }
 
-const isSamePassword = function () {
-    return password.value === passwordCheck.value;
-}
-
-const validateEmail = function () {
-    const regex = /^[A-Za-z0-9_\\.\\-]+@[A-Za-z0-9\\-]+\.[A-Za-z0-9\\-]+/;
-    return regex.test(email.value);
-}
-
-const validatePassword = function () {
-    const regex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
-    return regex.test(password.value)
-}
+const isSamePassword = () => password.value === passwordCheck.value;
+const validateEmail = () => /^[A-Za-z0-9_\\.\\-]+@[A-Za-z0-9\\-]+\.[A-Za-z0-9\\-]+/.test(email.value);
+const validatePassword = () => /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/.test(password.value);
 
 onMounted(() => {
-    const inputs = document.querySelectorAll(
-        '.resetpw-email, .resetpw-password, .resetpw-password-check, .resetpw-nickname');
-
+    const inputs = document.querySelectorAll('.resetpw-input');
     inputs.forEach(input => {
         input.addEventListener('focus', () => {
             input.dataset.placeholder = input.placeholder;
@@ -122,7 +87,7 @@ onMounted(() => {
         });
 
         input.addEventListener('blur', () => {
-            if (input.dataset.placeholder !== undefined) {
+            if (input.dataset.placeholder) {
                 input.placeholder = input.dataset.placeholder;
                 delete input.dataset.placeholder;
             }
@@ -132,247 +97,245 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="resetpw-wrap">
-    <div class="resetpw-title">
-      <img src="../../assets/biglogo.png" alt="흠으로 이동" @click="goHome">
-    </div>
-    <div class="resetpw-content">
-      <div class="resetpw-form" @keyup.enter="resetpw">
-        <!-- 이메일 입력 -->
-        <div class="email-verification-container">
-          <input type="email" class="resetpw-email" placeholder="이메일" v-model="email">
-          <button @click="sendPasswordResetEmail" :disabled="!email" class="verification-button">인증</button>
-        </div>
-        <!-- 이메일 인증코드 확인(검증) -->
-        <div v-if="showVerificationInput" class="verification-code-container">
-          <input type="text" class="resetpw-verification" placeholder="인증 코드" v-model="verificationCode">
-          <button @click="verifyEmail" :disabled="!verificationCode" class="verify-button">확인</button>
-        </div>
-        <!-- 인증 메시지 -->
-        <p v-if="verificationMessage" :class="[
-              'verification-message',
-              { 'verification-success': isEmailVerified, 'verification-failed': isVerificationFailed }
-            ]">
-          {{ verificationMessage }}
-        </p>
-        <input type="password" v-if="isEmailVerified" class="resetpw-password" placeholder="비밀번호 (영문 대/소문자, 숫자, 특수문자 조합 8~16자)" v-model="password">
-        <input type="password" v-if="isEmailVerified" class="resetpw-password-check" placeholder="비밀번호 확인" v-model="passwordCheck">
-        <button @click="resetpw" v-if="isEmailVerified" :disabled="!isFormValid" class="resetpw-button">비밀번호 재설정</button>
-      </div>
+    <div class="resetpw-wrap">
+        <div class="resetpw-content">
+            <h1 class="resetpw-title">
+                <router-link to="/">
+                    <span class="title-main">Trip For P</span>
+                    <span class="title-sub">Reset Your Password</span>
+                </router-link>
+            </h1>
+            <div class="resetpw-form" @keyup.enter="resetpw">
+                <div class="input-group">
+                    <input type="email" class="resetpw-input" placeholder="이메일" v-model="email">
+                    <button @click="sendPasswordResetEmail" :disabled="!email" class="verification-button">
+                        인증하기
+                    </button>
+                </div>
 
-      <div class="go-login-button" @click="goLogin">
-        <img src="../../assets/signup.png" alt="">
-        <span>로그인으로 이동</span>
-      </div>
+                <div v-if="showVerificationInput" class="input-group">
+                    <input type="text" class="resetpw-input" placeholder="인증 코드" v-model="verificationCode">
+                    <button @click="verifyEmail" :disabled="!verificationCode" class="verification-button">
+                        확인
+                    </button>
+                </div>
+
+                <p v-if="verificationMessage" :class="['verification-message',
+                    { 'success': isEmailVerified, 'error': isVerificationFailed }]">
+                    {{ verificationMessage }}
+                </p>
+
+                <template v-if="isEmailVerified">
+                    <input type="password" class="resetpw-input"
+                           placeholder="새 비밀번호 (영문 소문자, 숫자 포함 8~16자)"
+                           v-model="password">
+                    <input type="password" class="resetpw-input"
+                           placeholder="새 비밀번호 확인"
+                           v-model="passwordCheck">
+                    <button @click="resetpw" :disabled="!isFormValid" class="submit-button">
+                        비밀번호 재설정
+                    </button>
+                </template>
+            </div>
+
+            <div class="login-actions">
+                <div class="go-login-button" @click="goLogin">
+                    <span>로그인으로 돌아가기</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
-/* 공통 스타일 */
 .resetpw-wrap {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.resetpw-title img {
-    width: 100%;
-    max-width: 450px; /* 최대 크기 제한 */
-    height: auto; /* 높이 자동 조절 */
-    cursor: pointer;
+    width: 100vw;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.1) 0%, rgba(135, 148, 216, 0.1) 100%);
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
 }
 
 .resetpw-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-    margin-bottom: 100px;
+    width: 100%;
+    max-width: 450px;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.resetpw-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.resetpw-title a:hover {
+    opacity: 0.8;
+}
+
+.title-main {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-sub {
+    display: block;
+    font-size: 1rem;
+    color: #888;
+    letter-spacing: 0.5px;
 }
 
 .resetpw-form {
-  width: 100%;
-  max-width: 450px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-/* 입력 필드 공통 스타일 */
-.resetpw-email,
-.resetpw-password,
-.resetpw-password-check,
-.resetpw-verification {
-  width: 100%;
-  height: 60px;
-  border: 1px solid #C5CCD2;
-  border-radius: 10px;
-  padding-left: 50px;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 16px;
-  background-repeat: no-repeat;
-  background-position: 20px center;
-  margin-top: 10px;
+.input-group {
+    display: flex;
+    gap: 0.5rem;
 }
 
-/* 특정 입력 필드 스타일 */
-.resetpw-email {
-  background-image: url("@/assets/email.png");
-  margin-top: 0;
-}
-.resetpw-password,
-.resetpw-password-check {
-  background-image: url("@/assets/password.png");
-}
-.resetpw-verification {
-  background-image: url("@/assets/email.png");
+.resetpw-input {
+    width: 100%;
+    height: 54px;
+    border: 1px solid rgba(197, 204, 210, 0.8);
+    border-radius: 12px;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* 포커스 스타일 */
-.resetpw-email:focus,
-.resetpw-password:focus,
-.resetpw-password-check:focus,
-.resetpw-verification:focus {
-  outline: none;
-    border: 2px solid #333333;
-    box-shadow: 0 0 5px rgba(51, 51, 51, 0.5);
+.resetpw-input:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 4px rgba(92, 106, 196, 0.1);
 }
 
-/* 버튼 스타일 */
-.resetpw-form button {
-  background-color: #000000;
-  width: 100%;
-  height: 50px;
-  color: #FFFFFF;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #000000;
-  cursor: pointer;
+.verification-button {
+    min-width: 100px;
+    height: 54px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.resetpw-form button:disabled {
-  background-color: #D9D9D9;
-  border: 1px solid #D9D9D9;
-  cursor: not-allowed;
+.verification-button:disabled {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
-/* 이메일 인증 컨테이너 */
-.email-verification-container,
-.verification-code-container{
-  display: flex;
-  width: 100%;
-  max-width: 450px;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-.resetpw-email, .resetpw-verification {
-    flex: 7;
-}
-.verification-button, .verify-button {
-    flex: 3;
-}
-.resetpw-verification {
-    margin-top: 0;
+.verification-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
-/* 이메일 인증 전송, 확인 버튼 */
-.verification-button,
-.verify-button {
-  width: 80px;
-  height: 60px;
-  border-radius: 10px;
-  margin: 0;
+.submit-button {
+    width: 100%;
+    height: 54px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
 }
 
-.resetpw-button {
-    margin: 25px 0;
+.submit-button:disabled {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
-/* 로그인 버튼 */
-.go-login-button {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+.submit-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
+}
+
+.verification-message {
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+.verification-message.success {
+    color: #5c6ac4;
+}
+
+.verification-message.error {
+    color: #dc3545;
+}
+
+.login-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
 }
 
 .go-login-button span {
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 15px;
-  color: #888888;
-  margin-left: 5px;
-  line-height: 16px;
+    color: #888;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
 
-/* 플레이스홀더 스타일 */
-.resetpw-email::placeholder,
-.resetpw-password::placeholder,
-.resetpw-password-check::placeholder,
-.resetpw-verification::placeholder {
-  font-size: 15px;
-  color: #C5CCD2;
-  font-family: 'Pretendard Variable', sans-serif;
-}
-/* 닉네임 중복 검사 컨테이너 */
-.nickname-verification-container {
-  display: flex;
-  width: 100%;
-  max-width: 450px;
-  align-items: center;
-  gap: 10px;
-}
-/* 인증 메시지 스타일 */
-.verification-message {
-  font-size: 14px;
-  margin-top: 5px;
-  text-align: left;
-  width: 100%;
-}
-/* 인증 메시지 결과에 따른 색상 */
-.verification-success {
-  color: #28a745;
+.go-login-button span:hover {
+    color: #5c6ac4;
 }
 
-.verification-failed {
-  color: #dc3545;
-}
-
-/* 반응형 스타일 */
 @media (max-width: 768px) {
-  .resetpw-email,
-  .resetpw-password,
-  .resetpw-password-check,
-  .resetpw-verification {
-    height: 50px;
-    font-size: 14px;
-  }
-  .verification-button,
-  .verify-button,
-  .resetpw-form button {
-    height: 45px;
-    font-size: 14px;
-  }
+    .resetpw-content {
+        max-width: 400px;
+        padding: 2rem 1.5rem;
+    }
+
+    .title-main {
+        font-size: 2rem;
+    }
 }
 
 @media (max-width: 480px) {
-  .resetpw-email,
-  .resetpw-password,
-  .resetpw-password-check,
-  .resetpw-verification {
-    height: 45px;
-    font-size: 12px;
-    padding-left: 40px;
-  }
-  .verification-button,
-  .verify-button,
-  .resetpw-form button {
-    height: 40px;
-    font-size: 12px;
-  }
+    .resetpw-wrap {
+        min-height: calc(100vh - 100px);
+        padding: 1rem;
+    }
+
+    .resetpw-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .title-main {
+        font-size: 1.8rem;
+    }
+
+    .title-sub {
+        font-size: 0.9rem;
+    }
+
+    .resetpw-input,
+    .verification-button,
+    .submit-button {
+        height: 48px;
+    }
 }
 </style>

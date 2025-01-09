@@ -111,7 +111,7 @@ const routes = [
         component: ReviewPostDetailView
     },
     {
-        path: '/resetpassword',
+        path: '/forgot-password',
         name: 'ResetPassword',
         component: ResetPasswordView
     },

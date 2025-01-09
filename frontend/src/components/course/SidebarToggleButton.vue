@@ -17,7 +17,7 @@ defineEmits(['toggle']);
         v-show="!isOpen"
     >
         <span class="toggle-icon">☰</span>
-        인기 장소
+        핫플
     </button>
 </template>
 

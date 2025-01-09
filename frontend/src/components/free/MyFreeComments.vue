@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 import router from "@/router";
 import {getMyFreePostCommentListAPI} from "@/api/free";
 
@@ -10,174 +10,292 @@ const pageSize = ref(10);
 const loading = ref(false);
 
 const getMyFreeComments = async (page) => {
-  loading.value = true;
-  try {
-    const response = await getMyFreePostCommentListAPI({
-      page: page,
-      size: pageSize.value,
-    });
-    comments.value = response.data.content;
-    currentPage.value = response.data.number;
-    totalPages.value = response.data.totalPages;
-  } catch (error) {
-    console.error('댓글을 불러오는 데 실패했습니다:', error);
-  } finally {
-    loading.value = false;
-  }
+    loading.value = true;
+    try {
+        const response = await getMyFreePostCommentListAPI({
+            page: page,
+            size: pageSize.value,
+        });
+        comments.value = response.data.content;
+        currentPage.value = response.data.number;
+        totalPages.value = response.data.totalPages;
+    } catch (error) {
+        console.error('댓글을 불러오는 데 실패했습니다:', error);
+    } finally {
+        loading.value = false;
+    }
 };
 
 const goToPage = (page) => {
-  if (page >= 0 && page < totalPages.value) {
-    getMyFreeComments(page);
-  }
+    if (page >= 0 && page < totalPages.value) {
+        getMyFreeComments(page);
+    }
 };
 
 const formatRelativeTime = (dateString) => {
-  const now = new Date().toISOString();
-  const cleanDateString = dateString.replace(/\[.*\]$/, '');
-  const past = new Date(cleanDateString).toISOString();
-  const diffInMilliseconds = new Date(now) - new Date(past);
-  const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+    const now = new Date().toISOString();
+    const cleanDateString = dateString.replace(/\[.*\]$/, '');
+    const past = new Date(cleanDateString).toISOString();
+    const diffInMilliseconds = new Date(now) - new Date(past);
+    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
 
-  if (diffInSeconds < 60) {
-    return '방금 전';
-  } else if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes}분 전`;
-  } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return `${hours}시간 전`;
-  } else {
-    return formatDate(dateString);
-  }
+    if (diffInSeconds < 60) {
+        return '방금 전';
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes}분 전`;
+    } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours}시간 전`;
+    } else {
+        return formatDate(dateString);
+    }
 };
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
 };
 
 const goToPostDetail = (postId) => {
-  router.push(`/free-post/${postId}`);
+    router.push(`/free-post/${postId}`);
 };
 
 onMounted(() => {
-  getMyFreeComments(0);
+    getMyFreeComments(0);
 });
 </script>
 
 <template>
-  <h2>나의 자유게시판 댓글</h2>
-  <div class="comment-board-container">
-    <div v-if="loading" class="loading">로딩 중...</div>
-    <div v-else-if="comments.length" class="comment-list">
-      <div v-for="comment in comments" :key="comment.id" class="comment" @click="goToPostDetail(comment.postId)">
-        <div class="comment-content">{{ comment.content }}</div>
-        <div class="comment-footer">
-          <span class="comment-post-id">게시글 ID: {{ comment.postId }}</span>
-          <span class="comment-date">{{ formatRelativeTime(comment.createdAt) }}</span>
-        </div>
-      </div>
-    </div>
-    <p v-else>작성한 댓글이 없습니다.</p>
+    <div class="my-comments">
+        <h2 class="page-title">나의 자유게시글 댓글</h2>
 
-    <div v-if="totalPages > 1" class="pagination">
-      <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 0">이전</button>
-      <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
-      <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages - 1">다음</button>
+        <div class="comments-container">
+            <div v-if="loading" class="loading-state">
+                <div class="loading-spinner"></div>
+                <span>로딩 중...</span>
+            </div>
+
+            <div v-else-if="comments.length" class="comments-list">
+                <div v-for="comment in comments"
+                     :key="comment.id"
+                     class="comment-item"
+                     @click="goToPostDetail(comment.postId)">
+                    <div class="comment-content">
+                        <p class="comment-text">{{ comment.content }}</p>
+                        <div class="comment-footer">
+                            <span class="post-link">원문으로 이동</span>
+                            <span class="comment-date">{{
+                                    formatRelativeTime(comment.createdAt)
+                                }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else class="empty-state">
+                작성한 댓글이 없습니다.
+            </div>
+
+            <div class="pagination">
+                <button
+                    @click="goToPage(currentPage - 1)"
+                    :disabled="currentPage === 0"
+                    class="pagination-button"
+                >
+                    이전
+                </button>
+                <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
+                <button
+                    @click="goToPage(currentPage + 1)"
+                    :disabled="currentPage >= totalPages - 1"
+                    class="pagination-button"
+                >
+                    다음
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
-body, html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: 'Malgun Gothic', sans-serif;
+.my-comments {
+    width: 100%;
 }
 
-.comment-board-container {
-  width: 100%;
-  background-color: #ffffff;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
-.loading {
-  text-align: center;
-  margin: 20px 0;
+.comments-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.comment-list {
-  list-style-type: none;
-  padding: 0;
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    color: #666;
 }
 
-.comment {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 15px;
-  margin-bottom: 10px;
-  background-color: #fafafa;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(92, 106, 196, 0.1);
+    border-radius: 50%;
+    border-top-color: #5c6ac4;
+    animation: spin 1s linear infinite;
 }
 
-.comment:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.comment-item {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(92, 106, 196, 0.1);
+}
+
+.comment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.1);
+    border-color: rgba(92, 106, 196, 0.2);
 }
 
 .comment-content {
-  color: #555;
-  font-size: 16px;
-  margin-bottom: 10px;
+    padding: 1.5rem;
+}
+
+.comment-text {
+    color: #444;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
 }
 
 .comment-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  color: #888;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-link {
+    color: #5c6ac4;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.post-link::after {
+    content: '→';
+    font-size: 1.1em;
+}
+
+.comment-date {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid rgba(92, 106, 196, 0.1);
 }
 
 .pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
-.pagination button {
-  padding: 5px 10px;
-  margin: 0 5px;
-  background-color: #0066cc;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.pagination-button {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.pagination button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
+.pagination-button:disabled {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    cursor: not-allowed;
 }
 
-.pagination span {
-  margin: 0 10px;
+.pagination-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
-.comment-post-id{
-  display: none;
+
+.page-info {
+    font-size: 0.95rem;
+    color: #666;
+    min-width: 80px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .comment-content {
+        padding: 1rem;
+    }
+
+    .comment-text {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.1rem;
+    }
+
+    .comment-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .comment-content {
+        padding: 1rem;
+    }
 }
 </style>

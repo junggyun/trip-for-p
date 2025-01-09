@@ -16,7 +16,7 @@ const goSignup = function () {
 }
 
 const goResetPassword = function () {
-    router.push("/resetpassword");
+    router.push("/forgot-password");
 }
 
 const login = async function () {
