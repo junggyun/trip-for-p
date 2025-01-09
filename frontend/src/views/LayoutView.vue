@@ -40,8 +40,7 @@ watch(() => route.path, () => {
 }
 
 .app-header {
-    position: fixed;
-    top: 0;
+    position: relative;
     left: 0;
     width: 100%;
     z-index: 1002;
