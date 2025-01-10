@@ -3,7 +3,32 @@ import router from "@/router";
 import jwtDecoder from 'vue-jwt-decode';
 import {refreshTokenAPI} from "@/api/user.js";
 
+const handleError = (error) => {
+    const status = error.response?.status;
+
+    switch (status) {
+        case 502:
+            window.location.href = '/502.html';
+            break;
+    }
+
+    return Promise.reject(error);
+};
+
 const setInterceptors = function (instance) {
+
+    instance.interceptors.response.use(
+        (response) => {
+            return response;
+        },
+        (error) => {
+            return handleError(error)
+        }
+    );
+    return instance
+}
+
+const setAuthInterceptors = function (instance) {
     instance.interceptors.request.use(
         async (config) => {
             const token = store.state.accessToken
@@ -18,6 +43,7 @@ const setInterceptors = function (instance) {
                         config.headers.Authorization = 'Bearer ' + newToken;
                     } catch (error) {
                         store.commit('clearData');
+                        console.log('1')
                         alert('세션이 만료되었습니다.');
                         await router.push('/');
                         return Promise.reject('Token expired');
@@ -51,16 +77,18 @@ const setInterceptors = function (instance) {
                     return instance(originalRequest);
                 } catch (refreshError) {
                     store.commit('clearData');
+                    console.log('2')
                     alert('세션이 만료되었습니다.');
                     await router.push('/');
                     return Promise.reject('Token expired');
                 }
             }
 
-            return Promise.reject(error);
+            return handleError(error)
         }
     );
     return instance
 }
 
-export {setInterceptors}
+
+export {setInterceptors, setAuthInterceptors}

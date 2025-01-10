@@ -12,7 +12,7 @@ const createMagazineAPI = function (formData) {
 
 // 매거진 수정
 const updateMagazineAPI = function (id, formData) {
-    return authInstance.put(`/api/magazines/${id}`, formData,
+    return authInstance.patch(`/api/magazines/${id}`, formData,
         {
             headers: {
                 'Content-Type': 'multipart/form-data'

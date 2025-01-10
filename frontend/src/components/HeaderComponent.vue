@@ -1,5 +1,5 @@
 <script setup>
-import {computed, defineEmits, onMounted, ref} from "vue";
+import {computed, defineEmits, ref} from "vue";
 import store from "@/store";
 import {logoutAPI} from "@/api/user";
 
@@ -18,9 +18,6 @@ const toggleSubmenu = () => {
     isSubmenuVisible.value = !isSubmenuVisible.value;
     emit('submenu-expanded', isSubmenuVisible.value);
 };
-onMounted(() => {
-    console.log(isAccessTokenValid)
-})
 </script>
 
 <template>
@@ -117,7 +114,6 @@ header {
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.5px;
-    font-family: 'Montserrat', sans-serif;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     line-height: 1;
 }

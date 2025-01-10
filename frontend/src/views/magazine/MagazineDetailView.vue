@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { getMagazineAPI, deleteMagazineAPI } from "@/api/magazine";
 import { useRoute, useRouter } from "vue-router";
 import store from "@/store";
+import MarkdownViewer from "@/components/magazine/MarkdownViewer.vue";
 
 const magazine = ref({});
 const route = useRoute();
@@ -67,10 +68,13 @@ onMounted(() => {
                 <p>작성일: {{ formatDate(magazine.createdAt) }}</p>
                 <p>조회수: {{ magazine.views }}</p>
             </div>
-            <pre class="content">{{ magazine.content }}</pre>
+            <div class="content">
+                <markdown-viewer :content="magazine.content"/>
+            </div>
             <div v-if="magazine.fileUrls && magazine.fileUrls.length > 0" class="attachments">
                 <div class="image-gallery">
-                    <div v-for="fileUrl in magazine.fileUrls" :key="fileUrl" class="image-container">
+                    <div v-for="fileUrl in magazine.fileUrls" :key="fileUrl"
+                         class="image-container">
                         <img :src="fileUrl" alt="첨부 이미지">
                     </div>
                 </div>
@@ -103,10 +107,7 @@ h1 {
 }
 
 .content {
-    line-height: 1.6;
     margin-bottom: 30px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
 }
 
 .attachments {

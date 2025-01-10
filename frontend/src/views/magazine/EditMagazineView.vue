@@ -40,9 +40,11 @@ const updateMagazine = async function () {
             type: 'application/json'
         }));
 
-        newFiles.value.forEach((file) => {
-            formData.append(`files`, file);
-        });
+        if (newFiles.value.length > 0) {
+            newFiles.value.forEach((file) => {
+                formData.append('files', file);
+            });
+        }
 
         const response = await updateMagazineAPI(route.params.magazineId, formData);
         await router.push(`/magazine/${response.data.id}`);
@@ -88,7 +90,7 @@ onMounted(loadMagazine);
 
             <div class="form-group">
                 <label for="files">파일 첨부</label>
-                <input type="file" id="files" @change="handleFileChange" multiple>
+                <input type="file" id="files" accept="image/*" @change="handleFileChange" multiple>
             </div>
             <div class="file-preview" v-if="previewUrls.length > 0">
                 <div v-for="(url, index) in previewUrls" :key="index" class="preview-item">
