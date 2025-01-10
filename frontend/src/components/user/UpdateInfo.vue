@@ -1,8 +1,6 @@
 <script setup>
 import {computed, onMounted, ref, watch} from 'vue';
-import axios from 'axios';
-import store from '@/store';
-import {getUserInfoAPI, verifyNickNameAPI} from "@/api/user";
+import {getUserInfoAPI, updateUserInfoAPI, verifyNickNameAPI} from "@/api/user";
 
 const password = ref('');
 const passwordCheck = ref('');
@@ -118,11 +116,7 @@ const updateUserInfo = async () => {
             return;
         }
 
-        await axios.patch('/api/users/me', updateUserRequest, {
-            headers: {
-                Authorization: `Bearer ${store.getters.getAccessToken}`,
-            },
-        });
+        await updateUserInfoAPI(updateUserRequest);
 
         alert('회원 정보가 수정되었습니다.');
         window.location.reload();

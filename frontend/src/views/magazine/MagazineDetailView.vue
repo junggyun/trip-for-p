@@ -11,7 +11,7 @@ const router = useRouter();
 const loading = ref(true);
 const error = ref(null);
 
-const isAdmin = computed(() => store.getters.getRole === 'ADMIN');
+const isAdmin = computed(() => store.getters.getRole() === 'ADMIN');
 
 const getMagazine = async function () {
     try {

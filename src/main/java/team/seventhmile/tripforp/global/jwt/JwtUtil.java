@@ -99,7 +99,7 @@ public class JwtUtil {
 			return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
 		}
 
-		String newAccess = createJwt("access", username, nickname, role, 600000L);
+		String newAccess = createJwt("access", username, nickname, role, 6000L);
 		String newRefresh = createJwt("refresh", username, nickname, role, 86400000L);
 
 		refreshService.saveRefreshToken(username, newRefresh, 86400000L);
@@ -126,6 +126,8 @@ public class JwtUtil {
 		Cookie cookie = new Cookie(key, value);
 		cookie.setMaxAge(24 * 60 * 60);
 		cookie.setHttpOnly(true);
+		cookie.setPath("/");
+
 		return cookie;
 	}
 

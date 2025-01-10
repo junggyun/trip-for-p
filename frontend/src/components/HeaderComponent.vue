@@ -3,8 +3,8 @@ import {computed, defineEmits, ref} from "vue";
 import store from "@/store";
 import {logoutAPI} from "@/api/user";
 
-const isAccessTokenValid = computed(() => store.getters.isAccessTokenValid);
-const isAdmin = computed(() => store.getters.getRole==='ADMIN');
+const hasAccessToken = computed(() => store.getters.getAccessToken());
+const isAdmin = computed(() => store.getters.getRole() ==='ADMIN');
 const isSubmenuVisible = ref(false);
 const emit = defineEmits(['submenu-expanded']);
 
@@ -34,7 +34,7 @@ const toggleSubmenu = () => {
                     <span class="toggle-icon"></span>
                 </button>
                 <ul class="auth-menu">
-                    <template v-if="!isAccessTokenValid">
+                    <template v-if="!hasAccessToken">
                         <li>
                             <router-link to="/signup" class="auth-link">회원가입</router-link>
                         </li>

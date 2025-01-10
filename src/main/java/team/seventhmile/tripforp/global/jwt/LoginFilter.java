@@ -53,12 +53,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 		String nickname = ((CustomUserDetails) authentication.getPrincipal()).getNickname();
 
-		String access = jwtUtil.createJwt("access", username, nickname, role, 600000L);
+		String access = jwtUtil.createJwt("access", username, nickname, role, 6000L);
 		String refresh = jwtUtil.createJwt("refresh", username, nickname, role, 86400000L);
 
 		refreshService.saveRefreshToken(username, refresh, 86400000L);
 
 		response.setHeader("access", "Bearer " + access);
+
+		Cookie cookie = new Cookie("refresh", null);
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		response.addCookie(cookie);
 		response.addCookie(createCookie("refresh", refresh));
 		response.setStatus(HttpStatus.OK.value());
 

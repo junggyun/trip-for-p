@@ -54,6 +54,11 @@ const withdrawUserAPI = function () {
     return authInstance.patch('/api/users/deletion');
 }
 
+// 회원 수정
+const updateUserInfoAPI = function (request) {
+    return authInstance.patch(`/api/users/me`, request)
+}
+
 // 리프레시토큰 재발급
 const refreshTokenAPI = function () {
     return instance.post(`/api/users/reissue`)
@@ -134,7 +139,8 @@ export {
     resetPasswordAPI,
     sendVerificationEmailAPI,
     verifyEmailAPI,
-    logoutAPI
+    logoutAPI,
+    updateUserInfoAPI
 }
 
 

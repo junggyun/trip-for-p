@@ -21,11 +21,11 @@ const editingCommentId = ref(null);
 const editingCommentContent = ref('');
 
 // 현재 로그인한 사용자의 닉네임을 가져옵니다.
-const currentUserNickname = computed(() => store.getters.getNickname);
+const currentUserNickname = computed(() => store.getters.getNickname());
 
 // 현재 사용자가 게시글 작성자인지 확인합니다.
 const isPostAuthor = computed(() => currentUserNickname.value === post.value.author);
-const isAdmin = computed(() => store.getters.getRole==='ADMIN')
+const isAdmin = computed(() => store.getters.getRole() ==='ADMIN')
 
 const getReviewPost = async function () {
     try {
@@ -54,7 +54,7 @@ const getReviewCommentList = async function () {
 };
 
 const submitComment = async () => {
-    if (!store.getters.isAccessTokenValid) {
+    if (!store.getters.isAccessTokenValid()) {
         if (window.confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
             await router.push('/login');
         }

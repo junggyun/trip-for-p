@@ -21,6 +21,7 @@ import ReviewPostDetailView from "@/views/review/ReviewPostDetailView.vue";
 import EditReviewPostView from "@/views/review/EditReviewPostView.vue";
 import CourseListView from "@/views/course/CourseListView.vue";
 import EditCourseView from "@/views/course/EditCourseView.vue";
+import {refreshTokenAPI} from "@/api/user";
 
 const routes = [
     {
@@ -32,7 +33,7 @@ const routes = [
         path: '/mypage',
         name: 'MyPage',
         component: MypageView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/login',
@@ -53,13 +54,13 @@ const routes = [
         path: '/course/write',
         name: 'WriteCourse',
         component: WriteCourseView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/course/:courseId/edit',
         name: 'EditCourse',
         component: EditCourseView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/course/:courseId',
@@ -75,13 +76,13 @@ const routes = [
         path: '/free-post/write',
         name: 'WriteFreePost',
         component: WriteFreePostView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/free-post/:postId/edit',
         name: 'EditFreePost',
         component: EditFreePostView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/free-post/:postId',
@@ -97,13 +98,13 @@ const routes = [
         path: '/review-post/write',
         name: 'WriteReviewPost',
         component: WriteReviewPostView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/review-post/:postId/edit',
         name: 'EditReviewPost',
         component: EditReviewPostView,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: true}
     },
     {
         path: '/review-post/:postId',
@@ -119,13 +120,13 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: AdminView,
-        meta: { requiresAdminAuth: true }
+        meta: {requiresAdminAuth: true}
     },
     {
         path: '/admin/magazine/write',
         name: 'WriteMagazine',
         component: WriteMagazineView,
-        meta: { requiresAdminAuth: true }
+        meta: {requiresAdminAuth: true}
     },
     {
         path: '/magazine/:magazineId',
@@ -136,7 +137,7 @@ const routes = [
         path: '/admin/magazine/:magazineId/edit',
         name: 'EditMagazine',
         component: EditMagazineView,
-        meta: { requiresAdminAuth: true }
+        meta: {requiresAdminAuth: true}
     },
 ]
 
@@ -145,28 +146,90 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!store.getters.isAccessTokenValid) {
+router.beforeEach(async (to, from, next) => {
+    const hasToken = !!store.getters.getAccessToken();
+    const isValid = store.getters.isAccessTokenValid();
+    const isAdmin = store.getters.getRole() === 'ADMIN';
 
+    if (to.matched.some(record => !record.meta)) {
+        if (hasToken) {
+            if (!isValid) {
+                try {
+                    const response = await refreshTokenAPI();
+                    const newToken = response.headers.access.split(" ")[1];
+                    store.commit('setAccessToken', newToken);
+                    next();
+                } catch (error) {
+                    store.commit('clearData');
+                    alert('세션이 만료되었습니다.');
+                    next(false);
+                }
+            } else {
+                next();
+            }
+        } else {
+            next();
+        }
+        return;
+    }
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!hasToken) {
             if (window.confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
                 next('/login')
             } else {
                 next(false);
             }
-        } else {
-            next()
+            return;
         }
-    } else if (to.matched.some(record => record.meta.requiresAdminAuth)) {
-        if (store.getters.getRole === 'ADMIN') {
-            next()
+        if (!isValid) {
+            try {
+                const response = await refreshTokenAPI();
+                const newToken = response.headers.access.split(" ")[1];
+                store.commit('setAccessToken', newToken);
+                next();
+            } catch (error) {
+                store.commit('clearData');
+                alert('세션이 만료되었습니다.');
+                next('/');
+            }
         } else {
-            alert('관리자만 접근 가능합니다.');
-            next('/')
+            next();
         }
-    } else {
-        next()
+        return;
     }
+
+    if (to.matched.some(record => record.meta.requiresAdminAuth)) {
+        if (!hasToken) {
+            alert('관리자만 접근 가능합니다,');
+            next(false);
+        }
+        if (!isValid) {
+            try {
+                const response = await refreshTokenAPI();
+                const newToken = response.headers.access.split(" ")[1];
+                store.commit('setAccessToken', newToken);
+                if (!isAdmin) {
+                    alert('관리자만 접근 가능합니다.');
+                    next(false);
+                } else {
+                    next();
+                }
+            } catch (error) {
+                store.commit('clearData');
+                alert('세션이 만료되었습니다.');
+                next('/');
+            }
+        } else {
+            if (!isAdmin) {
+                alert('관리자만 접근 가능합니다.');
+                next(false);
+            } else {
+                next();
+            }
+        }
+        return;
+    }
+    next()
 })
 
 export default router
