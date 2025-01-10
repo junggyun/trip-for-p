@@ -1,11 +1,16 @@
 import axios from "axios";
-import {setInterceptors} from "@/api/interceptor";
+import {setAuthInterceptors, setInterceptors} from "@/api/interceptor";
 
-export const instance = axios.create();
+const createInstance = function () {
+    const instance = axios.create();
+    return setInterceptors(instance);
+}
+
+export const instance = createInstance();
 
 const createAuthInstance = function () {
     const instance = axios.create();
-    return setInterceptors(instance);
+    return setAuthInterceptors(instance);
 };
 
 export const authInstance = createAuthInstance();

@@ -28,6 +28,7 @@ const store = createStore({
                     store.commit('setAccessToken', newToken);
                 } catch (error) {
                     store.commit('clearData');
+                    console.log('3')
                     alert('세션이 만료되었습니다.');
                     router.push('/');
                     return false

@@ -114,7 +114,6 @@ header {
     font-weight: 800;
     color: #FFFFFF;
     letter-spacing: -0.5px;
-    font-family: 'Montserrat', sans-serif;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     line-height: 1;
 }
