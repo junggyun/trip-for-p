@@ -15,7 +15,7 @@ public class RefreshScheduler {
     private final RefreshRepository refreshRepository;
     private final JwtUtil jwtUtil;
 
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 0 2 * * *", zone = "Asia/Seoul")
     public void cleanExpiredCodes() {
         long initialSize = refreshRepository.count();
 
