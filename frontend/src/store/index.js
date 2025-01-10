@@ -1,45 +1,24 @@
 import {createStore} from "vuex";
 import createPersistedState from 'vuex-persistedstate';
 import jwtDecoder from 'vue-jwt-decode';
-import {refreshTokenAPI} from "@/api/user.js";
-import router from "@/router";
 
 const store = createStore({
     state: {
         accessToken: null
     },
     getters: {
-        getAccessToken: function (state) {
+        getAccessToken: (state) => () => {
             return state.accessToken;
         },
-        isAccessTokenValid: function (state) {
+        isAccessTokenValid: (state) => () => {
             if (!state.accessToken) {
                 return false;
             }
-            try {
-                const decodedToken = jwtDecoder.decode(state.accessToken)
-                const currentTime = Date.now() / 1000;
-                if (decodedToken.exp > currentTime) {
-                    return true;
-                }
-                try {
-                    const response = refreshTokenAPI();
-                    const newToken = response.headers.access.split(" ")[1];
-                    store.commit('setAccessToken', newToken);
-                } catch (error) {
-                    store.commit('clearData');
-                    console.log('3')
-                    alert('세션이 만료되었습니다.');
-                    router.push('/');
-                    return false
-                }
-
-                return true;
-            } catch (error) {
-                return false;
-            }
+            const decodedToken = jwtDecoder.decode(state.accessToken)
+            const currentTime = Date.now() / 1000;
+            return decodedToken.exp > currentTime;
         },
-        getNickname: function (state) {
+        getNickname: (state) => () => {
             if (!state.accessToken) {
                 return false;
             }
@@ -54,7 +33,7 @@ const store = createStore({
                 return false;
             }
         },
-        getRole: function (state) {
+        getRole: (state) => () => {
             if (!state.accessToken) {
                 return false;
             }

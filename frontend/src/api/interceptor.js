@@ -43,7 +43,6 @@ const setAuthInterceptors = function (instance) {
                         config.headers.Authorization = 'Bearer ' + newToken;
                     } catch (error) {
                         store.commit('clearData');
-                        console.log('1')
                         alert('세션이 만료되었습니다.');
                         await router.push('/');
                         return Promise.reject('Token expired');
@@ -77,7 +76,6 @@ const setAuthInterceptors = function (instance) {
                     return instance(originalRequest);
                 } catch (refreshError) {
                     store.commit('clearData');
-                    console.log('2')
                     alert('세션이 만료되었습니다.');
                     await router.push('/');
                     return Promise.reject('Token expired');

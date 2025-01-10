@@ -21,11 +21,11 @@ const editingCommentId = ref(null);
 const editingCommentContent = ref('');
 
 // 현재 로그인한 사용자의 닉네임을 가져옵니다.
-const currentUserNickname = computed(() => store.getters.getNickname);
+const currentUserNickname = computed(() => store.getters.getNickname());
 
 // 현재 사용자가 게시글 작성자인지 확인합니다.
 const isPostAuthor = computed(() => currentUserNickname.value === post.value.author);
-const isAdmin = computed(() => store.getters.getRole==='ADMIN')
+const isAdmin = computed(() => store.getters.getRole() ==='ADMIN')
 
 const getFreePost = async function () {
     try {
@@ -54,7 +54,7 @@ const getFreeCommentList = async function () {
 };
 
 const submitComment = async () => {
-    if (!store.getters.isAccessTokenValid) {
+    if (!store.getters.isAccessTokenValid()) {
         if (window.confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
             await router.push('/login');
         }
@@ -197,7 +197,9 @@ onMounted(() => {
             <h3>댓글</h3>
             <div class="comment-form">
                 <textarea v-model="newComment" placeholder="댓글을 입력하세요"></textarea>
-                <button @click="submitComment">댓글 등록</button>
+                <div class="button-container">
+                    <button @click="submitComment">댓글 등록</button>
+                </div>
             </div>
             <div v-for="comment in comments" :key="comment.id" class="comment">
                 <p class="comment-author">{{ comment.author }}</p>
@@ -229,201 +231,332 @@ onMounted(() => {
 <style scoped>
 .post-detail-container {
     width: 100%;
-    padding: 20px;
-    margin-top: 50px;
+    max-width: 1200px;
+    margin: 120px auto 40px;
+    padding: 0 20px;
 }
 
 .post-content {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(92, 106, 196, 0.1);
+    margin-bottom: 2rem;
     min-height: 300px;
     position: relative;
 }
 
-.post-actions {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-}
-
-h2 {
-    color: #333;
-    margin-bottom: 10px;
-}
-
 .post-info {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-.post-info span {
-    margin-right: 15px;
+    color: #8794d8;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(92, 106, 196, 0.1);
 }
 
 .post-body {
     white-space: pre-wrap;
     word-wrap: break-word;
-    line-height: 1.6;
-    color: #333;
-    margin-bottom: 40px; /* 버튼을 위한 여백 */
+    line-height: 1.7;
+    color: #4A4A4A;
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
 }
 
 .comments-section {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(92, 106, 196, 0.1);
 }
 
-h3 {
-    color: #333;
-    margin-bottom: 15px;
+.comments-section h3 {
+    color: #5c6ac4;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
 }
 
 .comment-form {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
 }
 
 .comment-form textarea {
     width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    height: 120px;
+    padding: 1rem;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+    border-radius: 12px;
     resize: vertical;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.1);
+}
+
+.comment-form .button-container {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .comment-form button {
-    margin-top: 10px;
-    padding: 8px 15px;
-    background-color: #4CAF50;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.comment-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .comment {
-    background-color: #ffffff;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #F8F9FF;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(92, 106, 196, 0.05);
     position: relative;
 }
 
 .comment-author {
-    font-weight: bold;
-    color: #444;
+    color: #5c6ac4;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
 }
 
 .comment-content {
-    margin-bottom: 30px; /* 버튼을 위한 여백 */
-    white-space: pre-wrap
-}
-
-.comment-actions {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+    margin: 1rem 0;
+    color: #4A4A4A;
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    margin-bottom: 2rem;
 }
 
 .comment-date {
-    font-size: 12px;
-    color: #888;
+    color: #8794d8;
+    font-size: 0.9rem;
+    position: absolute;
+    bottom: 1rem;
+    left: 1.5rem;
+}
+
+.post-actions,
+.comment-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+}
+
+.edit-btn,
+.delete-btn,
+.save-btn,
+.cancel-btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.edit-btn,
+.save-btn {
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+}
+
+.delete-btn {
+    background: #FFFFFF;
+    color: #FF4444;
+    border: 1px solid #FF4444;
+}
+
+.cancel-btn {
+    background: #FFFFFF;
+    color: #4A4A4A;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+}
+
+.edit-btn:hover,
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
+}
+
+.delete-btn:hover {
+    background: #FF4444;
+    color: white;
+}
+
+.cancel-btn:hover {
+    border-color: #4A4A4A;
+}
+
+.edit-comment-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 1rem;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+    border-radius: 12px;
+    resize: vertical;
+    transition: all 0.3s ease;
+    margin: 1rem 0;
+    font-size: 1rem;
+}
+
+.edit-comment-textarea:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.1);
+}
+
+.edit-comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
 }
 
 .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 2rem;
+    gap: 1rem;
 }
 
 .pagination button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    background-color: #0066cc;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 100px;
 }
 
 .pagination button:disabled {
-    background-color: #cccccc;
+    background: #E0E0E0;
     cursor: not-allowed;
+    transform: none;
+}
+
+.pagination button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .pagination span {
-    margin: 0 10px;
+    color: #5c6ac4;
+    font-weight: 600;
 }
 
-.post-actions, .comment-actions {
-    margin-top: 10px;
+@media (max-width: 1024px) {
+    .post-detail-container {
+        width: 90%;
+        margin: 120px auto 2rem;
+    }
 }
 
-.edit-btn, .delete-btn {
-    padding: 5px 10px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
+@media (max-width: 768px) {
+    .post-detail-container {
+        width: 95%;
+        margin: 160px auto 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .post-content,
+    .comments-section {
+        padding: 1.5rem;
+    }
+
+    .post-info {
+        font-size: 0.9rem;
+        gap: 1rem;
+    }
+
+    .post-body {
+        font-size: 1rem;
+    }
+
+    .comment {
+        padding: 1rem;
+    }
+
+    .comment-actions {
+        position: static;
+        margin-top: 1rem;
+    }
+
+    .comment-date {
+        position: static;
+        margin-top: 0.5rem;
+    }
+
+    .edit-btn,
+    .delete-btn,
+    .save-btn,
+    .cancel-btn {
+        padding: 0.5rem 1rem;
+    }
 }
 
-.edit-btn {
-    background-color: #4CAF50;
-    color: white;
-}
+@media (max-width: 480px) {
+    .post-detail-container {
+        margin: 140px auto 1rem;
+        padding: 0 0.8rem;
+    }
 
-.delete-btn {
-    background-color: #f44336;
-    color: white;
-}
+    .post-content,
+    .comments-section {
+        padding: 1.2rem;
+    }
 
-.edit-btn:hover, .delete-btn:hover {
-    opacity: 0.8;
-}
-.edit-comment-textarea {
-    width: 100%;
-    min-height: 60px;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-}
+    .post-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 
-.edit-comment-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
+    .post-body {
+        font-size: 0.95rem;
+    }
 
-.save-btn, .cancel-btn {
-    padding: 5px 10px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-}
+    .comment-form button,
+    .pagination button {
+        width: 100%;
+    }
 
-.save-btn {
-    background-color: #4CAF50;
-    color: white;
-}
+    .edit-comment-actions,
+    .comment-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 
-.cancel-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.save-btn:hover, .cancel-btn:hover {
-    opacity: 0.8;
+    .edit-btn,
+    .delete-btn,
+    .save-btn,
+    .cancel-btn {
+        width: 100%;
+    }
 }
 </style>

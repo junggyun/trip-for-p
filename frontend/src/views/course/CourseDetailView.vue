@@ -19,7 +19,7 @@ const getPlan = async function () {
         const response = await getCourseAPI(route.params.courseId);
         plan.value = response.data;
 
-        if (store.getters.isAccessTokenValid) {
+        if (store.getters.getAccessToken()) {
             await checkPlanLike();
         }
     } catch (error) {
@@ -119,7 +119,7 @@ const formatDate = (dateString) => {
 };
 
 const likePlan = async function () {
-    if (!store.getters.isAccessTokenValid) {
+    if (!store.getters.isAccessTokenValid()) {
         if (window.confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
             await router.push('/login');
         }
@@ -171,7 +171,7 @@ const deletePlan = async function (id) {
     }
 };
 
-const currentUserNickname = computed(() => store.getters.getNickname);
+const currentUserNickname = computed(() => store.getters.getNickname());
 const isPostAuthor = computed(() => currentUserNickname.value === plan.value?.writer);
 
 onMounted(async () => {

@@ -42,7 +42,7 @@ const formatDate = (dateString) => {
 };
 
 const goToCourseDetail = (courseId) => {
-    router.push(`/plan/${courseId}`);
+    router.push(`/course/${courseId}`);
 };
 
 onMounted(() => {

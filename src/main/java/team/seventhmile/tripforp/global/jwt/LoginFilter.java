@@ -59,6 +59,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		refreshService.saveRefreshToken(username, refresh, 86400000L);
 
 		response.setHeader("access", "Bearer " + access);
+
+		Cookie cookie = new Cookie("refresh", null);
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		response.addCookie(cookie);
 		response.addCookie(createCookie("refresh", refresh));
 		response.setStatus(HttpStatus.OK.value());
 

@@ -40,14 +40,14 @@ public class CacheConfig {
         return new CaffeineCache("popularRegions",
             Caffeine.newBuilder()
                 .maximumSize(20)
-                .expireAfterWrite(1, TimeUnit.DAYS)
+                .expireAfterWrite(1, TimeUnit.HOURS)
                 .build());
     }
 
     private CaffeineCache buildPopularPlaceCache() {
         return new CaffeineCache("popularPlaces",
             Caffeine.newBuilder()
-                .expireAfterWrite(1, TimeUnit.DAYS)
+                .expireAfterWrite(1, TimeUnit.HOURS)
                 .maximumSize(1500)
                 .build());
     }
