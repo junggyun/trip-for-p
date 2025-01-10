@@ -11,9 +11,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -39,13 +39,13 @@ public class MagazineController {
 		return magazineService.createMagazinePost(magazineDto, user.getUsername(), files);
 	}
 
-	@PutMapping("/{id}")
+	@PatchMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public MagazineDto updateMagazinePost(
 		@PathVariable("id") Long id,
 		@AuthenticationPrincipal UserDetails user,
 		@RequestPart(value = "request") MagazineDto magazineDto,
-		@RequestPart(value = "files") List<MultipartFile> files
+		@RequestPart(value = "files", required = false) List<MultipartFile> files
 	) throws IOException {
 		return magazineService.updateMagazinePost(id, magazineDto, user.getUsername(), files);
 	}

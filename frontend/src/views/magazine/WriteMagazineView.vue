@@ -67,7 +67,7 @@ const createMagazine = async function () {
 
             <div class="form-group">
                 <label for="files">파일 첨부:</label>
-                <input type="file" id="files" @change="handleFileChange" multiple>
+                <input type="file" id="files" accept="image/*" @change="handleFileChange" multiple>
             </div>
 
             <div class="file-preview" v-if="previewUrls.length > 0">

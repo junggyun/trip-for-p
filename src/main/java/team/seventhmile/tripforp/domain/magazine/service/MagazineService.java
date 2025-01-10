@@ -71,14 +71,15 @@ public class MagazineService {
             .orElseThrow(() -> new ResourceNotFoundException(Magazine.class));
 
         magazine.update(magazineDto.getTitle(), magazineDto.getContent());
-        if (magazine.getFiles() != null) {
-            for (MagazineFile file : magazine.getFiles()) {
-                magazineFileService.deleteFile(file.getFileName());
-            }
-        }
-		magazine.clearFile();
+
 
 		if (files != null && !files.isEmpty()) {
+            if (magazine.getFiles() != null) {
+                for (MagazineFile file : magazine.getFiles()) {
+                    magazineFileService.deleteFile(file.getFileName());
+                }
+            }
+            magazine.clearFile();
 			for (MultipartFile file : files) {
 				MagazineFile magazineFile = magazineFileService.saveFile(file);
 				magazine.addFile(magazineFile);
