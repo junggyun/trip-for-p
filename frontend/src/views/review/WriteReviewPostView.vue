@@ -89,17 +89,18 @@ onMounted(() => {
             </div>
             <div class="form-group">
                 <label for="content">내용</label>
-                <textarea id="content" v-model="content" required
-                          placeholder="내용을 입력하세요"></textarea>
+                <textarea id="content" v-model="content" required placeholder="내용을 입력하세요"></textarea>
             </div>
             <div class="form-group">
-                <label for="files">파일 첨부</label>
-                <input type="file" id="files" @change="handleFileChange" multiple>
+                <label for="files" class="file-input-label">
+                    사진 업로드
+                </label>
+                <input type="file" id="files" @change="handleFileChange" multiple accept="image/*">
             </div>
             <div class="file-preview" v-if="previewUrls.length > 0">
                 <div v-for="(url, index) in previewUrls" :key="index" class="preview-item">
                     <img :src="url" alt="File preview"/>
-                    <button @click.prevent="removeFile(index)" class="remove-btn">삭제</button>
+                    <button @click.prevent="removeFile(index)" class="remove-btn">×</button>
                 </div>
             </div>
             <div class="form-actions">
@@ -110,122 +111,229 @@ onMounted(() => {
 </template>
 
 <style scoped>
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    font-family: 'Malgun Gothic', sans-serif;
-}
-
 .review-create-container {
     width: 100%;
     max-width: 800px;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(92, 106, 196, 0.1);
 }
 
-h2 {
-    color: #333;
-    margin-bottom: 20px;
+.review-create-container h2 {
+    color: #5c6ac4;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .review-form {
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
+    color: #4A4A4A;
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 input[type="text"],
 textarea,
 select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
+    padding: 0.8rem 1.2rem;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #FFFFFF;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.1);
 }
 
 textarea {
-    height: 200px;
+    height: 240px;
     resize: vertical;
+    line-height: 1.5;
 }
 
 input[type="file"] {
-    margin-top: 5px;
+    display: none;
 }
 
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.submit-btn {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
+.file-input-label {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: #FFFFFF;
+    font-weight: 600;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
-.submit-btn:hover {
-    background-color: #45a049;
+.file-input-label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .file-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .preview-item {
     position: relative;
-    width: 100px;
-    height: 100px;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(92, 106, 196, 0.1);
 }
 
 .preview-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.preview-item:hover img {
+    transform: scale(1.05);
 }
 
 .remove-btn {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: rgba(255, 0, 0, 0.7);
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(92, 106, 196, 0.9);
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
+    border-radius: 8px;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .remove-btn:hover {
-    background-color: rgba(255, 0, 0, 0.9);
+    background: #5c6ac4;
+    transform: scale(1.1);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+.submit-btn {
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: #FFFFFF;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(92, 106, 196, 0.3);
+}
+
+@media (max-width: 1024px) {
+    .review-create-container {
+        width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .review-create-container {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .review-create-container h2 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .form-group {
+        gap: 0.4rem;
+    }
+
+    textarea {
+        height: 200px;
+    }
+
+    .file-preview {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .review-create-container {
+        padding: 1.2rem;
+    }
+
+    .review-create-container h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .file-preview {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.6rem;
+    }
+
+    .remove-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+
+    .form-actions {
+        margin-top: 1.5rem;
+    }
 }
 </style>

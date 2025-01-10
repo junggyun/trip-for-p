@@ -78,7 +78,7 @@ watch(() => route.path, () => {
     .app-content.my-page {
         padding: calc(4rem + 5rem + 80px) 10px 1rem 10px;
     }
-    .app-content.submenu-expanded {
+    .app-content.submenu-expanded.my-page {
         padding: calc(4rem + 5rem + 228px + 80px) 10px 1rem 10px;
     }
     .app-content.no-padding {

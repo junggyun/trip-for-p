@@ -208,7 +208,9 @@ onMounted(() => {
             <h3>댓글</h3>
             <div class="comment-form">
                 <textarea v-model="newComment" placeholder="댓글을 입력하세요"></textarea>
-                <button @click="submitComment">댓글 등록</button>
+                <div class="button-container">
+                    <button @click="submitComment">댓글 등록</button>
+                </div>
             </div>
             <div v-for="comment in comments" :key="comment.id" class="comment">
                 <p class="comment-author">{{ comment.author }}</p>
@@ -240,260 +242,382 @@ onMounted(() => {
 <style scoped>
 .review-detail-container {
     width: 100%;
-    padding: 20px;
-    margin-top: 50px;
-}
-
-.review-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
-    white-space: nowrap;      /* 텍스트를 한 줄로 표시 */
-    overflow: hidden;         /* 넘치는 텍스트를 숨김 */
-    text-overflow: ellipsis;  /* 넘친 부분을 ...으로 표시 */
-    width: 60%;
+    max-width: 1200px;
+    padding: 0 20px;
 }
 
 .review-content {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(92, 106, 196, 0.1);
+    margin-bottom: 2rem;
     min-height: 300px;
     position: relative;
 }
 
-.review-actions {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-}
-.review-info {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
+.review-title {
+    color: #5c6ac4;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
-.review-info span {
-    margin-right: 15px;
-    margin-bottom: 5px;
+.review-info {
+    color: #8794d8;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(92, 106, 196, 0.1);
 }
+
 .review-body {
-    line-height: 1.6;
-    color: #333;
-    margin-bottom: 40px;
+    line-height: 1.7;
+    color: #4A4A4A;
+    margin-bottom: 3rem;
 }
 
 .review-content-text {
     white-space: pre-wrap;
     word-wrap: break-word;
     text-align: left;
-    margin: 30px 0;
+    margin: 1.5rem 0;
     padding: 0;
     font-family: inherit;
-    font-size: 20px;
+    font-size: 1.1rem;
     line-height: inherit;
     max-width: 100%;
     overflow-x: auto;
-
 }
 
 .review-images {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 20px;
-    margin-bottom: 20px;  /* 이미지와 plan-link 사이의 간격 */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
 }
 
 .review-images img {
-    max-width: 300px;
-    max-height: 300px;
+    width: 100%;
+    aspect-ratio: 1;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.review-images img:hover {
+    transform: scale(1.02);
 }
 
 .plan-link-container {
-    margin-top: 20px;  /* plan-link 위의 간격 */
+    margin-top: 2rem;
     width: 100%;
 }
 
 .plan-link {
     display: block;
     width: 100%;
-    padding: 10px;
-    background-color: #0066cc;
+    padding: 1rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
     color: white;
     text-align: center;
-    text-decoration: none;
     border: none;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .plan-link:hover {
-    background-color: #004499;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(92, 106, 196, 0.3);
 }
 
 .comments-section {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(92, 106, 196, 0.1);
 }
 
-h3 {
-    color: #333;
-    margin-bottom: 15px;
+.comments-section h3 {
+    color: #5c6ac4;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
 }
 
 .comment-form {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
+}
+
+.comment-form .button-container {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .comment-form textarea {
     width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    height: 120px;
+    padding: 1rem;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+    border-radius: 12px;
     resize: vertical;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.1);
 }
 
 .comment-form button {
-    margin-top: 10px;
-    padding: 8px 15px;
-    background-color: #4CAF50;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.comment-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .comment {
-    background-color: #ffffff;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #F8F9FF;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(92, 106, 196, 0.05);
     position: relative;
 }
 
 .comment-author {
-    font-weight: bold;
-    color: #444;
+    color: #5c6ac4;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
 }
 
 .comment-content {
-    margin-bottom: 30px; /* 버튼을 위한 여백 */
+    margin: 1rem 0;
+    color: #4A4A4A;
+    line-height: 1.6;
+    font-size: 1rem;
     white-space: pre-wrap;
 }
 
-.comment-actions {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+.comment-date {
+    color: #8794d8;
+    font-size: 0.9rem;
 }
 
-.comment-date {
-    font-size: 12px;
-    color: #888;
+.review-actions,
+.comment-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+}
+
+.edit-btn,
+.delete-btn,
+.save-btn,
+.cancel-btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.edit-btn {
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+}
+
+.delete-btn {
+    background: #FFFFFF;
+    color: #FF4444;
+    border: 1px solid #FF4444;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
+    color: white;
+}
+
+.cancel-btn {
+    background: #FFFFFF;
+    color: #4A4A4A;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+}
+
+.edit-btn:hover,
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
+}
+
+.delete-btn:hover {
+    background: #FF4444;
+    color: white;
+}
+
+.cancel-btn:hover {
+    border-color: #4A4A4A;
+}
+
+.edit-comment-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 1rem;
+    border: 1px solid rgba(92, 106, 196, 0.2);
+    border-radius: 12px;
+    resize: vertical;
+    transition: all 0.3s ease;
+    margin: 1rem 0;
+}
+
+.edit-comment-textarea:focus {
+    outline: none;
+    border-color: #5c6ac4;
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.1);
 }
 
 .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 2rem;
+    gap: 1rem;
 }
 
 .pagination button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    background-color: #0066cc;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #5c6ac4 0%, #8794d8 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .pagination button:disabled {
-    background-color: #cccccc;
+    background: #E0E0E0;
     cursor: not-allowed;
+    transform: none;
+}
+
+.pagination button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 106, 196, 0.2);
 }
 
 .pagination span {
-    margin: 0 10px;
+    color: #5c6ac4;
+    font-weight: 600;
 }
 
-.review-actions, .comment-actions {
-    margin-top: 10px;
+@media (max-width: 1024px) {
+    .review-detail-container {
+        width: 90%;
+    }
 }
 
-.edit-btn, .delete-btn {
-    padding: 5px 10px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
+@media (max-width: 768px) {
+    .review-detail-container {
+        width: 95%;
+        padding: 0 1rem;
+    }
+
+    .review-content,
+    .comments-section {
+        padding: 1.5rem;
+    }
+
+    .review-title {
+        font-size: 1.8rem;
+    }
+
+    .review-info {
+        font-size: 0.9rem;
+        gap: 1rem;
+    }
+
+    .review-content-text {
+        font-size: 1rem;
+    }
+
+    .review-images {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .comment {
+        padding: 1rem;
+    }
 }
 
-.edit-btn {
-    background-color: #4CAF50;
-    color: white;
-}
+@media (max-width: 480px) {
+    .review-detail-container {
+        padding: 0 0.8rem;
+    }
 
-.delete-btn {
-    background-color: #f44336;
-    color: white;
-}
+    .review-content,
+    .comments-section {
+        padding: 1.2rem;
+    }
 
-.edit-btn:hover, .delete-btn:hover {
-    opacity: 0.8;
-}
+    .review-title {
+        font-size: 1.6rem;
+    }
 
-.edit-comment-textarea {
-    width: 100%;
-    min-height: 60px;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-}
+    .review-images {
+        grid-template-columns: 1fr;
+    }
 
-.edit-comment-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
+    .comment-form button,
+    .pagination button {
+        width: auto;
+        min-width: 100px;
+    }
 
-.save-btn, .cancel-btn {
-    padding: 5px 10px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-}
+    .review-actions,
+    .comment-actions {
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
 
-.save-btn {
-    background-color: #4CAF50;
-    color: white;
-}
+    .edit-btn,
+    .delete-btn,
+    .save-btn,
+    .cancel-btn {
+        width: auto;
+        min-width: 80px;
+        text-align: center;
+    }
 
-.cancel-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.save-btn:hover, .cancel-btn:hover {
-    opacity: 0.8;
+    .comment-form .button-container {
+        justify-content: flex-end;
+    }
 }
 </style>
