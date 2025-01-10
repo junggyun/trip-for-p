@@ -53,7 +53,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 		String nickname = ((CustomUserDetails) authentication.getPrincipal()).getNickname();
 
-		String access = jwtUtil.createJwt("access", username, nickname, role, 6000L);
+		String access = jwtUtil.createJwt("access", username, nickname, role, 600000L);
 		String refresh = jwtUtil.createJwt("refresh", username, nickname, role, 86400000L);
 
 		refreshService.saveRefreshToken(username, refresh, 86400000L);
