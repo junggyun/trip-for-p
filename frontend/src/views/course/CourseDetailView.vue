@@ -6,6 +6,7 @@ import router from "@/router";
 import store from "@/store";
 import GoogleMapComponent from "@/components/course/GoogleMapComponent.vue";
 import {detailPlaceAPI} from "@/api/google";
+import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
 
 const currentDateIndex = ref(0);
 const plan = ref(null);
@@ -233,8 +234,17 @@ onMounted(async () => {
             <div class="itinerary-section">
                 <div class="itinerary">
                     <h2>일정</h2>
-                    <div v-for="(item) in selectedPlaces[currentDate]" :key="item.sequence"
+                    <div v-for="(item, index) in selectedPlaces[currentDate]" :key="item.sequence"
                          class="itinerary-item">
+                        <div v-if="index > 0" class="distance-wrapper">
+                            <DistanceDisplay
+                                :origin-lat="selectedPlaces[currentDate][index - 1].place.latitude"
+                                :origin-lon="selectedPlaces[currentDate][index - 1].place.longitude"
+                                :destination-lat="item.place.latitude"
+                                :destination-lon="item.place.longitude"
+                                unit="km"
+                            />
+                        </div>
                         <div class="place-item">
                             <div class="place-content">
                                 <div class="place-header">
@@ -464,9 +474,6 @@ onMounted(async () => {
 }
 
 /* Place Items */
-.itinerary-item {
-    margin-bottom: 1.5rem;
-}
 
 .place-item {
     background: #f8f9fa;
@@ -591,6 +598,13 @@ onMounted(async () => {
 
 .like-button.liked {
     background: #4c5aa0;
+}
+
+.distance-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+    margin: 16px 0;
 }
 
 /* Responsive Design */

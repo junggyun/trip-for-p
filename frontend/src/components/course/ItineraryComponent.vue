@@ -2,6 +2,7 @@
 // script 부분은 동일하게 유지
 import {defineEmits, defineProps, ref} from 'vue';
 import draggable from 'vuedraggable';
+import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
 
 const props = defineProps({
     places: {
@@ -47,6 +48,15 @@ const onEnd = (event) => {
         >
             <template #item="{ element, index }">
                 <div class="itinerary-item">
+                    <div v-if="index > 0" class="distance-wrapper">
+                        <DistanceDisplay
+                            :origin-lat="places[index - 1].place.latitude"
+                            :origin-lon="places[index - 1].place.longitude"
+                            :destination-lat="element.place.latitude"
+                            :destination-lon="element.place.longitude"
+                            unit="km"
+                        />
+                    </div>
                     <div class="place-item">
                         <div class="drag-handle">&#9776;</div>
                         <div class="place-content">
@@ -93,7 +103,6 @@ const onEnd = (event) => {
 }
 
 .itinerary-item {
-    margin-bottom: 16px;
     transition: all 0.2s ease;
 }
 
@@ -240,6 +249,13 @@ const onEnd = (event) => {
 .delete-btn:hover {
     color: #5c6ac4;
     background-color: rgba(92, 106, 196, 0.1);
+}
+
+.distance-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+    margin: 16px 0;
 }
 
 .ghost {
