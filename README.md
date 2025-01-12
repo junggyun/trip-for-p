@@ -1,36 +1,34 @@
 # Trip For P
 <div align="center">
   
-<img width="291" alt="image" src="https://github.com/user-attachments/assets/dc0e9e6a-171f-47b8-876d-aef6738316ee">
+![Logo](https://github.com/user-attachments/assets/f88a4395-ee1a-4f87-8b8c-3c2af26d249f)
 
-**MBTI P** 들을 위한 맞춤형 여행 계획 서비스
-
-
+**MBTI P**들을 위한 여행 계획 서비스
 
 </div>
-<br>
-v1. 2024-08-21 ~ 2024-09-13 <br>
-v2. 2024-12-11 ~ <br>
 
 ## 목차
-1. [팀원 소개 및 역할](#팀원-소개-및-역할)
-2. [프로젝트 개요](#-프로젝트-개요)
-3. [개발 기술 및 환경](#️-개발-기술-및-환경)
-4. [개발 일정](#️-개발-일정)
-5. [배포 URL 및 테스트 계정](#️-배포-URL-및-테스트-계정)
-6. [Architecture](#️-architecture)
-7. [요구사항 및 기능 명세](#️-요구사항-및-기능-명세)
-8. [ERD](#️-erd)
-9. [플로우차트 & 화면 설계](#-플로우차트-&-화면-설계)
-10. [프로젝트 구조](#-프로젝트-구조)
-11. [API 명세서](#️-API-명세서)
-12. [구현 화면 GIF](#️-구현-화면-GIF)
-13. [시연 영상](#-시연-영상)
-
+1. [프로젝트 개요](#-프로젝트-개요)
+1. [팀원 및 역할](#-팀원-및-역할)
+3. [주요 기능](#-주요-기능)
+4. [기술 스택](#-기술-스택)
+5. [시스템 아키텍처](#-시스템-아키텍처)
+6. [ERD](#-시스템-아키텍처)
+7. [구현 화면](#-구현-화면)
 
 <br>
 
-## 팀원 소개 및 역할
+## 📝 프로젝트 개요
+- **개요**: MBTI가 P인 사람들을 위한 AI 기반 여행 계획 서비스
+- **기간**: 
+  - v1.0: 기본 여행 계획 서비스 (2024.08 ~ 2024.09)
+  - v2.0: 기능 고도화 및 성능 최적화, UI 개선 (2024.12 ~)
+- **배포 링크**: [Trip For P](https://tripforp.co.kr)
+- **테스트 계정**: ID: testuser / PW: qweqwe123
+
+<br>
+
+## 👥 팀원 및 역할
 
 <div align="center">
 
@@ -43,93 +41,94 @@ v2. 2024-12-11 ~ <br>
 |<br>**#설계**<br>- 화면 설계<br><br>**#Backend**<br>- 리뷰 게시글 + 댓글 API 개발<br>- 자유 게시글 + 댓글 API 개발<br>- 매거진 게시글(첨부파일) API 개발<br><br>|<br>**#설계**<br>- ERD 및 배포 구조 설계<br><br>**#Frontend**<br>- 마이페이지 프론트엔드 개발<br><br>**#Backend**<br>- 회원가입 및 이메일 인증 API 개발<br>- 마이페이지 API 개발<br><br>**#기타**<br>- GitHub Actions 활용 CI/CD 구축<br><br>|<br>**#설계**<br>- ERD 설계<br><br>**#Backend**<br>- 로그인, 로그아웃<br>(Spring Security & JWT) 개발<br>- 비밀번호 재설정 API 개발<br>- AI 장소 기반 추천 서비스 API 개발<br><br>|
 </div>
 
-</br>
+<br>
 
-## 💡 프로젝트 개요
-- **주제** : 여행 계획 세우기가 어려운 **MBTI가 P인** 사람들을 위한 여행 계획 서비스
-- **선정 배경**
-    - 코로나19 이후 여행 및 관광 사업이 활기를 되찾으며 꾸준히 성장하고 있고 여행자들의 기대와 요구도 더욱 다양하고 세분화되면서 여행 계획의 필요성이 증가하고 있음
-    - 하지만 많은 사람들이 여행 경로 설정, 숙박, 관광지 찾기 등 여행을 계획하는데 부담을 느끼고 있음
-    - 계획을 세우는 것이 어려운 사람들을 위해 맞춤형으로 여행 일정을 제안하고자 함
-- **기대 효과**
-    - 국내 여행 및 관광 산업 활성화
-    - 경로, 숙박, 관광지 등 여행 계획 설정의 간편화로 사용자 편의성 증진
+## 💡 주요 기능
+### 여행 코스 생성 및 공유
+- 구글맵 API를 활용한 장소 검색 및 선택
+- 장소의 주소, 평점, 리뷰 수, 구글맵 링크 제공
+- 일별로 방문지 순서 선택 가능
+- 여행 동선을 지도에서 한눈에 확인
+- 지역별 여행 코스 필터링 조회
+### AI 기반 여행 동선 추천
+- Google Gemini를 활용하여 장소의 카테고리와 좌표를 통해 여행 동선 추천
+- 좌표를 이용하여 최적의 방문 순서 제안
+- 카테고리를 이용하여 식당과 관광지의 균형있는 배치 제안
+### 데이터 기반 인기 지역/방문지 추천
+- 사용자들의 여행 코스 데이터 분석을 통한 인기 방문지 추천
+- 지역별 인기 방문지 순위 제공
+- 지역별 여행 코스 등록 수를 반영한 인기 지역 제공
+### 여행 리뷰 및 커뮤니티
+- 여행 코스 리뷰 작성 및 공유
+- 사진 첨부 기능으로 생생한 여행 리뷰 전달
+- 자유게시판을 통한 여행 정보 공유 및 소통
+### 여행 매거진
+- 운영자가 주기적으로 작성하는 여행지 소개
+- 사진과 텍스트를 통한 상세한 여행 코스 공유
 
 <br>
 
-## ⚙️ 개발 기술 및 환경
+## 🛠 기술 스택
+### Backend
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=SpringBoot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
-**BE**
+### Frontend
+![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=white)
 
-<img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
-<img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=SpringBoot&logoColor=white">
-<img src="https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
-<img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=Spring-Security&logoColor=white">
-<img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white">
-<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
-<img src="https://img.shields.io/badge/Alan%20AI-blue?style=for-the-badge">
-<img src="https://img.shields.io/badge/AWS%20S3-569A31?style=for-the-badge&logo=amazon-s3&logoColor=white">
-<img src="https://img.shields.io/badge/redis-%23DD0031.svg?&style=for-the-badge&logo=redis&logoColor=white">
+### Infrastructure
+![AWS EC2](https://img.shields.io/badge/Amazon_EC2-FF9900?style=flat-square&logo=amazonec2&logoColor=white)
+![AWS RDS](https://img.shields.io/badge/Amazon_RDS-527FFF?style=flat-square&logo=amazon-rds&logoColor=white)
+![AWS S3](https://img.shields.io/badge/Amazon_S3-569A31?style=flat-square&logo=amazon-s3&logoColor=white)
 
-**DevOps**
-
-<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/docker--compose-2496ED?style=for-the-badge&logo=docker&logoColor=white">
-<img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white">
-<img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
-<img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white">
-<img src="https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=amazon-aws&logoColor=white">
-
-
-**FE**
-
-<img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white">
-
-**TOOLS**
-
-<img src="https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=for-the-badge&logo=intellij-idea&logoColor=white"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white"><img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+### DevOps & Testing
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white)
+![k6](https://img.shields.io/badge/k6-7D64FF?style=flat-square&logo=k6&logoColor=white)
 
 <br>
 
+## 📐 시스템 아키텍처
+![Architecture](https://github.com/user-attachments/assets/97321cc0-43d4-4f64-a360-87755eb2457a)
+
+<br>
+
+<!--
 ## 🗓️ 개발 일정
 <div align="center">
-  
+
   ![image](https://github.com/user-attachments/assets/9f7a657c-a278-4630-b78f-f9af799f8cfd)
-
+  
 </div>
-<br>
-
-## 🔗 배포 URL 및 테스트 계정
-- 배포 URL: ~~[Trip For P](http://54.180.168.123/)~~
-- 테스트 계정: ID: testuser PW: qweqwe123
 
 <br>
+-->
 
-## 🏗️ Architecture
-![image](https://github.com/user-attachments/assets/ff5914f6-937f-4752-8eaa-9c96c29e371d)
-
-<br>
-
+<!--
 ## 🖥 요구사항 및 기능 명세
 ### 회원, 여행 코스
 ![image](https://github.com/user-attachments/assets/1ad0dc4b-f575-493b-86c8-9d53851afa80)
 
-
-
-
 ### 리뷰 게시글, 자유 게시글
 ![image](https://github.com/user-attachments/assets/01626440-baa2-4c73-8012-e5f241be7023)
-
 
 ### 매거진, AI 활용 추천 서비스
 ![image](https://github.com/user-attachments/assets/7c3146f8-916b-4041-9cd3-ac7a26733225)
 
 
 <br>
+-->
+
 
 ## 🛢️ ERD
-![image](https://github.com/user-attachments/assets/775773d7-42a4-4ac4-969e-f427fceede93)
+![ERD](https://github.com/user-attachments/assets/c9a26b5a-815a-4a77-95e5-20080bf9d049)
 
 <br>
+
+<!--
 
 ## 플로우차트 & 화면 설계
 ### 🔀 플로우차트
@@ -139,6 +138,9 @@ v2. 2024-12-11 ~ <br>
 ![image](https://github.com/user-attachments/assets/e8bbb6bd-42e0-4b62-bf04-ec3ac37eba5a)
 
 <br>
+-->
+
+<!--
 
 ## 📦 프로젝트 구조
 FE 프론트엔드와 BE 백엔드가 합쳐진 프로젝트 디렉토리 구조입니다.
@@ -308,6 +310,9 @@ FE 프론트엔드와 BE 백엔드가 합쳐진 프로젝트 디렉토리 구조
 ```
 
 <br>
+-->
+
+<!--
 
 ## API 명세서
 ### User
@@ -405,8 +410,10 @@ FE 프론트엔드와 BE 백엔드가 합쳐진 프로젝트 디렉토리 구조
 | userprocess | GET | /api/plan/user | 개인맞춤형 여행코스 추천 |
 
 <br>
+-->
 
-## 📺 구현 화면 GIF
+
+## 📺 구현 화면
 
 | ![메인 화면](https://github.com/user-attachments/assets/d7e744bc-bf97-4945-b579-96d717a76e73) | ![회원가입](https://github.com/user-attachments/assets/d76b93f3-2f7c-4764-81e2-17752afc8433) |
 | :---: | :---: |
@@ -430,6 +437,8 @@ FE 프론트엔드와 BE 백엔드가 합쳐진 프로젝트 디렉토리 구조
 
 <br>
 
+<!--
+
 ## 🔴 시연 영상
 <div align="center">
 
@@ -437,3 +446,5 @@ FE 프론트엔드와 BE 백엔드가 합쳐진 프로젝트 디렉토리 구조
 
   [YouTube에서 보기](https://www.youtube.com/watch?v=5ZE6PsUTqrM)
 </div>
+
+-->
