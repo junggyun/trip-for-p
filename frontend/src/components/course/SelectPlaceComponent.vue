@@ -68,6 +68,13 @@ const currentDate = computed(() => {
     return dates.value[currentDateIndex.value].toISOString().split('T')[0];
 });
 
+const currentDateWeekDay = computed(() => {
+    if (!currentDate.value) return '';
+    const date = new Date(currentDate.value);
+    const weekDays = ['(일)', '(월)', '(화)', '(수)', '(목)', '(금)', '(토)'];
+    return weekDays[date.getDay()];
+});
+
 const goToNextDate = () => {
     if (currentDateIndex.value < dates.value.length - 1) {
         currentDateIndex.value++;
@@ -380,7 +387,7 @@ onMounted(async () => {
             <button @click="goToPreviousDate" :disabled="currentDateIndex === 0"
                     class="nav-button prev-button">&lt; 이전
             </button>
-            <h3>{{ currentDate }}</h3>
+            <h3>{{ currentDate }} {{ currentDateWeekDay }}</h3>
             <button @click="goToNextDate" :disabled="currentDateIndex === dates.length - 1"
                     class="nav-button next-button">다음 &gt;
             </button>
