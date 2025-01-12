@@ -6,7 +6,9 @@ const searchPlacesAPI = function (request) {
             params: {
                 textQuery: request.textQuery,
                 pageSize: request.pageSize,
-                pageToken: request.pageToken
+                pageToken: request.pageToken,
+                latitude: request.latitude,
+                longitude: request.longitude
             }
         }
     )

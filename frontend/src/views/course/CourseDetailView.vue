@@ -6,6 +6,7 @@ import router from "@/router";
 import store from "@/store";
 import GoogleMapComponent from "@/components/course/GoogleMapComponent.vue";
 import {detailPlaceAPI} from "@/api/google";
+import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
 
 const currentDateIndex = ref(0);
 const plan = ref(null);
@@ -35,6 +36,7 @@ const fetchPlaceDetails = async () => {
     for (const spot of plan.value.spots) {
         try {
             const response = await detailPlaceAPI(spot.place.mapPlaceId);
+            console.log(response.data)
             placesDetail.value[spot.place.mapPlaceId] = response.data;
         } catch (error) {
             console.log(error);
@@ -90,6 +92,16 @@ const currentDate = computed(() => {
         return null;
     }
     return dates.value[currentDateIndex.value];
+});
+
+// script 부분에 새로운 computed 속성 추가
+const currentDateWeekDay = computed(() => {
+    if (!currentDate.value) {
+        return '';
+    }
+    const date = new Date(currentDate.value);
+    const weekDays = ['(일)', '(월)', '(화)', '(수)', '(목)', '(금)', '(토)'];
+    return weekDays[date.getDay()];
 });
 
 const prevDate = () => {
@@ -171,6 +183,12 @@ const deletePlan = async function (id) {
     }
 };
 
+const openPlaceUrl = (uri) => {
+    if (uri) {
+        window?.open(uri, '_blank');
+    }
+};
+
 const currentUserNickname = computed(() => store.getters.getNickname());
 const isPostAuthor = computed(() => currentUserNickname.value === plan.value?.writer);
 
@@ -211,7 +229,7 @@ onMounted(async () => {
             <button @click="prevDate" :disabled="currentDateIndex === 0"
                     class="nav-button prev-button">&lt; 이전
             </button>
-            <span>{{ currentDate }}</span>
+            <span>{{ currentDate }} {{ currentDateWeekDay }}</span>
             <button @click="nextDate" :disabled="currentDateIndex === dates.length - 1"
                     class="nav-button next-button">다음 &gt;
             </button>
@@ -233,29 +251,40 @@ onMounted(async () => {
             <div class="itinerary-section">
                 <div class="itinerary">
                     <h2>일정</h2>
-                    <div v-for="(item) in selectedPlaces[currentDate]" :key="item.sequence"
+                    <div v-for="(item, index) in selectedPlaces[currentDate]" :key="item.sequence"
                          class="itinerary-item">
+                        <div v-if="index > 0" class="distance-wrapper">
+                            <DistanceDisplay
+                                :origin-lat="selectedPlaces[currentDate][index - 1].place.latitude"
+                                :origin-lon="selectedPlaces[currentDate][index - 1].place.longitude"
+                                :destination-lat="item.place.latitude"
+                                :destination-lon="item.place.longitude"
+                                unit="km"
+                            />
+                        </div>
                         <div class="place-item">
                             <div class="place-content">
                                 <div class="place-header">
                                     <div class="place-info">
                                         <span class="sequence">{{ item.sequence }}</span>
-                                        <div class="place-main-info">
+                                        <div
+                                            class="place-main-info"
+                                            :class="{ 'has-link': item.place.uri }"
+                                            @click="openPlaceUrl(item.place.uri)"
+                                        >
                                             <h3>{{ item.place.name }}</h3>
                                             <p class="address">{{ item.place.address }}</p>
-                                            <div class="place-details"
-                                                 v-if="item.place.category || item.place.rating">
-                                                <span class="category" v-if="item.place.category">
-                                                    {{ item.place.category }}
-                                                </span>
+                                            <div class="place-details" v-if="item.place.category || item.place.rating">
+                <span class="category" v-if="item.place.category">
+                    {{ item.place.category }}
+                </span>
                                                 <span class="rating" v-if="item.place.rating">
-                                                    <span class="rating-stars">★</span>
-                                                    {{ item.place.rating }}
-                                                    <span class="review-count"
-                                                          v-if="item.place.reviewCount">
-                                                        ({{ item.place.reviewCount }})
-                                                    </span>
-                                                </span>
+                    <span class="rating-stars">★</span>
+                    {{ item.place.rating }}
+                    <span class="review-count" v-if="item.place.reviewCount">
+                        ({{ item.place.reviewCount }})
+                    </span>
+                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -345,6 +374,24 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.place-main-info.has-link {
+    cursor: pointer;
+    position: relative;
+}
+
+.place-main-info.has-link:hover {
+    color: #5c6ac4;
+}
+
+.place-main-info.has-link:hover h3 {
+    color: #5c6ac4;
+    text-decoration: underline;
+}
+
+.place-main-info.has-link:hover .address {
+    color: #5c6ac4;
 }
 
 .author-actions {
@@ -464,9 +511,6 @@ onMounted(async () => {
 }
 
 /* Place Items */
-.itinerary-item {
-    margin-bottom: 1.5rem;
-}
 
 .place-item {
     background: #f8f9fa;
@@ -591,6 +635,13 @@ onMounted(async () => {
 
 .like-button.liked {
     background: #4c5aa0;
+}
+
+.distance-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+    margin: 16px 0;
 }
 
 /* Responsive Design */

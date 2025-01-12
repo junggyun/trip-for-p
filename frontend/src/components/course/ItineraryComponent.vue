@@ -2,6 +2,7 @@
 // script 부분은 동일하게 유지
 import {defineEmits, defineProps, ref} from 'vue';
 import draggable from 'vuedraggable';
+import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
 
 const props = defineProps({
     places: {
@@ -34,6 +35,11 @@ const deletePlace = (index) => {
 const onEnd = (event) => {
     emit('reorder', props.currentDate, event.oldIndex, event.newIndex);
 };
+const openPlaceUrl = (uri) => {
+    if (uri) {
+        window?.open(uri, '_blank');
+    }
+};
 </script>
 
 <template>
@@ -47,22 +53,50 @@ const onEnd = (event) => {
         >
             <template #item="{ element, index }">
                 <div class="itinerary-item">
+                    <div v-if="index > 0" class="distance-wrapper">
+                        <DistanceDisplay
+                            :origin-lat="places[index - 1].place.latitude"
+                            :origin-lon="places[index - 1].place.longitude"
+                            :destination-lat="element.place.latitude"
+                            :destination-lon="element.place.longitude"
+                            unit="km"
+                        />
+                    </div>
                     <div class="place-item">
                         <div class="drag-handle">&#9776;</div>
                         <div class="place-content">
                             <div class="place-header">
                                 <div class="place-info">
                                     <span class="sequence">{{ element.sequence }}</span>
-                                    <div class="place-main-info">
+                                    <div class="place-main-info"
+                                         v-if="element.place.uri"
+                                         @click="openPlaceUrl(element.place.uri)"
+                                         :class="{ 'has-link': element.place.uri }">
                                         <h3>{{ element.place.name }}</h3>
                                         <p class="address">{{ element.place.address }}</p>
                                         <div class="place-details">
-                                            <span class="category">{{ element.place.category }}</span>
+                                            <span class="category">{{
+                                                    element.place.category
+                                                }}</span>
                                             <span class="rating">
-                                                <span class="rating-stars">★</span>
-                                                {{ element.place.rating }}
-                                                <span class="review-count">({{ element.place.reviewCount }})</span>
-                                            </span>
+                <span class="rating-stars">★</span>
+                {{ element.place.rating }}
+                <span class="review-count">({{ element.place.reviewCount }})</span>
+            </span>
+                                        </div>
+                                    </div>
+                                    <div class="place-main-info" v-else>
+                                        <h3>{{ element.place.name }}</h3>
+                                        <p class="address">{{ element.place.address }}</p>
+                                        <div class="place-details">
+                                            <span class="category">{{
+                                                    element.place.category
+                                                }}</span>
+                                            <span class="rating">
+                <span class="rating-stars">★</span>
+                {{ element.place.rating }}
+                <span class="review-count">({{ element.place.reviewCount }})</span>
+            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -93,7 +127,6 @@ const onEnd = (event) => {
 }
 
 .itinerary-item {
-    margin-bottom: 16px;
     transition: all 0.2s ease;
 }
 
@@ -122,6 +155,24 @@ const onEnd = (event) => {
 .drag-handle:hover {
     color: #5c6ac4;
     background-color: rgba(92, 106, 196, 0.1);
+}
+
+.place-main-info.has-link {
+    cursor: pointer;
+    position: relative;
+}
+
+.place-main-info.has-link:hover {
+    color: #5c6ac4;
+}
+
+.place-main-info.has-link:hover h3 {
+    color: #5c6ac4;
+    text-decoration: underline;
+}
+
+.place-main-info.has-link:hover .address {
+    color: #5c6ac4;
 }
 
 .place-content {
@@ -240,6 +291,13 @@ const onEnd = (event) => {
 .delete-btn:hover {
     color: #5c6ac4;
     background-color: rgba(92, 106, 196, 0.1);
+}
+
+.distance-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+    margin: 16px 0;
 }
 
 .ghost {

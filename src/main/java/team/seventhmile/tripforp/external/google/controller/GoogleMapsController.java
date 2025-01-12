@@ -12,6 +12,7 @@ import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiRequest;
+import team.seventhmile.tripforp.external.google.dto.SearchPlacesRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesResponse;
 import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
 
@@ -25,9 +26,10 @@ public class GoogleMapsController {
 
     @GetMapping("/search")
     public ResponseEntity<Mono<SearchPlacesResponse>> searchPlaces(
-        @ModelAttribute SearchPlacesApiRequest request
+        @ModelAttribute SearchPlacesRequest request
     ) {
-        return ResponseEntity.ok(googleMapsService.searchPlacesApi(request));
+        SearchPlacesApiRequest apiRequest = new SearchPlacesApiRequest(request);
+        return ResponseEntity.ok(googleMapsService.searchPlacesApi(apiRequest));
     }
 
     @GetMapping("/detail")

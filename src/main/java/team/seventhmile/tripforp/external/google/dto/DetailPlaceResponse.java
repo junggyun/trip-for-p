@@ -15,6 +15,7 @@ public class DetailPlaceResponse {
     private int reviewCount;
     private double latitude;
     private double longitude;
+    private String uri;
 
     public DetailPlaceResponse(GoogleMapsPlaceApiDto place) {
         this.id = place.getId();
@@ -25,5 +26,6 @@ public class DetailPlaceResponse {
         this.reviewCount = place.getUserRatingCount();
         this.latitude = place.getLocation().getLatitude();
         this.longitude = place.getLocation().getLongitude();
+        this.uri = place.getGoogleMapsUri();
     }
 }

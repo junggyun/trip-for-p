@@ -68,6 +68,13 @@ const currentDate = computed(() => {
     return dates.value[currentDateIndex.value].toISOString().split('T')[0];
 });
 
+const currentDateWeekDay = computed(() => {
+    if (!currentDate.value) return '';
+    const date = new Date(currentDate.value);
+    const weekDays = ['(일)', '(월)', '(화)', '(수)', '(목)', '(금)', '(토)'];
+    return weekDays[date.getDay()];
+});
+
 const goToNextDate = () => {
     if (currentDateIndex.value < dates.value.length - 1) {
         currentDateIndex.value++;
@@ -102,7 +109,8 @@ const addPlace = (place, date) => {
                 rating: place.place.rating,
                 reviewCount: place.place.reviewCount,
                 latitude: place.place.latitude,
-                longitude: place.place.longitude
+                longitude: place.place.longitude,
+                uri: place.place.uri
             },
             memo: '',
             sequence: selectedPlaces.value[dateString].length + 1
@@ -379,7 +387,7 @@ onMounted(async () => {
             <button @click="goToPreviousDate" :disabled="currentDateIndex === 0"
                     class="nav-button prev-button">&lt; 이전
             </button>
-            <h3>{{ dates[currentDateIndex].toLocaleDateString() }}</h3>
+            <h3>{{ currentDate }} {{ currentDateWeekDay }}</h3>
             <button @click="goToNextDate" :disabled="currentDateIndex === dates.length - 1"
                     class="nav-button next-button">다음 &gt;
             </button>
@@ -409,7 +417,9 @@ onMounted(async () => {
             <div class="info-section">
                 <div class="search-component-wrapper">
                     <SearchPlaceComponent
-                        @place-selected="place => addPlace(place, dates[currentDateIndex])"/>
+                        @place-selected="place => addPlace(place, dates[currentDateIndex])"
+                        :tempPlace="selectedPlaces[currentDate]?.length > 0 ? selectedPlaces[currentDate][0] : null"
+                    />
                 </div>
                 <ItineraryComponent
                     :places="selectedPlaces[currentDate] || []"
@@ -591,21 +601,44 @@ onMounted(async () => {
 
 .location-select {
     flex: 1;
-    padding: 10px;
+    padding: 12px 16px;
     font-size: 1em;
-    border: 2px solid #ddd;
+    border: 2px solid #e4e7f2;
     border-radius: 8px;
-    transition: border-color 0.3s ease;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    appearance: none; /* 기본 화살표 제거 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235c6ac4' d='M2.95 4.28a.75.75 0 0 1 1.06 0L6 6.27l1.97-1.99a.75.75 0 1 1 1.06 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 0 1 0-1.06z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(92, 106, 196, 0.05);
+}
+
+.location-select:hover:not(:disabled) {
+    border-color: #5c6ac4;
+    box-shadow: 0 2px 8px rgba(92, 106, 196, 0.1);
 }
 
 .location-select:focus {
     outline: none;
     border-color: #5c6ac4;
+    box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.15);
 }
 
 .location-select:disabled {
-    background-color: #f5f5f5;
+    background-color: #f8f9fd;
+    border-color: #e4e7f2;
+    color: #999;
     cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.location-select option {
+    padding: 12px;
+    background-color: white;
+    color: #333;
 }
 
 .recommend-button {
@@ -633,15 +666,6 @@ onMounted(async () => {
 }
 
 @media (max-width: 600px) {
-    .location-selectors {
-        flex-direction: column;
-    }
-    .recommend-button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 600px) {
     .trip-planner {
         padding: 10px;
     }
@@ -663,6 +687,19 @@ onMounted(async () => {
 
     .save-plan-button, .back-button {
         width: 100%;
+    }
+
+    .location-selectors {
+        flex-direction: column;
+    }
+    .recommend-button {
+        width: 100%;
+    }
+
+    .location-select {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 16px; /* 모바일에서 더 큰 글씨 */
     }
 }
 </style>

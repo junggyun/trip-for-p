@@ -29,7 +29,7 @@ public class GoogleMapsService {
             .uri("/places:searchText")
             .headers(headers -> {
                 headers.add("X-Goog-FieldMask",
-                    "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.location,nextPageToken");
+                    "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.location,places.googleMapsUri,nextPageToken");
             })
             .bodyValue(request)
             .retrieve()
@@ -55,7 +55,7 @@ public class GoogleMapsService {
                 .build())
             .headers(headers -> {
                 headers.add("X-Goog-FieldMask",
-                    "id,location,displayName,formattedAddress,primaryTypeDisplayName,rating,userRatingCount");
+                    "id,location,displayName,formattedAddress,primaryTypeDisplayName,rating,userRatingCount,googleMapsUri");
             })
             .retrieve()
             .bodyToMono(GoogleMapsPlaceApiDto.class)
