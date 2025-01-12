@@ -260,7 +260,6 @@ onUnmounted(() => {
 
 .slider-container {
     position: relative;
-    margin-bottom: 4rem;
     padding: 0.5rem 0;
 }
 
@@ -514,9 +513,6 @@ onUnmounted(() => {
 
     .stats-value {
         font-size: 0.8rem;
-    }
-    .slider-container {
-        margin-bottom: 2rem;
     }
 }
 

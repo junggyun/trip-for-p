@@ -61,6 +61,10 @@ watch(() => route.path, () => {
     padding: 0;
 }
 
+.app-footer {
+    margin-top: 100px;
+}
+
 @media (max-width: 1024px) {
     .app-content {
         width: 80%;
@@ -83,6 +87,9 @@ watch(() => route.path, () => {
     }
     .app-content.no-padding {
         padding: 0;
+    }
+    .app-footer {
+        margin-top: 50px;
     }
 }
 
