@@ -1,5 +1,5 @@
 <script setup>
-import {defineEmits, onMounted, onUnmounted, ref} from 'vue';
+import {defineEmits, defineProps, onMounted, onUnmounted, ref} from 'vue';
 import {searchPlacesAPI} from "@/api/google";
 
 const showResults = ref(false);
@@ -10,6 +10,13 @@ const searchInputRef = ref(null); // [] 대신 null로 수정
 const searchComponentRef = ref(null);
 const isSearching = ref(false);
 const emit = defineEmits(['place-selected']);
+
+const props = defineProps({
+    tempPlace: {
+        type: Object,
+        required: true
+    }
+});
 
 /**
  * 장소 검색
@@ -25,10 +32,13 @@ const searchPlace = async () => {
     isSearching.value = true;
 
     try {
+        console.log(props.tempPlace)
         const request = {
             textQuery: searchQuery.value,
             pageSize: 20,
             pageToken: '',
+            latitude: props.tempPlace !== null ? props.tempPlace.place.latitude : 37.550263,
+            longitude: props.tempPlace !== null ? props.tempPlace.place.longitude : 126.9970831
         }
         const response = await searchPlacesAPI(request);
         searchResults.value = response.data.places;

@@ -417,7 +417,9 @@ onMounted(async () => {
             <div class="info-section">
                 <div class="search-component-wrapper">
                     <SearchPlaceComponent
-                        @place-selected="place => addPlace(place, dates[currentDateIndex])"/>
+                        @place-selected="place => addPlace(place, dates[currentDateIndex])"
+                        :tempPlace="selectedPlaces[currentDate]?.length > 0 ? selectedPlaces[currentDate][0] : null"
+                    />
                 </div>
                 <ItineraryComponent
                     :places="selectedPlaces[currentDate] || []"
