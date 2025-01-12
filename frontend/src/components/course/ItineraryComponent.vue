@@ -1,16 +1,12 @@
 <script setup>
 // script 부분은 동일하게 유지
-import { ref, computed, defineProps, defineEmits } from 'vue';
+import {defineEmits, defineProps, ref} from 'vue';
 import draggable from 'vuedraggable';
 
 const props = defineProps({
     places: {
         type: Array,
         required: true
-    },
-    routeInfo: {
-        type: Object,
-        default: () => ({})
     },
     currentDate: {
         type: String,
@@ -19,28 +15,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:memo', 'reorder', 'delete']);
-
-const formatDuration = (durationInSeconds) => {
-    if (durationInSeconds == null) return 'N/A';
-
-    const hours = Math.floor(durationInSeconds / 3600);
-    const minutes = Math.floor((durationInSeconds % 3600) / 60);
-    const seconds = durationInSeconds % 60;
-
-    const parts = [];
-
-    if (hours > 0) {
-        parts.push(`${hours}시간`);
-    }
-    if (minutes > 0) {
-        parts.push(`${minutes}분`);
-    }
-    if (seconds > 0 || parts.length === 0) {
-        parts.push(`${seconds}초`);
-    }
-
-    return parts.join(' ');
-};
 
 const dragOptions = ref({
     animation: 200,
@@ -60,10 +34,6 @@ const deletePlace = (index) => {
 const onEnd = (event) => {
     emit('reorder', props.currentDate, event.oldIndex, event.newIndex);
 };
-
-const totalDuration = computed(() => {
-    return props.routeInfo?.summary?.duration ?? 0;
-});
 </script>
 
 <template>
@@ -113,9 +83,6 @@ const totalDuration = computed(() => {
                 </div>
             </template>
         </draggable>
-        <div v-if="totalDuration > 0" class="total-duration">
-            총 예상 소요 시간: {{ formatDuration(totalDuration) }}
-        </div>
     </div>
 </template>
 
@@ -273,33 +240,6 @@ const totalDuration = computed(() => {
 .delete-btn:hover {
     color: #5c6ac4;
     background-color: rgba(92, 106, 196, 0.1);
-}
-
-.duration-info {
-    margin: 12px 0;
-    padding: 12px;
-    background-color: rgba(92, 106, 196, 0.05);
-    border-radius: 6px;
-    color: #5c6ac4;
-    font-size: 0.925rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.duration-icon {
-    font-size: 1.125rem;
-    color: #8794d8;
-}
-
-.total-duration {
-    margin-top: 24px;
-    padding: 16px;
-    background-color: rgba(92, 106, 196, 0.05);
-    border-radius: 8px;
-    font-weight: 600;
-    text-align: right;
-    color: #5c6ac4;
 }
 
 .ghost {
