@@ -102,7 +102,8 @@ const addPlace = (place, date) => {
                 rating: place.place.rating,
                 reviewCount: place.place.reviewCount,
                 latitude: place.place.latitude,
-                longitude: place.place.longitude
+                longitude: place.place.longitude,
+                uri: place.place.uri
             },
             memo: '',
             sequence: selectedPlaces.value[dateString].length + 1
@@ -379,7 +380,7 @@ onMounted(async () => {
             <button @click="goToPreviousDate" :disabled="currentDateIndex === 0"
                     class="nav-button prev-button">&lt; 이전
             </button>
-            <h3>{{ dates[currentDateIndex].toLocaleDateString() }}</h3>
+            <h3>{{ currentDate }}</h3>
             <button @click="goToNextDate" :disabled="currentDateIndex === dates.length - 1"
                     class="nav-button next-button">다음 &gt;
             </button>

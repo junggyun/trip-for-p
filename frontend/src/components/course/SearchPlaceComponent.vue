@@ -56,7 +56,8 @@ const selectPlace = (place) => {
             rating: place.rating,
             reviewCount: place.reviewCount,
             latitude: place.latitude,
-            longitude: place.longitude
+            longitude: place.longitude,
+            uri: place.uri
         }
     };
 
@@ -101,10 +102,23 @@ onUnmounted(() => {
             <div v-if="isSearching" class="searching">검색 중...</div>
             <ul v-else-if="searchResults.length > 0">
                 <li v-for="place in searchResults" :key="place.id" @click="selectPlace(place)">
-                    <div class="place-name">{{ place.name }}</div>
-                    <div class="place-category">{{ place.category }}</div>
-                    <div class="place-address">{{ place.address }}</div>
-                    <div class="place-rating">평점: {{ place.rating }} ({{ place.reviewCount }}개 리뷰)</div>
+                    <div class="place-header">
+                        <div class="place-title">{{ place.name }}</div>
+                        <a
+                            v-if="place.uri"
+                            :href="place.uri"
+                            target="_blank"
+                            class="place-link-button"
+                            @click.stop
+                        >
+                            <span class="external-icon">↗</span>
+                        </a>
+                    </div>
+                    <div class="place-content" @click="selectPlace(place)">
+                        <div class="place-category">{{ place.category }}</div>
+                        <div class="place-address">{{ place.address }}</div>
+                        <div class="place-rating">평점: {{ place.rating }} ({{ place.reviewCount }}개 리뷰)</div>
+                    </div>
                 </li>
             </ul>
             <div v-else class="no-results">
@@ -177,11 +191,51 @@ onUnmounted(() => {
 }
 
 .search-results li {
-    cursor: pointer;
     padding: 12px;
     border-bottom: 1px solid #eee;
-    transition: all 0.3s ease;
 }
+
+.place-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.place-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.place-content {
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.place-link-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: #5c6ac4;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.place-link-button:hover {
+    background-color: #4f5bb4;
+    transform: translateY(-1px);
+}
+
+.external-icon {
+    font-size: 1em;
+}
+
 
 .search-results li:last-child {
     border-bottom: none;
@@ -189,11 +243,6 @@ onUnmounted(() => {
 
 .search-results li:hover {
     background-color: rgba(92, 106, 196, 0.05);
-}
-
-.place-name {
-    font-weight: bold;
-    margin-bottom: 3px;
 }
 
 .place-category {
@@ -225,6 +274,21 @@ onUnmounted(() => {
 
     .search-button {
         margin-top: 10px;
+    }
+
+    .search-results li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .place-link-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .place-header {
+        margin-bottom: 8px;
     }
 }
 </style>

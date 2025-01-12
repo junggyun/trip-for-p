@@ -18,6 +18,7 @@ public class GoogleMapsPlaceApiDto {
     private PlaceLocation location;
     private final List<Photo> photos = new ArrayList<>();
     private GoogleMapsLinks googleMapsLinks;
+    private String googleMapsUri;
 
     public PlaceType getPrimaryTypeDisplayName() {
         return primaryTypeDisplayName != null ? primaryTypeDisplayName : new PlaceType();

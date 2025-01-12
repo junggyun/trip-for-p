@@ -36,6 +36,7 @@ const fetchPlaceDetails = async () => {
     for (const spot of plan.value.spots) {
         try {
             const response = await detailPlaceAPI(spot.place.mapPlaceId);
+            console.log(response.data)
             placesDetail.value[spot.place.mapPlaceId] = response.data;
         } catch (error) {
             console.log(error);
@@ -172,6 +173,12 @@ const deletePlan = async function (id) {
     }
 };
 
+const openPlaceUrl = (uri) => {
+    if (uri) {
+        window?.open(uri, '_blank');
+    }
+};
+
 const currentUserNickname = computed(() => store.getters.getNickname());
 const isPostAuthor = computed(() => currentUserNickname.value === plan.value?.writer);
 
@@ -250,22 +257,24 @@ onMounted(async () => {
                                 <div class="place-header">
                                     <div class="place-info">
                                         <span class="sequence">{{ item.sequence }}</span>
-                                        <div class="place-main-info">
+                                        <div
+                                            class="place-main-info"
+                                            :class="{ 'has-link': item.place.uri }"
+                                            @click="openPlaceUrl(item.place.uri)"
+                                        >
                                             <h3>{{ item.place.name }}</h3>
                                             <p class="address">{{ item.place.address }}</p>
-                                            <div class="place-details"
-                                                 v-if="item.place.category || item.place.rating">
-                                                <span class="category" v-if="item.place.category">
-                                                    {{ item.place.category }}
-                                                </span>
+                                            <div class="place-details" v-if="item.place.category || item.place.rating">
+                <span class="category" v-if="item.place.category">
+                    {{ item.place.category }}
+                </span>
                                                 <span class="rating" v-if="item.place.rating">
-                                                    <span class="rating-stars">★</span>
-                                                    {{ item.place.rating }}
-                                                    <span class="review-count"
-                                                          v-if="item.place.reviewCount">
-                                                        ({{ item.place.reviewCount }})
-                                                    </span>
-                                                </span>
+                    <span class="rating-stars">★</span>
+                    {{ item.place.rating }}
+                    <span class="review-count" v-if="item.place.reviewCount">
+                        ({{ item.place.reviewCount }})
+                    </span>
+                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -355,6 +364,24 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.place-main-info.has-link {
+    cursor: pointer;
+    position: relative;
+}
+
+.place-main-info.has-link:hover {
+    color: #5c6ac4;
+}
+
+.place-main-info.has-link:hover h3 {
+    color: #5c6ac4;
+    text-decoration: underline;
+}
+
+.place-main-info.has-link:hover .address {
+    color: #5c6ac4;
 }
 
 .author-actions {

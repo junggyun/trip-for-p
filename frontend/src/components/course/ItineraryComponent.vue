@@ -35,6 +35,11 @@ const deletePlace = (index) => {
 const onEnd = (event) => {
     emit('reorder', props.currentDate, event.oldIndex, event.newIndex);
 };
+const openPlaceUrl = (uri) => {
+    if (uri) {
+        window?.open(uri, '_blank');
+    }
+};
 </script>
 
 <template>
@@ -63,16 +68,35 @@ const onEnd = (event) => {
                             <div class="place-header">
                                 <div class="place-info">
                                     <span class="sequence">{{ element.sequence }}</span>
-                                    <div class="place-main-info">
+                                    <div class="place-main-info"
+                                         v-if="element.place.uri"
+                                         @click="openPlaceUrl(element.place.uri)"
+                                         :class="{ 'has-link': element.place.uri }">
                                         <h3>{{ element.place.name }}</h3>
                                         <p class="address">{{ element.place.address }}</p>
                                         <div class="place-details">
-                                            <span class="category">{{ element.place.category }}</span>
+                                            <span class="category">{{
+                                                    element.place.category
+                                                }}</span>
                                             <span class="rating">
-                                                <span class="rating-stars">★</span>
-                                                {{ element.place.rating }}
-                                                <span class="review-count">({{ element.place.reviewCount }})</span>
-                                            </span>
+                <span class="rating-stars">★</span>
+                {{ element.place.rating }}
+                <span class="review-count">({{ element.place.reviewCount }})</span>
+            </span>
+                                        </div>
+                                    </div>
+                                    <div class="place-main-info" v-else>
+                                        <h3>{{ element.place.name }}</h3>
+                                        <p class="address">{{ element.place.address }}</p>
+                                        <div class="place-details">
+                                            <span class="category">{{
+                                                    element.place.category
+                                                }}</span>
+                                            <span class="rating">
+                <span class="rating-stars">★</span>
+                {{ element.place.rating }}
+                <span class="review-count">({{ element.place.reviewCount }})</span>
+            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -131,6 +155,24 @@ const onEnd = (event) => {
 .drag-handle:hover {
     color: #5c6ac4;
     background-color: rgba(92, 106, 196, 0.1);
+}
+
+.place-main-info.has-link {
+    cursor: pointer;
+    position: relative;
+}
+
+.place-main-info.has-link:hover {
+    color: #5c6ac4;
+}
+
+.place-main-info.has-link:hover h3 {
+    color: #5c6ac4;
+    text-decoration: underline;
+}
+
+.place-main-info.has-link:hover .address {
+    color: #5c6ac4;
 }
 
 .place-content {
