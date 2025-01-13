@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineProps } from 'vue';
+import {computed, defineProps} from 'vue';
 
 const props = defineProps({
     originLat: {
@@ -30,7 +30,12 @@ const props = defineProps({
 });
 
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // 지구의 반지름 (km)
+    // 좌표 값이 유효한지 확인
+    if (!lat1 || !lon1 || !lat2 || !lon2) {
+        return null;
+    }
+
+    const R = 6371;
     const lat1Rad = (lat1 * Math.PI) / 180;
     const lon1Rad = (lon1 * Math.PI) / 180;
     const lat2Rad = (lat2 * Math.PI) / 180;
@@ -56,15 +61,19 @@ const distance = computed(() => {
         props.destinationLon
     );
 
-    if (props.unit === 'm') {
-        return (kmDistance * 1000).toFixed(props.decimals);
+    if (kmDistance === null) {
+        return '-';
     }
-    return kmDistance.toFixed(props.decimals);
+
+    if (props.unit === 'm') {
+        return `${(kmDistance * 1000).toFixed(props.decimals)}`;
+    }
+    return `${kmDistance.toFixed(props.decimals)}`;
 });
 </script>
 
 <template>
-    <div class="distance-display">
+    <div class="distance-display" v-if="distance !== '-'">
         <span class="distance-icon">↕</span>
         <span class="distance-value">{{ distance }}</span>
         <span class="distance-unit">{{ unit }}</span>

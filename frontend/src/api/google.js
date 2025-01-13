@@ -24,7 +24,12 @@ const detailPlaceAPI = function (id) {
     )
 };
 
+const mapLoadAPI = function () {
+    return authInstance.get(`/api/google-maps/load`)
+};
+
 export {
     searchPlacesAPI,
-    detailPlaceAPI
+    detailPlaceAPI,
+    mapLoadAPI
 }

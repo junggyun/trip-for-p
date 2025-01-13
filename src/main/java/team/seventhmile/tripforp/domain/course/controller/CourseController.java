@@ -30,6 +30,7 @@ import team.seventhmile.tripforp.domain.course.service.CourseService;
 import team.seventhmile.tripforp.domain.spot.dto.GetPopularPlaceResponse;
 import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
+import team.seventhmile.tripforp.global.common.PageResponse;
 
 @Slf4j
 @RestController
@@ -73,7 +74,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<GetCourseListResponse>> getCourseList(
+    public ResponseEntity<PageResponse<GetCourseListResponse>> getCourseList(
         @RequestParam(value = "keyword", required = false) String keyword,
         Pageable pageable
     ) {
@@ -90,12 +91,13 @@ public class CourseController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
-    public ResponseEntity<Page<GetCourseListResponse>> getMyCourseList(
+    public ResponseEntity<PageResponse<GetCourseListResponse>> getMyCourseList(
         @AuthenticationPrincipal UserDetails user,
         Pageable pageable) {
         return ResponseEntity.ok(courseService.getMyCourseList(user, pageable));
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/popular-places")
     public ResponseEntity<List<GetPopularPlaceResponse>> getPopularPlaces(
         String city,

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ public class AiController {
 
     private final AiService aiService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/date-area")
     public ResponseEntity<Map<String, Object>> generationDateAndAreaResponse(
         @RequestParam(name = "startDate") @NotNull @FutureOrPresent LocalDate startDate,
@@ -40,6 +42,7 @@ public class AiController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/date-area2")
     public String generationDateAndAreaResponse2(
         @RequestParam(name = "startDate") @NotNull @FutureOrPresent LocalDate startDate,

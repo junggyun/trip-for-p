@@ -109,7 +109,7 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
     @Override
     public Course findCourse(Long id) {
         return queryFactory
-            .selectFrom(qCourse)
+            .select(qCourse)
             .leftJoin(qCourse.creator).fetchJoin()
             .leftJoin(qCourse.spots, qSpot).fetchJoin()
             .leftJoin(qSpot.place).fetchJoin()

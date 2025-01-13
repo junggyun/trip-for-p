@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ public class WeatherController {
 
     private final WeatherService weatherService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<WeatherApiResponse> getWeatherApi(
         @RequestParam(name = "area") String area
@@ -27,6 +29,7 @@ public class WeatherController {
         return ResponseEntity.ok(weatherService.getWeatherApi(area));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/filter")
     public ResponseEntity<List<WeatherDto>> getWeather(
         @RequestParam(name = "area") String area,

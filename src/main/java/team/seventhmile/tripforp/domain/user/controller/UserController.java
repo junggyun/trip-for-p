@@ -58,12 +58,14 @@ public class UserController {
 		}
 	}
 
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@PostMapping("/reissue")
 	public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
 		return jwtUtil.reissueToken(request, response);
 	}
 
+	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/me")
 	public ResponseEntity<UserInfoResponse> getUserInfo(
 		@AuthenticationPrincipal UserDetails userDetails) {
@@ -78,6 +80,7 @@ public class UserController {
 		return ResponseEntity.ok(userService.updateInfo(userDetails, userInfoReq));
 	}
 
+	@PreAuthorize("hasRole('USER')")
 	@PatchMapping("/me/password")
 	public ResponseEntity<?> modifyPassword(HttpServletRequest request,
 		@Valid @RequestBody ModifyPasswordRequest modifyPasswordRequest) {
@@ -90,6 +93,7 @@ public class UserController {
 			findPasswordRequest.getNewPassword());
 	}
 
+	@PreAuthorize("hasRole('USER')")
 	@PatchMapping("/deletion")
 	public ResponseEntity<?> deleteUser(
 			@AuthenticationPrincipal UserDetails userDetails,

@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ public class RegionController {
     private final RegionService regionService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createRegion(
         @RequestBody CreateRegionRequest request
     ) {
@@ -32,6 +34,7 @@ public class RegionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteRegion(
         @PathVariable(name = "id") Long id
     ) {
@@ -42,12 +45,14 @@ public class RegionController {
     }
 
     @GetMapping("/provinces")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<String>> getProvinceList() {
         return ResponseEntity
             .ok(regionService.getProvinceList());
     }
 
     @GetMapping("/cities")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<String>> getCityListByProvince(
         String province
     ) {

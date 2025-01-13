@@ -13,6 +13,7 @@ const plan = ref(null);
 const placesDetail = ref({});
 const route = useRoute();
 const isLiked = ref(false);
+const isFetched = ref(false);
 const GOOGLE_MAP_API_KEY = process.env.VUE_APP_GOOGLE_MAP_API_KEY
 
 const getPlan = async function () {
@@ -39,9 +40,23 @@ const fetchPlaceDetails = async () => {
             console.log(response.data)
             placesDetail.value[spot.place.mapPlaceId] = response.data;
         } catch (error) {
-            console.log(error);
+            if (error.status === 429) {
+                if (store.getters.isAccessTokenValid()) {
+                    alert("일일한도량을 초과하였습니다.");
+                    await router.push('/');
+                } else {
+                    if (window.confirm(
+                        "일일한도량을 초과하였습니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                        await router.push('/login');
+                    } else {
+                        await router.push('/');
+                    }
+                }
+            }
+            break;
         }
     }
+    isFetched.value = true;
 };
 
 const selectedPlaces = computed(() => {
@@ -241,6 +256,7 @@ onMounted(async () => {
             <div class="map-section">
                 <GoogleMapComponent
                     class="google-map-component"
+                    v-if="isFetched"
                     :places="selectedPlaces[currentDate] || []"
                     :date="currentDate"
                     :apiKey="GOOGLE_MAP_API_KEY"

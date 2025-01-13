@@ -5,19 +5,20 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import team.seventhmile.tripforp.domain.file.entity.MagazineFile;
 import team.seventhmile.tripforp.domain.file.service.MagazineFileService;
+import team.seventhmile.tripforp.domain.magazine.dto.GetMagazinesResponse;
 import team.seventhmile.tripforp.domain.magazine.dto.MagazineDto;
 import team.seventhmile.tripforp.domain.magazine.entity.Magazine;
 import team.seventhmile.tripforp.domain.magazine.repository.MagazineRepository;
 import team.seventhmile.tripforp.domain.user.entity.Role;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.domain.user.repository.UserRepository;
+import team.seventhmile.tripforp.global.common.PageResponse;
 import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
 import team.seventhmile.tripforp.global.exception.UnauthorizedAccessException;
 
@@ -72,19 +73,18 @@ public class MagazineService {
 
         magazine.update(magazineDto.getTitle(), magazineDto.getContent());
 
-
-		if (files != null && !files.isEmpty()) {
+        if (files != null && !files.isEmpty()) {
             if (magazine.getFiles() != null) {
                 for (MagazineFile file : magazine.getFiles()) {
                     magazineFileService.deleteFile(file.getFileName());
                 }
             }
             magazine.clearFile();
-			for (MultipartFile file : files) {
-				MagazineFile magazineFile = magazineFileService.saveFile(file);
-				magazine.addFile(magazineFile);
-			}
-		}
+            for (MultipartFile file : files) {
+                MagazineFile magazineFile = magazineFileService.saveFile(file);
+                magazine.addFile(magazineFile);
+            }
+        }
 
         return MagazineDto.convertToDto(magazine);
     }
@@ -124,23 +124,9 @@ public class MagazineService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "magazines")
-    public Page<MagazineDto> getAllMagazineList(Pageable pageable) {
+    public PageResponse<GetMagazinesResponse> getMagazineSearch(String keyword, Pageable pageable) {
 
-        return magazineRepository.findAllByOrderByCreatedAtDesc(pageable)
-            .map(MagazineDto::convertToDto);
-    }
-
-    @Transactional(readOnly = true)
-    @Cacheable(value = "magazines")
-    public Page<MagazineDto> getMagazineSearch(String keyword, Pageable pageable) {
-
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return Page.empty(pageable);
-        }
-
-        Page<Magazine> magazines = magazineRepository.getMagazineKeywordContaining(
-            keyword.trim(), pageable);
-        return magazines.map(MagazineDto::convertToDto);
-
+        return new PageResponse<>(magazineRepository.getMagazineKeywordContaining(
+            keyword, pageable));
     }
 }

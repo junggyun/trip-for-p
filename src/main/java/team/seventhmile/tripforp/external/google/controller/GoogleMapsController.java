@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
@@ -18,20 +17,21 @@ import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/google-maps")
 public class GoogleMapsController {
 
     private final GoogleMapsService googleMapsService;
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/search")
-    public ResponseEntity<Mono<SearchPlacesResponse>> searchPlaces(
+    public ResponseEntity<SearchPlacesResponse> searchPlaces(
         @ModelAttribute SearchPlacesRequest request
     ) {
         SearchPlacesApiRequest apiRequest = new SearchPlacesApiRequest(request);
         return ResponseEntity.ok(googleMapsService.searchPlacesApi(apiRequest));
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN') or isAnonymous()")
     @GetMapping("/detail")
     public ResponseEntity<DetailPlaceResponse> detailPlace(
         @ModelAttribute DetailPlaceApiRequest request
@@ -39,6 +39,13 @@ public class GoogleMapsController {
         return ResponseEntity.ok(googleMapsService.detailPlaceApi(request));
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN') or isAnonymous()")
+    @GetMapping("/load")
+    public ResponseEntity<String> loadMap() {
+        return ResponseEntity.ok("Map Loaded");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/photo")
     public ResponseEntity<PhotoPlaceResponse> photoPlace(
         @ModelAttribute DetailPlaceApiRequest request

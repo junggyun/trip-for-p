@@ -1,6 +1,5 @@
 package team.seventhmile.tripforp.domain.courseLike.controller;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseListResponse;
 import team.seventhmile.tripforp.domain.courseLike.dto.CourseLikeResponseDto;
 import team.seventhmile.tripforp.domain.courseLike.service.CourseLikeService;
+import team.seventhmile.tripforp.global.common.PageResponse;
 
 @RestController
 @RequestMapping("/api/course-likes")
@@ -27,6 +27,7 @@ public class CourseLikeController {
         this.courseLikeService = courseLikeService;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/courses/{id}")
     public ResponseEntity<CourseLikeResponseDto> toggleLikeCourse(
         @AuthenticationPrincipal UserDetails userDetails,
@@ -40,13 +41,13 @@ public class CourseLikeController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
-    public ResponseEntity<Page<GetCourseListResponse>> getMyFavCourseList(
+    public ResponseEntity<PageResponse<GetCourseListResponse>> getMyFavCourseList(
         @AuthenticationPrincipal UserDetails user,
         Pageable pageable) {
         return ResponseEntity.ok(courseLikeService.getMyFavCourseList(user, pageable));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/check")
     public ResponseEntity<Boolean> checkCourseLike(
         @AuthenticationPrincipal UserDetails user,

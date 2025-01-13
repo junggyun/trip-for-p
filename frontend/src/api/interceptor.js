@@ -25,6 +25,7 @@ const setInterceptors = function (instance) {
             return handleError(error)
         }
     );
+
     return instance
 }
 
@@ -82,7 +83,7 @@ const setAuthInterceptors = function (instance) {
                 }
             }
 
-            return handleError(error)
+            return handleError(error);
         }
     );
     return instance

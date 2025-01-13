@@ -14,6 +14,7 @@ import team.seventhmile.tripforp.domain.courseLike.entity.CourseLike;
 import team.seventhmile.tripforp.domain.courseLike.repository.CourseLikeRepository;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.domain.user.repository.UserRepository;
+import team.seventhmile.tripforp.global.common.PageResponse;
 import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
 
 @Service
@@ -46,13 +47,13 @@ public class CourseLikeService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GetCourseListResponse> getMyFavCourseList(UserDetails user, Pageable pageable) {
+    public PageResponse<GetCourseListResponse> getMyFavCourseList(UserDetails user, Pageable pageable) {
         Page<Course> myFavCourses = courseLikeRepository.findCoursesByUserEmail(user.getUsername(),
             pageable);
-        return myFavCourses.map(course -> {
+        return new PageResponse<>(myFavCourses.map(course -> {
             long likeCount = courseLikeRepository.countByCourseId(course.getId());
             return new GetCourseListResponse(course, likeCount);
-        });
+        }));
     }
 
     public Boolean checkCourseLike(String email, Long courseId) {
