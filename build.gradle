@@ -65,6 +65,8 @@ dependencies {
     // Caffeine
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    // bucket4j
+    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
 }
 
 dependencyManagement {
