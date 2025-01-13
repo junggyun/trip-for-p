@@ -92,16 +92,17 @@ public class CourseService {
     }
 
     @Transactional
-    public GetCourseResponse getCourseById(Long id) {
+    public GetCourseResponse getCourse(Long id) {
 
         Course course = courseRepository.findCourse(id);
         if (course == null) {
             throw new ResourceNotFoundException(Course.class, id);
         }
-        int likeCount = courseLikeRepository.countByCourseId(id);
+        long likeCount = courseLikeRepository.countByCourseId(id);
         course.increaseViews();
 
         return new GetCourseResponse(course, likeCount);
+//        return courseRepository.getCourse(id);
     }
 
     public PageResponse<GetCourseListResponse> getCourseList(String keyword, Pageable pageable) {
