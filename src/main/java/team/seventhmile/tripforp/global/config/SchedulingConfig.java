@@ -13,7 +13,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(1);
+        scheduler.setPoolSize(2);
         scheduler.setThreadNamePrefix("scheduled-task-");
         scheduler.initialize();
 

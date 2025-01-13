@@ -11,11 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseListResponse;
+import team.seventhmile.tripforp.domain.course.dto.GetCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.QGetCourseListResponse;
+import team.seventhmile.tripforp.domain.course.dto.QGetCourseResponse;
 import team.seventhmile.tripforp.domain.course.entity.Course;
 import team.seventhmile.tripforp.domain.course.entity.QCourse;
 import team.seventhmile.tripforp.domain.courseLike.entity.QCourseLike;
 import team.seventhmile.tripforp.domain.region.entity.Province;
+import team.seventhmile.tripforp.domain.spot.dto.CourseGetItemDto;
+import team.seventhmile.tripforp.domain.spot.dto.QCourseGetItemDto;
 import team.seventhmile.tripforp.domain.spot.entity.QSpot;
 
 @RequiredArgsConstructor
@@ -116,6 +120,45 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
             .leftJoin(qCourse.region).fetchJoin()
             .where(qCourse.id.eq(id))
             .fetchOne();
+    }
+
+    @Override
+    public GetCourseResponse getCourse(Long id) {
+        List<CourseGetItemDto> spots = queryFactory
+            .select(new QCourseGetItemDto(
+                    qSpot.id,
+                    qSpot.place,
+                    qSpot.tripDate,
+                    qSpot.memo,
+                    qSpot.sequence
+            ))
+            .from(qSpot)
+            .leftJoin(qSpot.place)
+            .where(qSpot.course.id.eq(id))
+            .fetch();
+
+        GetCourseResponse response = queryFactory
+            .select(new QGetCourseResponse(
+                qCourse.id,
+                qCourse.creator.nickname,
+                qCourse.title,
+                qCourse.region,
+                qCourse.startDate,
+                qCourse.endDate,
+                qCourse.views,
+                JPAExpressions
+                    .select(qCourseLike.count())
+                    .from(qCourseLike)
+                    .where(qCourseLike.course.id.eq(qCourse.id)),
+                qCourse.createdAt
+            ))
+            .from(qCourse)
+            .where(qCourse.id.eq(id))
+            .fetchOne();
+
+        response.setSpots(spots);
+
+        return response;
     }
 
 }

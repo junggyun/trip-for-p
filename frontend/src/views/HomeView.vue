@@ -165,7 +165,7 @@ onUnmounted(() => {
                              class="item"
                              @click="goToMagazineDetail(magazine.id)">
                             <div class="image-container">
-                                <img :src="magazine.fileUrls[0]" :alt="magazine.title"
+                                <img :src="magazine.fileUrl" :alt="magazine.title"
                                      class="item-image">
                             </div>
                             <div class="item-content">

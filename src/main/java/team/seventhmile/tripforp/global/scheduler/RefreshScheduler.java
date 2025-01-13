@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import team.seventhmile.tripforp.domain.refresh.repository.RefreshRepository;
+import team.seventhmile.tripforp.global.common.RateLimitInterceptor;
 import team.seventhmile.tripforp.global.jwt.JwtUtil;
 
 @Component
@@ -13,10 +14,11 @@ import team.seventhmile.tripforp.global.jwt.JwtUtil;
 public class RefreshScheduler {
 
     private final RefreshRepository refreshRepository;
+    private final RateLimitInterceptor rateLimitInterceptor;
     private final JwtUtil jwtUtil;
 
-    @Scheduled(cron = "0 0 2 * * *", zone = "Asia/Seoul")
-    public void cleanExpiredCodes() {
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    private void cleanExpiredCodes() {
         long initialSize = refreshRepository.count();
 
         try {
@@ -27,6 +29,15 @@ public class RefreshScheduler {
             log.info("만료된 토큰 정리 완료. 삭제된 토큰 수: {}", removedCount);
         } catch (Exception e) {
             log.error("토큰 정리 중 오류 발생", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    private void cleanBuckets() {
+        try {
+            rateLimitInterceptor.resetBucket();
+        } catch (Exception e) {
+            log.error("버켓 정리 중 오류 발생", e);
         }
     }
 

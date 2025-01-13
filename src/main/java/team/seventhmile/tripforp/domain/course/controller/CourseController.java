@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +29,7 @@ import team.seventhmile.tripforp.domain.course.service.CourseService;
 import team.seventhmile.tripforp.domain.spot.dto.GetPopularPlaceResponse;
 import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
+import team.seventhmile.tripforp.global.common.PageResponse;
 
 @Slf4j
 @RestController
@@ -73,7 +73,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<GetCourseListResponse>> getCourseList(
+    public ResponseEntity<PageResponse<GetCourseListResponse>> getCourseList(
         @RequestParam(value = "keyword", required = false) String keyword,
         Pageable pageable
     ) {
@@ -84,18 +84,19 @@ public class CourseController {
     public ResponseEntity<GetCourseResponse> getCourseDetail(
         @PathVariable("id") Long id
     ) {
-        GetCourseResponse CourseDto = courseService.getCourseById(id);
+        GetCourseResponse CourseDto = courseService.getCourse(id);
         return ResponseEntity.ok(CourseDto);
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
-    public ResponseEntity<Page<GetCourseListResponse>> getMyCourseList(
+    public ResponseEntity<PageResponse<GetCourseListResponse>> getMyCourseList(
         @AuthenticationPrincipal UserDetails user,
         Pageable pageable) {
         return ResponseEntity.ok(courseService.getMyCourseList(user, pageable));
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/popular-places")
     public ResponseEntity<List<GetPopularPlaceResponse>> getPopularPlaces(
         String city,

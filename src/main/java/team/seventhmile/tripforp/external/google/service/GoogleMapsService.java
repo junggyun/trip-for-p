@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.GoogleMapsPhotoApiDto;
@@ -23,7 +22,7 @@ public class GoogleMapsService {
 
     private final WebClient webClient;
 
-    public Mono<SearchPlacesResponse> searchPlacesApi(SearchPlacesApiRequest request) {
+    public SearchPlacesResponse searchPlacesApi(SearchPlacesApiRequest request) {
 
         return webClient.post()
             .uri("/places:searchText")
@@ -42,7 +41,8 @@ public class GoogleMapsService {
                     .places(places)
                     .nextPageToken(response.getNextPageToken())
                     .build();
-            });
+            })
+            .block();
     }
 
     public DetailPlaceResponse detailPlaceApi(DetailPlaceApiRequest request) {

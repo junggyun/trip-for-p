@@ -2,6 +2,9 @@
 /* global google */
 import {defineProps, nextTick, ref, watch, onMounted} from 'vue';
 import {GoogleMap, Marker, Polyline} from 'vue3-google-map';
+import {mapLoadAPI} from "@/api/google";
+import store from "@/store";
+import router from "@/router";
 
 const props = defineProps({
     places: {
@@ -123,10 +126,31 @@ const initMap = () => {
     });
 };
 
+const mapLoad = async function () {
+    try {
+        await mapLoadAPI();
+    } catch (error) {
+        if (error.status === 429) {
+            if (store.getters.isAccessTokenValid()) {
+                alert("일일한도량을 초과하였습니다.");
+                await router.push('/');
+            } else {
+                if (window.confirm(
+                    "일일한도량을 초과하였습니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                    await router.push('/login');
+                } else {
+                    await router.push('/');
+                }
+            }
+        }
+    }
+};
+
 // Map ready 감지
 watch(() => mapRef.value?.ready, (ready) => {
     if (!ready) return;
     initMap();
+    mapLoad();
 });
 
 // Places 변경 감지
@@ -155,6 +179,7 @@ onMounted(() => {
             :center="mapCenter"
             :zoom="mapZoom"
             class="map"
+            @load="handleMapLoad"
         >
             <template v-if="isMapReady">
                 <Marker

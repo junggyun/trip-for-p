@@ -2,7 +2,6 @@ package team.seventhmile.tripforp.domain.course.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,7 @@ import team.seventhmile.tripforp.domain.spot.service.SpotService;
 import team.seventhmile.tripforp.domain.user.entity.User;
 import team.seventhmile.tripforp.domain.user.repository.UserRepository;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
+import team.seventhmile.tripforp.global.common.PageResponse;
 import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
 import team.seventhmile.tripforp.global.exception.UnauthorizedAccessException;
 
@@ -92,24 +92,25 @@ public class CourseService {
     }
 
     @Transactional
-    public GetCourseResponse getCourseById(Long id) {
+    public GetCourseResponse getCourse(Long id) {
 
         Course course = courseRepository.findCourse(id);
         if (course == null) {
             throw new ResourceNotFoundException(Course.class, id);
         }
-        int likeCount = courseLikeRepository.countByCourseId(id);
+        long likeCount = courseLikeRepository.countByCourseId(id);
         course.increaseViews();
 
         return new GetCourseResponse(course, likeCount);
+//        return courseRepository.getCourse(id);
     }
 
-    public Page<GetCourseListResponse> getCourseList(String keyword, Pageable pageable) {
-        return courseRepository.getCourses(keyword, pageable);
+    public PageResponse<GetCourseListResponse> getCourseList(String keyword, Pageable pageable) {
+        return new PageResponse<>(courseRepository.getCourses(keyword, pageable));
     }
 
-    public Page<GetCourseListResponse> getMyCourseList(UserDetails user, Pageable pageable) {
-        return courseRepository.getMyCourses(user.getUsername(), pageable);
+    public PageResponse<GetCourseListResponse> getMyCourseList(UserDetails user, Pageable pageable) {
+        return new PageResponse<>(courseRepository.getMyCourses(user.getUsername(), pageable));
     }
 
     private void checkUpdateAuthorization(UserDetails user, Course course) {
