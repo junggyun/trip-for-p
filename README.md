@@ -14,7 +14,7 @@
 4. [기술 스택](#-기술-스택)
 5. [시스템 아키텍처](#-시스템-아키텍처)
 6. [ERD](#-시스템-아키텍처)
-<!-- 7. [구현 화면](#-구현-화면) -->
+7. [구현 화면](#-구현-화면)
 
 <br>
 
@@ -412,31 +412,24 @@ FE 프론트엔드와 BE 백엔드가 합쳐진 프로젝트 디렉토리 구조
 <br>
 -->
 
-<!--
+
 ## 📺 구현 화면
-
-| ![메인 화면](https://github.com/user-attachments/assets/d7e744bc-bf97-4945-b579-96d717a76e73) | ![회원가입](https://github.com/user-attachments/assets/d76b93f3-2f7c-4764-81e2-17752afc8433) |
+| ![코스 등록](https://github.com/user-attachments/assets/8d018bfe-1c1c-494a-9dc6-33be1c5ad312) | ![코스 조회](https://github.com/user-attachments/assets/72a3ee8f-1d58-43aa-9623-c7a2a0b138a3) |
 | :---: | :---: |
-| **메인 화면** | **회원가입** |
+| **코스 등록** | **코스 조회** |
 
-| ![로그인](https://github.com/user-attachments/assets/61db42e7-adcf-487a-9826-8170f7910d9a) | ![마이페이지](https://github.com/user-attachments/assets/832adc40-4ed1-4290-8929-0df985be3398) |
+| ![핫플 추천](https://github.com/user-attachments/assets/777332a3-2b23-4cde-8629-5dd4b5acabd9) | ![동선 추천](https://github.com/user-attachments/assets/007d224f-ac4c-4083-9f0d-338647e4dfcf) |
 | :---: | :---: |
-| **로그인** | **마이페이지** |
+| **데이터 기반 핫플 추천** | **AI 기반 동선 추천** |
 
-| ![사용자기반AI](https://github.com/user-attachments/assets/864d8bd5-3d20-4d1a-baef-c54c76e44706) | ![선택지역기반AI](https://github.com/user-attachments/assets/5afca7f4-c25b-4d7e-9f1d-f6d8653e1815)|
-| :---: | :---: |
-| **사용자 기반 추천 AI** | **선택 지역 기반 추천 AI** |
 
-| ![여행코스작성](https://github.com/user-attachments/assets/cc6db700-a285-417d-a53e-bde596463db3) | ![여행코스조회](https://github.com/user-attachments/assets/9aac964a-bfd2-4cd7-b870-6d2b14f09260) |
-| :---: | :---: |
-| **여행코스 등록** | **여행코스 조회** |
 
-| ![리뷰게시판](https://github.com/user-attachments/assets/eaceb6c2-899c-41aa-9985-6312d3817185) | ![자유게시판](https://github.com/user-attachments/assets/908c84ba-ff12-428a-9e62-d6d10853adf0) |
-| :---: | :---: |
-| **리뷰 게시글** | **자유 게시글** |
+
+
+
+
 
 <br>
--->
 
 <!--
 
