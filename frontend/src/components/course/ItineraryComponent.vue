@@ -49,8 +49,9 @@ const recommendRoute = async (places) => {
         prompt = prompt + '[' +
             place.sequence + ',' +
             place.place.name + ',' +
-            place.place.address + ',' +
-            (place.place.category || '') + '] ';
+            place.place.latitude + ',' +
+            place.place.longitude + ',' +
+            (place.place.category || '알 수 없음') + '] ';
     }
     const request = {
         prompt: prompt

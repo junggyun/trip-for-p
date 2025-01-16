@@ -36,7 +36,7 @@ public class AiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("x-goog-api-key", key);
 
-        prompt = generatePromptV2(prompt);
+        prompt = generatePromptV1(prompt);
 
         Map<String, Object> part = new HashMap<>();
         part.put("text", prompt);
@@ -64,15 +64,16 @@ public class AiService {
     }
 
     private String generatePromptV1(String prompt) {
-        return "주어진 장소들의 위치와 특성을 고려하여 효율적이고 합리적인 여행 코스를 만들어주세요. 각 장소의 정보는 [id, 위도, 경도, 카테고리] 형식으로 제공됩니다:\n"
+        return "주어진 장소들의 위치와 특성을 고려하여 효율적이고 합리적인 여행 코스를 만들어주세요. 각 장소의 정보는 [id, 장소명, 위도, 경도, 카테고리] 형식으로 제공됩니다:\n"
             + prompt + "\n"
             + "다음 조건을 고려해서 최적의 코스를 추천해주세요:\n"
             + "\n"
-            + "1. 이동 거리와 시간을 최소화\n"
-            + "2. 카테고리 순서가 자연스러워야 함 (예: 관광지 -> 식사 -> 카페)\n"
-            + "3. 전체 동선이 효율적이어야 함\n"
-            + "4. 코스를 id값만 쉼표로 구분하여 응답해야함.\n"
-            + "5. 다른 설명은 포함하면 안됨.";
+            + "1. 장소 간의 거리를 우선적으로 고려해야 함\n"
+            + "2. 대신 적절한 카테고리의 배치가 필요함. 특히 같은 카테고리의 연속은 되도록 피해야 함.\n"
+            + "3. 카테고리가 알 수 없음인 경우 장소명을 통해 유추해야 함.\n"
+            + "4. 하루 일정 기준으로 개인 선호도는 특별히 고려하지 않고 트렌디한 코스로 제안해야함.\n"
+            + "5. 코스를 id값만 쉼표로 구분하여 응답해야함.\n"
+            + "6. 다른 설명은 포함하면 안됨.";
     }
 
     private String generatePromptV2(String prompt) {
@@ -82,9 +83,10 @@ public class AiService {
             + "\n"
             + "1. 장소 간의 거리를 우선적으로 고려해야 함\n"
             + "2. 대신 적절한 카테고리의 배치가 필요함. 특히 같은 카테고리의 연속은 되도록 피해야 함.\n"
-            + "3. 하루 일정 기준으로 개인 선호도는 특별히 고려하지 않고 트렌디한 코스로 제안해야함"
-            + "4. 코스를 id값만 쉼표로 구분하여 응답해야함.\n"
-            + "5. 다른 설명은 포함하면 안됨.";
+            + "3. 카테고리가 알 수 없음인 경우 장소명을 통해 유추해야 함.\n"
+            + "4. 하루 일정 기준으로 개인 선호도는 특별히 고려하지 않고 트렌디한 코스로 제안해야함.\n"
+            + "5. 코스를 id값만 쉼표로 구분하여 응답해야함.\n"
+            + "6. 다른 설명은 포함하면 안됨.";
     }
 
     private String parseGeminiResponse(Map<String, Object> responseBody) {
