@@ -6,6 +6,13 @@ const recommendRouteAPI = function (request) {
     )
 };
 
+const getChanceAPI = function () {
+    return authInstance.get(
+        `/api/ai/chance`
+    )
+};
+
 export {
-    recommendRouteAPI
+    recommendRouteAPI,
+    getChanceAPI
 }

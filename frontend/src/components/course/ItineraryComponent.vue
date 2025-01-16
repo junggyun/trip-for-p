@@ -1,9 +1,11 @@
 <script setup>
 // script 부분은 동일하게 유지
-import {defineEmits, defineProps, ref} from 'vue';
+import {defineEmits, defineProps, onMounted, ref} from 'vue';
 import draggable from 'vuedraggable';
 import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
-import {recommendRouteAPI} from "@/api/gemini";
+import {getChanceAPI, recommendRouteAPI} from "@/api/gemini";
+
+const chance = ref();
 
 const props = defineProps({
     places: {
@@ -77,11 +79,26 @@ const recommendRoute = async (places) => {
 
             // places 배열 업데이트
             places.splice(0, places.length, ...reorderedPlaces);
+            const chanceResponse = await getChanceAPI();
+            chance.value = chanceResponse.data;
         }
+    } catch (error) {
+        if (error.status === 429) {
+            alert("일일한도량을 초과하였습니다.");
+        }
+    }
+}
+const getChance = async function () {
+    try {
+        const response = await getChanceAPI();
+        chance.value = response.data;
     } catch (error) {
         console.log(error);
     }
-}
+};
+onMounted(() => {
+    getChance();
+})
 </script>
 
 <template>
@@ -162,9 +179,10 @@ const recommendRoute = async (places) => {
         <div v-if="places.length >= 2" class="recommend-router-button-wrapper">
             <button
                 @click="recommendRoute(places)"
+                :disabled="chance === 0"
                 class="recommend-router-button"
             >
-                AI 동선 최적화 추천
+                AI 동선 최적화
             </button>
         </div>
     </div>
@@ -381,6 +399,13 @@ const recommendRoute = async (places) => {
     background-color: #4c59a3;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(92, 106, 196, 0.3);
+}
+
+.recommend-router-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 @media (max-width: 640px) {

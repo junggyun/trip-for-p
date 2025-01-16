@@ -5,13 +5,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import team.seventhmile.tripforp.global.common.RateLimitInterceptor;
+import team.seventhmile.tripforp.global.common.GeminiRateLimitInterceptor;
+import team.seventhmile.tripforp.global.common.GoogleMapRateLimitInterceptor;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-	private final RateLimitInterceptor rateLimitInterceptor;
+	private final GoogleMapRateLimitInterceptor googleMapRateLimitInterceptor;
+	private final GeminiRateLimitInterceptor geminiRateLimitInterceptor;
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
@@ -22,7 +24,11 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(rateLimitInterceptor)
+		registry.addInterceptor(googleMapRateLimitInterceptor)
 			.addPathPatterns("/api/google-maps/**");
+		registry.addInterceptor(geminiRateLimitInterceptor)
+			.addPathPatterns("/api/ai");
 	}
+
+
 }

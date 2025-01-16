@@ -13,9 +13,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import team.seventhmile.tripforp.global.common.GeminiRateLimitInterceptor;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 public class AiService {
 
     private final RestTemplate restTemplate;
+    private final GeminiRateLimitInterceptor geminiRateLimitInterceptor;
     @Value("${gemini.api.key}")
     private String key;
     @Value("${gemini.api.url}")
@@ -103,6 +106,10 @@ public class AiService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse Gemini response", e);
         }
+    }
+
+    public long getChance(UserDetails userDetails) {
+        return geminiRateLimitInterceptor.getChance(userDetails);
     }
 
 }
