@@ -40,6 +40,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         buckets.clear();
     }
 
+    public int count() {
+        return buckets.size();
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) {

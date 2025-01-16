@@ -58,9 +58,17 @@ public class JwtUtil {
 	}
 
 	public Boolean isExpired(String token) {
-
-		return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
-			.getExpiration().before(new Date());
+		try {
+			return Jwts.parser()
+				.verifyWith(secretKey)
+				.build()
+				.parseSignedClaims(token)
+				.getPayload()
+				.getExpiration()
+				.before(new Date());
+		} catch (ExpiredJwtException e) {
+			return true;
+		}
 	}
 
 	public String createJwt(String category, String username, String nickname, String role, Long expiredMs) {
