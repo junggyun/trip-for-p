@@ -3,6 +3,7 @@
 import {defineEmits, defineProps, ref} from 'vue';
 import draggable from 'vuedraggable';
 import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
+import {recommendRouteAPI} from "@/api/gemini";
 
 const props = defineProps({
     places: {
@@ -40,6 +41,47 @@ const openPlaceUrl = (uri) => {
         window?.open(uri, '_blank');
     }
 };
+const recommendRoute = async (places) => {
+    let prompt = '';
+    for (const place of places) {
+        prompt = prompt + '[' +
+            place.sequence + ',' +
+            place.place.name + ',' +
+            place.place.address + ',' +
+            (place.place.category || '') + '] ';
+    }
+    const request = {
+        prompt: prompt
+    }
+    try {
+        const response = await recommendRouteAPI(request);
+        console.log(response.data);
+
+        // 추천 순서에 따라 sequence 재정렬
+        if (response.data) {
+            const newOrder = response.data.split(',').map(Number);  // "2,1" -> [2, 1]
+
+            // 현재 순서와 추천 순서를 매핑
+            const reorderedPlaces = [...places];
+            newOrder.forEach((newPosition, index) => {
+                // newPosition은 1부터 시작하는 새로운 순서
+                // index는 0부터 시작하는 배열 인덱스
+                const placeToMove = places.find(p => p.sequence === newPosition);
+                if (placeToMove) {
+                    reorderedPlaces[index] = {
+                        ...placeToMove,
+                        sequence: index + 1  // 새로운 순서 할당 (1부터 시작)
+                    };
+                }
+            });
+
+            // places 배열 업데이트
+            places.splice(0, places.length, ...reorderedPlaces);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
 </script>
 
 <template>
@@ -117,6 +159,14 @@ const openPlaceUrl = (uri) => {
                 </div>
             </template>
         </draggable>
+        <div v-if="places.length >= 2" class="recommend-router-button-wrapper">
+            <button
+                @click="recommendRoute(places)"
+                class="recommend-router-button"
+            >
+                AI 동선 최적화 추천
+            </button>
+        </div>
     </div>
 </template>
 
@@ -305,6 +355,34 @@ const openPlaceUrl = (uri) => {
     background: rgba(92, 106, 196, 0.1);
 }
 
+.recommend-router-button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.recommend-router-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background-color: #5c6ac4;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(92, 106, 196, 0.2);
+}
+
+.recommend-router-button:hover:not(:disabled) {
+    background-color: #4c59a3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(92, 106, 196, 0.3);
+}
+
 @media (max-width: 640px) {
     .place-item {
         flex-direction: column;
@@ -317,6 +395,11 @@ const openPlaceUrl = (uri) => {
 
     .place-content {
         padding: 12px;
+    }
+
+    .recommend-router-button {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>
