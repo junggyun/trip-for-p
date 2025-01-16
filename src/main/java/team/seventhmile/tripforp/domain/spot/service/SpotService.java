@@ -2,9 +2,11 @@ package team.seventhmile.tripforp.domain.spot.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.seventhmile.tripforp.domain.course.entity.Course;
+import team.seventhmile.tripforp.domain.place.dto.GetPlaceCountResponse;
 import team.seventhmile.tripforp.domain.place.entity.Place;
 import team.seventhmile.tripforp.domain.place.service.PlaceService;
 import team.seventhmile.tripforp.domain.spot.dto.CreateSpotRequest;
@@ -15,11 +17,13 @@ import team.seventhmile.tripforp.domain.spot.repository.SpotRepository;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
 import team.seventhmile.tripforp.external.google.service.GoogleMapsService;
+import team.seventhmile.tripforp.global.common.RequestSizeHolder;
 import team.seventhmile.tripforp.global.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class SpotService {
 
     private final PlaceService placeService;
@@ -85,7 +89,9 @@ public class SpotService {
     }
 
     public List<GetPopularPlaceResponse> getPopularPlaces(String city, int size) {
-        return spotRepository.getPlaceCount(city, size).stream()
+        List<GetPlaceCountResponse> places = spotRepository.getPlaceCount(city, size);
+        RequestSizeHolder.setSize(places.size());
+        return places.stream()
             .map(p -> {
                 DetailPlaceResponse response = googleMapsService.detailPlaceApi(
                     DetailPlaceApiRequest.builder().id(p.getPlace().getMapPlaceId()).build());

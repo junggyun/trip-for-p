@@ -6,7 +6,8 @@ import router from "@/router";
 import {useRoute} from "vue-router";
 import {
     createCourseAPI,
-    getCityListByProvinceAPI, getPopularPlaceListAPI,
+    getCityListByProvinceAPI,
+    getPopularPlaceListAPI,
     getProvinceListAPI,
     updateCourseAPI
 } from "@/api/course";
@@ -44,6 +45,7 @@ const GOOGLE_MAP_API_KEY = process.env.VUE_APP_GOOGLE_MAP_API_KEY;
 const emit = defineEmits(['back-to-day']);
 const popularPlaces = ref([]);
 const isSidebarOpen = ref(false);
+const popularPlaceQuery = ref();
 
 /**
  * 날짜 목록
@@ -259,16 +261,21 @@ const isSaveButtonEnabled = computed(() => {
 const showPopularPlaces = async () => {
     try {
         if (!city.value) return;
-
-        const request = {
-            city: city.value,
-            size: 5
+        if (popularPlaceQuery.value !== city.value) {
+            const request = {
+                city: city.value,
+                size: 5
+            }
+            const response = await getPopularPlaceListAPI(request);
+            popularPlaces.value = response.data;
+            popularPlaceQuery.value = city.value;
+            isSidebarOpen.value = true;
         }
-        const response = await getPopularPlaceListAPI(request);
-        popularPlaces.value = response.data;
-        isSidebarOpen.value = true;
+
     } catch (error) {
-        console.log(error);
+        if (error.status === 429) {
+            alert("일일한도량을 초과하였습니다.");
+        }
     }
 };
 

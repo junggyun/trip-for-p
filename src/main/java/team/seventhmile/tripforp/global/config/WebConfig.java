@@ -25,7 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(googleMapRateLimitInterceptor)
-			.addPathPatterns("/api/google-maps/**");
+			.addPathPatterns("/api/google-maps/**")
+			.addPathPatterns("/api/courses/popular-places");
 		registry.addInterceptor(geminiRateLimitInterceptor)
 			.addPathPatterns("/api/ai");
 	}

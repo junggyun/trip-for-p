@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 @Component
 @RequiredArgsConstructor
@@ -48,10 +49,11 @@ public class GoogleMapRateLimitInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) {
 
+        String path = request.getRequestURI();
+
         String ip = getClientIP(request);
         String role = getRole();
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        String path = request.getRequestURI();
 
         Bucket bucket;
         if (!role.equals("ANONYMOUS")) {
@@ -62,14 +64,42 @@ public class GoogleMapRateLimitInterceptor implements HandlerInterceptor {
             log.info("클라이언트 IP: {}, 권한: {}", ip, role);
         }
 
+        if (path.startsWith("/api/courses/popular-places") && bucket.getAvailableTokens() >= 100) {
+            return true;
+        }
+
         int requiredTokens = getRequiredTokens(path);
-        if (requiredTokens > 0 && bucket.tryConsume(requiredTokens)) {
+        if (bucket.tryConsume(requiredTokens)) {
             log.info("잔여 API 호출 횟수: {}", bucket.getAvailableTokens());
             return true;
         }
 
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         return false;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+        ModelAndView modelAndView) {
+
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/courses/popular-places")) {
+            Integer size = RequestSizeHolder.getSize();
+            if (size != null && size > 0) {
+                String role = getRole();
+                String name = SecurityContextHolder.getContext().getAuthentication().getName();
+
+                Bucket bucket = buckets.computeIfAbsent(name, k -> createNewBucket(role));
+                log.info("계정: {}, 권한: {}", name, role);
+
+                int requiredTokens = size * 20;
+                if (bucket.tryConsume(requiredTokens)) {
+                    log.info("잔여 API 호출 횟수: {}", bucket.getAvailableTokens());
+                } else {
+                    response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                }
+            }
+        }
     }
 
     private String getRole() {
@@ -91,6 +121,13 @@ public class GoogleMapRateLimitInterceptor implements HandlerInterceptor {
         if (path.startsWith("/api/google-maps/detail")) return 20;
         if (path.startsWith("/api/google-maps/search")) return 32;
         if (path.startsWith("/api/google-maps/load")) return 7;
+        if (path.startsWith("/api/courses/popular-places")) return 100;
         return 1;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+        Object handler, Exception ex) {
+        RequestSizeHolder.clear();
     }
 }
