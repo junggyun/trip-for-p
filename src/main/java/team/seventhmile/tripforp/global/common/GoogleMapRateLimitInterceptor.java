@@ -18,7 +18,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RateLimitInterceptor implements HandlerInterceptor {
+public class GoogleMapRateLimitInterceptor implements HandlerInterceptor {
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
