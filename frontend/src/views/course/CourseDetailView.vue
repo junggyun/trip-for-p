@@ -7,6 +7,7 @@ import store from "@/store";
 import GoogleMapComponent from "@/components/course/GoogleMapComponent.vue";
 import {detailPlaceAPI} from "@/api/google";
 import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
+import LoadingSpinner from "@/components/course/LoadingSpinner.vue";
 
 const currentDateIndex = ref(0);
 const plan = ref(null);
@@ -14,10 +15,12 @@ const placesDetail = ref({});
 const route = useRoute();
 const isLiked = ref(false);
 const isFetched = ref(false);
+const isLoading = ref(true);
 const GOOGLE_MAP_API_KEY = process.env.VUE_APP_GOOGLE_MAP_API_KEY
 
 const getPlan = async function () {
     try {
+        isLoading.value = true;
         const response = await getCourseAPI(route.params.courseId);
         plan.value = response.data;
 
@@ -26,6 +29,8 @@ const getPlan = async function () {
         }
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoading.value = false;
     }
 };
 
@@ -34,29 +39,32 @@ const fetchPlaceDetails = async () => {
         return;
     }
 
-    for (const spot of plan.value.spots) {
-        try {
-            const response = await detailPlaceAPI(spot.place.mapPlaceId);
-            console.log(response.data)
-            placesDetail.value[spot.place.mapPlaceId] = response.data;
-        } catch (error) {
-            if (error.status === 429) {
-                if (store.getters.isAccessTokenValid()) {
-                    alert("일일한도량을 초과하였습니다.");
-                    await router.push('/');
-                } else {
-                    if (window.confirm(
-                        "일일한도량을 초과하였습니다.\n로그인 페이지로 이동하시겠습니까?")) {
-                        await router.push('/login');
-                    } else {
+    try {
+        isLoading.value = true;
+        for (const spot of plan.value.spots) {
+            try {
+                const response = await detailPlaceAPI(spot.place.mapPlaceId);
+                placesDetail.value[spot.place.mapPlaceId] = response.data;
+            } catch (error) {
+                if (error.status === 429) {
+                    if (store.getters.isAccessTokenValid()) {
+                        alert("일일한도량을 초과하였습니다.");
                         await router.push('/');
+                    } else {
+                        if (window.confirm("일일한도량을 초과하였습니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                            await router.push('/login');
+                        } else {
+                            await router.push('/');
+                        }
                     }
                 }
+                break;
             }
-            break;
         }
+    } finally {
+        isLoading.value = false;
+        isFetched.value = true;
     }
-    isFetched.value = true;
 };
 
 const selectedPlaces = computed(() => {
@@ -214,100 +222,102 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="plan-detail-view" v-if="plan">
-        <!-- Header Section -->
-        <div class="header-section">
-            <img
-                @click="goBackToSelection"
-                class="back-button"
-                src="../../assets/backbutton.png"
-                alt="뒤로가기 버튼"
-            />
-            <div class="title-info">
-                <h2>{{ plan.title }}</h2>
-                <p>{{ formatDate(plan.createdAt) }}</p>
-            </div>
-            <div class="plan-info">
-                <span>{{ plan.writer }}</span>
-                <p>
-                    <span>조회 {{ plan.views }}</span>
-                </p>
-            </div>
-            <div v-if="isPostAuthor" class="author-actions">
-                <button @click="goUpdatePlan(plan.id)" class="edit-button">수정</button>
-                <button @click="deletePlan(plan.id)" class="delete-button">삭제</button>
-            </div>
-        </div>
-
-        <!-- Date Navigation -->
-        <div class="date-navigation" v-if="dates.length > 0">
-            <button @click="prevDate" :disabled="currentDateIndex === 0"
-                    class="nav-button prev-button">&lt; 이전
-            </button>
-            <span>{{ currentDate }} {{ currentDateWeekDay }}</span>
-            <button @click="nextDate" :disabled="currentDateIndex === dates.length - 1"
-                    class="nav-button next-button">다음 &gt;
-            </button>
-        </div>
-
-        <!-- Main Content Section -->
-        <div class="main-content">
-            <!-- Left Section - Map -->
-            <div class="map-section">
-                <GoogleMapComponent
-                    class="google-map-component"
-                    v-if="isFetched"
-                    :places="selectedPlaces[currentDate] || []"
-                    :date="currentDate"
-                    :apiKey="GOOGLE_MAP_API_KEY"
+    <div class="plan-detail-view">
+        <LoadingSpinner :is-loading="isLoading" />
+        <div v-if="plan && !isLoading">
+            <div class="header-section">
+                <img
+                    @click="goBackToSelection"
+                    class="back-button"
+                    src="../../assets/backbutton.png"
+                    alt="뒤로가기 버튼"
                 />
+                <div class="title-info">
+                    <h2>{{ plan.title }}</h2>
+                    <p>{{ formatDate(plan.createdAt) }}</p>
+                </div>
+                <div class="plan-info">
+                    <span>{{ plan.writer }}</span>
+                    <p>
+                        <span>조회 {{ plan.views }}</span>
+                    </p>
+                </div>
+                <div v-if="isPostAuthor" class="author-actions">
+                    <button @click="goUpdatePlan(plan.id)" class="edit-button">수정</button>
+                    <button @click="deletePlan(plan.id)" class="delete-button">삭제</button>
+                </div>
             </div>
 
-            <!-- Right Section - Itinerary -->
-            <div class="itinerary-section">
-                <div class="itinerary">
-                    <h2>일정</h2>
-                    <div v-for="(item, index) in selectedPlaces[currentDate]" :key="item.sequence"
-                         class="itinerary-item">
-                        <div v-if="index > 0" class="distance-wrapper">
-                            <DistanceDisplay
-                                :origin-lat="selectedPlaces[currentDate][index - 1].place.latitude"
-                                :origin-lon="selectedPlaces[currentDate][index - 1].place.longitude"
-                                :destination-lat="item.place.latitude"
-                                :destination-lon="item.place.longitude"
-                                unit="km"
-                            />
-                        </div>
-                        <div class="place-item">
-                            <div class="place-content">
-                                <div class="place-header">
-                                    <div class="place-info">
-                                        <span class="sequence">{{ item.sequence }}</span>
-                                        <div
-                                            class="place-main-info"
-                                            :class="{ 'has-link': item.place.uri }"
-                                            @click="openPlaceUrl(item.place.uri)"
-                                        >
-                                            <h3>{{ item.place.name }}</h3>
-                                            <p class="address">{{ item.place.address }}</p>
-                                            <div class="place-details" v-if="item.place.category || item.place.rating">
+            <!-- Date Navigation -->
+            <div class="date-navigation" v-if="dates.length > 0">
+                <button @click="prevDate" :disabled="currentDateIndex === 0"
+                        class="nav-button prev-button">&lt; 이전
+                </button>
+                <span>{{ currentDate }} {{ currentDateWeekDay }}</span>
+                <button @click="nextDate" :disabled="currentDateIndex === dates.length - 1"
+                        class="nav-button next-button">다음 &gt;
+                </button>
+            </div>
+
+            <!-- Main Content Section -->
+            <div class="main-content">
+                <!-- Left Section - Map -->
+                <div class="map-section">
+                    <GoogleMapComponent
+                        class="google-map-component"
+                        v-if="isFetched"
+                        :places="selectedPlaces[currentDate] || []"
+                        :date="currentDate"
+                        :apiKey="GOOGLE_MAP_API_KEY"
+                    />
+                </div>
+
+                <!-- Right Section - Itinerary -->
+                <div class="itinerary-section">
+                    <div class="itinerary">
+                        <h2>일정</h2>
+                        <div v-for="(item, index) in selectedPlaces[currentDate]" :key="item.sequence"
+                             class="itinerary-item">
+                            <div v-if="index > 0" class="distance-wrapper">
+                                <DistanceDisplay
+                                    :origin-lat="selectedPlaces[currentDate][index - 1].place.latitude"
+                                    :origin-lon="selectedPlaces[currentDate][index - 1].place.longitude"
+                                    :destination-lat="item.place.latitude"
+                                    :destination-lon="item.place.longitude"
+                                    unit="km"
+                                />
+                            </div>
+                            <div class="place-item">
+                                <div class="place-content">
+                                    <div class="place-header">
+                                        <div class="place-info">
+                                            <span class="sequence">{{ item.sequence }}</span>
+                                            <div
+                                                class="place-main-info"
+                                                :class="{ 'has-link': item.place.uri }"
+                                                @click="openPlaceUrl(item.place.uri)"
+                                            >
+                                                <h3>{{ item.place.name }}</h3>
+                                                <p class="address">{{ item.place.address }}</p>
+                                                <div class="place-details" v-if="item.place.category || item.place.rating">
                 <span class="category" v-if="item.place.category">
                     {{ item.place.category }}
                 </span>
-                                                <span class="rating" v-if="item.place.rating">
+                                                    <span class="rating" v-if="item.place.rating">
                     <span class="rating-stars">★</span>
                     {{ item.place.rating }}
                     <span class="review-count" v-if="item.place.reviewCount">
                         ({{ item.place.reviewCount }})
                     </span>
                 </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div v-if="item.memo" class="memo-section">
-                                    <div class="memo-content">
-                                        {{ item.memo }}
+                                    <div v-if="item.memo" class="memo-section">
+                                        <div class="memo-content">
+                                            {{ item.memo }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -315,13 +325,13 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Like Button -->
-        <div class="like-button-container">
-            <button @click="likePlan" class="like-button" :class="{ 'liked': isLiked }">
-                {{ isLiked ? '♥' : '♡' }} 좋아요 {{ plan.likeCount }}
-            </button>
+            <!-- Like Button -->
+            <div class="like-button-container">
+                <button @click="likePlan" class="like-button" :class="{ 'liked': isLiked }">
+                    {{ isLiked ? '♥' : '♡' }} 좋아요 {{ plan.likeCount }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
