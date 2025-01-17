@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
-import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesResponse;
@@ -44,14 +43,4 @@ public class GoogleMapsController {
     public ResponseEntity<String> loadMap() {
         return ResponseEntity.ok("Map Loaded");
     }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/photo")
-    public ResponseEntity<PhotoPlaceResponse> photoPlace(
-        @ModelAttribute DetailPlaceApiRequest request
-    ) {
-        return ResponseEntity.ok(googleMapsService.photoPlaceApi(request));
-    }
-
-
 }

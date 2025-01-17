@@ -1,99 +1,76 @@
 package team.seventhmile.tripforp.external.google.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceApiRequest;
 import team.seventhmile.tripforp.external.google.dto.DetailPlaceResponse;
-import team.seventhmile.tripforp.external.google.dto.GoogleMapsPhotoApiDto;
 import team.seventhmile.tripforp.external.google.dto.GoogleMapsPlaceApiDto;
-import team.seventhmile.tripforp.external.google.dto.PhotoPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlaceResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiRequest;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesApiResponse;
 import team.seventhmile.tripforp.external.google.dto.SearchPlacesResponse;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GoogleMapsService {
 
-    private final WebClient webClient;
+    private final RestTemplate restTemplate;
+
+    public GoogleMapsService(@Qualifier("googleMapsRestTemplate") RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public SearchPlacesResponse searchPlacesApi(SearchPlacesApiRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Goog-FieldMask",
+            "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.location,places.googleMapsUri,nextPageToken");
 
-        return webClient.post()
-            .uri("/places:searchText")
-            .headers(headers -> {
-                headers.add("X-Goog-FieldMask",
-                    "places.id,places.displayName.text,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.location,places.googleMapsUri,nextPageToken");
-            })
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(SearchPlacesApiResponse.class)
-            .map(response -> {
-                List<SearchPlaceResponse> places = response.getPlaces().stream()
-                    .map(SearchPlaceResponse::new)
-                    .toList();
-                return SearchPlacesResponse.builder()
-                    .places(places)
-                    .nextPageToken(response.getNextPageToken())
-                    .build();
-            })
-            .block();
+        HttpEntity<SearchPlacesApiRequest> entity = new HttpEntity<>(
+            request, headers);
+
+        SearchPlacesApiResponse response = restTemplate.postForObject(
+            "/places:searchText",
+            entity,
+            SearchPlacesApiResponse.class
+        );
+
+        List<SearchPlaceResponse> places = response.getPlaces().stream()
+            .map(SearchPlaceResponse::new)
+            .toList();
+
+        return SearchPlacesResponse.builder()
+            .places(places)
+            .nextPageToken(response.getNextPageToken())
+            .build();
     }
 
     public DetailPlaceResponse detailPlaceApi(DetailPlaceApiRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Goog-FieldMask",
+            "id,location,displayName,formattedAddress,primaryTypeDisplayName,rating,userRatingCount,googleMapsUri");
 
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder
-                .path("/places/" + request.getId())
-                .queryParam("languageCode", request.getLanguageCode())
-                .queryParam("regionCode", request.getRegionCode())
-                .build())
-            .headers(headers -> {
-                headers.add("X-Goog-FieldMask",
-                    "id,location,displayName,formattedAddress,primaryTypeDisplayName,rating,userRatingCount,googleMapsUri");
-            })
-            .retrieve()
-            .bodyToMono(GoogleMapsPlaceApiDto.class)
-            .map(DetailPlaceResponse::new)
-            .block();
-    }
+        String url = UriComponentsBuilder.fromPath("/places/" + request.getId())
+            .queryParam("languageCode", request.getLanguageCode())
+            .queryParam("regionCode", request.getRegionCode())
+            .build()
+            .toString();
 
-    public PhotoPlaceResponse photoPlaceApi(DetailPlaceApiRequest request) {
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder
-                .path("/places/" + request.getId())
-                .queryParam("languageCode", request.getLanguageCode())
-                .queryParam("regionCode", request.getRegionCode())
-                .build())
-            .headers(headers -> {
-                headers.add("X-Goog-FieldMask",
-                    "id,displayName,formattedAddress,photos,googleMapsLinks");
-            })
-            .retrieve()
-            .bodyToMono(GoogleMapsPlaceApiDto.class)
-            .flatMap(placeDto -> {
-                PhotoPlaceResponse response = new PhotoPlaceResponse(placeDto);
+        GoogleMapsPlaceApiDto response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            entity,
+            GoogleMapsPlaceApiDto.class
+        ).getBody();
 
-                return webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                        .path("/" + response.getPhotoUri() + "/media")
-                        .queryParam("maxWidthPx", 350)
-                        .queryParam("maxHeightPx", 250)
-                        .queryParam("skipHttpRedirect", true)
-                        .build())
-                    .retrieve()
-                    .bodyToMono(GoogleMapsPhotoApiDto.class)
-                    .map(photoDto -> {
-                        response.setPhotoUri(photoDto.getPhotoUri());
-                        return response;
-                    });
-            })
-            .block();
+        return new DetailPlaceResponse(response);
     }
 }
