@@ -11,12 +11,10 @@ const plans = ref([]);
 
 // 각 섹션별 현재 슬라이드 인덱스 관리
 const magazineSlideIndex = ref(0);
-const regionSlideIndex = ref(0);
 const planSlideIndex = ref(0);
 
 // 각 섹션별 interval 저장
 let magazineInterval;
-let regionInterval;
 let planInterval;
 
 const getMagazineList = async function () {
@@ -35,7 +33,7 @@ const getMagazineList = async function () {
 
 const getPopularRegionList = async function () {
     try {
-        const response = await getPopularRegionsAPI(10);
+        const response = await getPopularRegionsAPI(5);
         regions.value = response.data;
     } catch (error) {
         console.log(error)
@@ -82,14 +80,6 @@ const moveSlide = (direction, section) => {
                 : (currentIndex - 1 + maxIndex) % maxIndex;
             slideIndex = magazineSlideIndex.value;
             break;
-        case 'popular-regions':
-            currentIndex = regionSlideIndex.value;
-            maxIndex = regions.value.length - (isMobile ? 0 : 2);
-            regionSlideIndex.value = direction === 'next'
-                ? (currentIndex + 1) % maxIndex
-                : (currentIndex - 1 + maxIndex) % maxIndex;
-            slideIndex = regionSlideIndex.value;
-            break;
         case 'popular-plans':
             currentIndex = planSlideIndex.value;
             maxIndex = plans.value.length - (isMobile ? 0 : 2);
@@ -106,16 +96,12 @@ const moveSlide = (direction, section) => {
 
 const startAutoSlides = () => {
     magazineInterval = setInterval(() => moveSlide('next', 'magazine'), 3000);
-    regionInterval = setInterval(() => moveSlide('next', 'popular-regions'), 3000);
     planInterval = setInterval(() => moveSlide('next', 'popular-plans'), 3000);
 };
 
 const stopAutoSlides = () => {
     if (magazineInterval) {
         clearInterval(magazineInterval);
-    }
-    if (regionInterval) {
-        clearInterval(regionInterval);
     }
     if (planInterval) {
         clearInterval(planInterval);
@@ -129,7 +115,6 @@ const resumeAutoSlides = () => {
 
 const handleResize = () => {
     moveSlide('next', 'magazine');
-    moveSlide('next', 'popular-regions');
     moveSlide('next', 'popular-plans');
 };
 
@@ -179,6 +164,32 @@ onUnmounted(() => {
             </div>
         </section>
 
+        <section class="popular-regions-section">
+            <h1 class="section-title">인기 여행지</h1>
+            <div class="grid-wrapper">
+                <div class="grid">
+                    <div v-for="(region, index) in regions"
+                         :key="region.id"
+                         class="item region-item"
+                         @click="goToCourseListByRegion(region.city)">
+                        <div class="rank-number">{{ index + 1 }}</div>
+                        <div class="region-content">
+                            <div class="region-info">
+                                <h2 class="region-name">{{ region.city }}</h2>
+                                <p class="region-province">{{ region.province }}</p>
+                            </div>
+                            <div class="region-stats">
+                                <div class="stats-item">
+                                    <span class="stats-icon">📍</span>
+                                    <span class="stats-value">{{ region.count }}개의 코스</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="popular-plans-section">
             <h1 class="section-title">인기 코스</h1>
             <div class="slider-container">
@@ -204,38 +215,6 @@ onUnmounted(() => {
                     </div>
                 </div>
                 <button class="nav-button next" @click="moveSlide('next', 'popular-plans')">&gt;
-                </button>
-            </div>
-        </section>
-        <section class="popular-regions-section">
-            <h1 class="section-title">인기 여행지</h1>
-            <div class="slider-container">
-                <button class="nav-button prev" @click="moveSlide('prev', 'popular-regions')">&lt;
-                </button>
-                <div class="grid-wrapper">
-                    <div class="grid"
-                         @mouseenter="stopAutoSlides"
-                         @mouseleave="resumeAutoSlides">
-                        <div v-for="region in regions" :key="region.id"
-                             class="item region-item"
-                            @click="goToCourseListByRegion(region.city)">
-                            <div class="region-content">
-                                <div class="region-info">
-                                    <h2 class="region-name">{{ region.city }}</h2>
-                                    <p class="region-province">{{ region.province }}</p>
-                                    <div class="region-stats">
-                                        <div class="stats-item">
-                                            <span class="stats-icon">📍</span>
-                                            <span class="stats-value">{{ region.count }}개의 코스</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="region-gradient"></div>
-                        </div>
-                    </div>
-                </div>
-                <button class="nav-button next" @click="moveSlide('next', 'popular-regions')">&gt;
                 </button>
             </div>
         </section>
@@ -364,97 +343,124 @@ onUnmounted(() => {
     display: none;
 }
 
+/* 인기 여행지 섹션 스타일 */
+.popular-regions-section {
+    margin: 2rem 0;
+}
+
+.popular-regions-section .grid-wrapper {
+    margin: 0;
+    padding: 0;
+}
+
+.popular-regions-section .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    transform: none !important; /* 슬라이드 동작 방지 */
+}
+
 .region-item {
     position: relative;
-    height: 200px;
-    background-color: #f8f9fa;
+    min-height: 80px;
+    width: 100%; /* 전체 너비 사용 */
+    background: white;
     border-radius: 12px;
     overflow: hidden;
-    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.region-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.rank-number {
+    width: 80px;
+    background: #5c6ac4;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    font-weight: bold;
+    align-self: stretch; /* 부모 높이에 맞춤 */
+}
+
+/* 1위 강조 스타일 */
+.region-item:first-child .rank-number {
+    background: #4338ca;
+    position: relative;
+}
+
+.region-item:first-child .rank-number::after {
+    content: "🏆";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1rem;
+}
+
+.region-item:first-child .region-stats {
+    background: rgba(92, 106, 196, 0.1);
+}
+
+.region-item:first-child .stats-value {
+    color: #4338ca;
+    font-weight: 600;
 }
 
 .region-content {
-    position: relative;
-    height: 100%;
-    padding: 2rem;
+    flex: 1;
+    padding: 1rem 1.5rem;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    z-index: 2;
-}
-
-.region-gradient {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 70%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-    z-index: 1;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
 }
 
 .region-info {
-    color: white;
+    color: #333;
 }
 
 .region-name {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
     margin: 0;
     margin-bottom: 0.25rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .region-province {
-    font-size: 1rem;
-    opacity: 0.9;
+    font-size: 0.9rem;
+    color: #666;
     margin: 0;
-    margin-bottom: 1rem;
 }
 
 .region-stats {
-    display: flex;
-    gap: 1rem;
-}
-
-.stats-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.stats-icon {
-    font-size: 1.2rem;
+    background: #f5f7ff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
 }
 
 .stats-value {
-    font-size: 0.9rem;
+    color: #5c6ac4;
     font-weight: 500;
 }
 
-/* 각 지역별로 다른 그라데이션 배경을 주기 위한 스타일 */
-.region-item:nth-child(3n + 1) {
-    background-image: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
-}
-
-.region-item:nth-child(3n + 2) {
-    background-image: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.region-item:nth-child(3n + 3) {
-    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 @media (max-width: 768px) {
+    .region-item:first-child .rank-number {
+        font-size: 1.75rem;
+    }
+
+    .region-item:first-child .region-name {
+        font-size: 1.25rem;
+    }
     .container {
         padding: 1rem 0.5rem 0 0.5rem;
     }
@@ -469,12 +475,15 @@ onUnmounted(() => {
         flex: 0 0 calc(100% - 20px);
         margin: 0 10px;
     }
+
     .grid-wrapper {
         margin: 0 40px;  /* 좌우 여백 줄임 */
     }
+
     .grid {
         gap: 0;
     }
+
     .nav-button {
         width: 32px;   /* 버튼 크기 줄임 */
         height: 32px;
@@ -493,26 +502,40 @@ onUnmounted(() => {
         font-size: 0.85rem;
     }
 
-    /* 지역 카드 스타일 수정 */
+    /* 인기 여행지 모바일 스타일 */
+    .popular-regions-section {
+        margin: 1.5rem 0;
+    }
+
+    .popular-regions-section .grid {
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
     .region-item {
-        height: 150px;  /* 높이 줄임 */
+        min-height: 70px;
+    }
+
+    .rank-number {
+        width: 70px;
+        font-size: 1.5rem;
     }
 
     .region-content {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
     }
 
     .region-name {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
     }
 
     .region-province {
         font-size: 0.85rem;
-        margin-bottom: 0.5rem;
     }
 
-    .stats-value {
-        font-size: 0.8rem;
+    .region-stats {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
     }
 }
 
@@ -526,5 +549,10 @@ onUnmounted(() => {
         height: 28px;
         font-size: 1rem;
     }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 </style>
