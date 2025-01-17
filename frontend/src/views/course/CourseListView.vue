@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { getCourseListAPI } from "@/api/course";
-import { Heart, Eye } from 'lucide-vue-next';
+import { Heart, Eye, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
 const route = useRoute();
 
@@ -176,11 +176,11 @@ watch(
                 </div>
                 <p v-else class="no-results">검색 결과가 없습니다.</p>
 
-                <div v-if="totalPages > 1" class="pagination">
+                <div class="pagination">
                     <button @click="changePage(currentPage - 1)"
                             :disabled="currentPage === 1"
                             class="page-button">
-                        <i class="fas fa-chevron-left"></i>
+                        <ChevronLeft size="18"/>
                     </button>
                     <button
                         v-for="page in totalPages"
@@ -195,7 +195,7 @@ watch(
                     <button @click="changePage(currentPage + 1)"
                             :disabled="currentPage === totalPages"
                             class="page-button">
-                        <i class="fas fa-chevron-right"></i>
+                        <ChevronRight size="18"/>
                     </button>
                 </div>
             </div>
