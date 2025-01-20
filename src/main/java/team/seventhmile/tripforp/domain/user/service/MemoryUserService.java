@@ -81,6 +81,12 @@ public class MemoryUserService implements UserService {
 	}
 
 	public boolean isDuplicatedNickname(String nickname) {
+		if (nickname.length() < 2) {
+			throw new AuthCustomException(ErrorCode.NICKNAME_TOO_SHORT);
+		}
+		if (nickname.length() > 10) {
+			throw new AuthCustomException(ErrorCode.NICKNAME_TOO_LONG);
+		}
 		if (userRepository.existsByNickname(nickname)) {
 			return true;
 		}

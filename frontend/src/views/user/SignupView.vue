@@ -47,13 +47,6 @@ const verifyEmail = async () => {
 
 const verifyNickname = async () => {
     try {
-        if (!validateNickname()) {
-            isNicknameVerified.value = false;
-            nicknameVerificationMessage.value = "닉네임은 2-10자로 입력해주세요.";
-            isNicknameVerificationFailed.value = true;
-            return;
-        }
-
         const isDuplicated = await verifyNickNameAPI(nickname.value);
         if (isDuplicated.status !== 'success') {
             isNicknameVerified.value = false;
@@ -65,6 +58,7 @@ const verifyNickname = async () => {
             isNicknameVerificationFailed.value = false;
         }
     } catch (error) {
+        console.log(error)
         isNicknameVerified.value = false;
         nicknameVerificationMessage.value = error.message || "닉네임 중복 검사 중 오류가 발생했습니다.";
         isNicknameVerificationFailed.value = true;
@@ -109,10 +103,6 @@ const signup = async function () {
         }
         if (!nickname.value) {
             document.querySelector('.signup-nickname').focus();
-            return;
-        }
-        if (!validateNickname()) {
-            alert("닉네임은 2-10자로 입력해주세요.");
             return;
         }
         if (!isEmailVerified.value) {
