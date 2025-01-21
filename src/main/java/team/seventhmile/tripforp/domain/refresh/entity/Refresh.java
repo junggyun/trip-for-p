@@ -23,6 +23,7 @@ public class Refresh {
     private Long id;
 
     private String username;
+    @Column(length = 500)
     private String token;
     private String expiration;
 
