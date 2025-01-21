@@ -1,6 +1,5 @@
 import {createStore} from "vuex";
 import createPersistedState from 'vuex-persistedstate';
-import jwtDecoder from 'vue-jwt-decode';
 
 const store = createStore({
     state: {
@@ -14,7 +13,7 @@ const store = createStore({
             if (!state.accessToken) {
                 return false;
             }
-            const decodedToken = jwtDecoder.decode(state.accessToken)
+            const decodedToken = decodeJwtToken(state.accessToken)
             const currentTime = Date.now() / 1000;
             return decodedToken.exp > currentTime;
         },
@@ -38,7 +37,7 @@ const store = createStore({
                 return false;
             }
             try {
-                const decodedToken = jwtDecoder.decode(state.accessToken)
+                const decodedToken = decodeJwtToken(state.accessToken)
                 return decodedToken.role
             } catch (error) {
                 return false;
