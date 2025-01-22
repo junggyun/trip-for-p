@@ -38,7 +38,7 @@ const provinceList = ref([]);
 const cityList = ref([]);
 const province = ref(props.province || '');
 const city = ref(props.city || '');
-const selectedPlaces = ref({});  // 객체로 초기화
+const selectedPlaces = ref({});
 const currentDateIndex = ref(0);
 const deletedPlaces = ref([]);
 const GOOGLE_MAP_API_KEY = process.env.VUE_APP_GOOGLE_MAP_API_KEY;
@@ -47,9 +47,11 @@ const popularPlaces = ref([]);
 const isSidebarOpen = ref(false);
 const popularPlaceQuery = ref();
 
-/**
- * 날짜 목록
- */
+const titleInput = ref(null);
+const provinceSelect = ref(null);
+const citySelect = ref(null);
+
+// Computed Properties
 const dates = computed(() => {
     const start = new Date(props.startDate);
     const end = new Date(props.endDate);
@@ -60,9 +62,6 @@ const dates = computed(() => {
     return dateArray;
 });
 
-/**
- * 현재 날짜
- */
 const currentDate = computed(() => {
     if (dates.value.length === 0) {
         return null;
@@ -77,6 +76,7 @@ const currentDateWeekDay = computed(() => {
     return weekDays[date.getDay()];
 });
 
+// Methods
 const goToNextDate = () => {
     if (currentDateIndex.value < dates.value.length - 1) {
         currentDateIndex.value++;
@@ -96,7 +96,6 @@ const addPlace = (place, date) => {
         selectedPlaces.value[dateString] = [];
     }
 
-    // 중복 여부 확인
     const isPlaceAlreadyAdded = selectedPlaces.value[dateString].some(
         selectedPlace => selectedPlace.place.id === place.place.id
     );
@@ -171,10 +170,50 @@ const reorderPlaces = (date) => {
     });
 };
 
+const hasAnyPlace = computed(() => {
+    // 모든 날짜에 장소가 하나 이상 있는지 확인
+    const start = new Date(props.startDate);
+    const end = new Date(props.endDate);
+
+    // 각 날짜를 순회하며 확인
+    for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+        const dateString = dt.toISOString().split('T')[0];
+        // 해당 날짜에 장소가 없으면 false 반환
+        if (!selectedPlaces.value[dateString] || selectedPlaces.value[dateString].length === 0) {
+            return false;
+        }
+    }
+    // 모든 날짜에 장소가 있으면 true 반환
+    return true;
+});
+
+// 유효성 검사 함수
+const validateForm = () => {
+    if (!title.value.trim()) {
+        titleInput.value?.focus();
+        return false;
+    }
+
+    if (!province.value) {
+        provinceSelect.value?.focus();
+        return false;
+    }
+
+    if (!city.value) {
+        citySelect.value?.focus();
+        return false;
+    }
+
+    return true;
+};
+
+// API 관련 함수들
 const createCourse = async () => {
+    if (!validateForm()) return;
+
     try {
         const spots = Object.entries(selectedPlaces.value)
-        .filter(([, places]) => Array.isArray(places)) // 배열인 것만 필터링
+        .filter(([, places]) => Array.isArray(places))
         .flatMap(([date, places]) =>
             places.map(place => ({
                 place: {
@@ -204,6 +243,8 @@ const createCourse = async () => {
 };
 
 const updatePlan = async () => {
+    if (!validateForm()) return;
+
     try {
         const spots = [
             ...deletedPlaces.value,
@@ -248,16 +289,7 @@ const handleBack = () => {
     }
 };
 
-const isSaveButtonEnabled = computed(() => {
-    const hasPlaces = Object.values(selectedPlaces.value)
-    .filter(Array.isArray)
-    .some(places => places.length > 0);
-
-    return title.value.trim() !== '' ||
-        (props.mode === 'update' && hasPlaces);
-});
-
-// 인기 장소 처음 보여주기
+// 인기 장소 관련 함수들
 const showPopularPlaces = async () => {
     try {
         if (!city.value) return;
@@ -271,7 +303,6 @@ const showPopularPlaces = async () => {
             popularPlaceQuery.value = city.value;
             isSidebarOpen.value = true;
         }
-
     } catch (error) {
         if (error.status === 429) {
             alert("일일한도량을 초과하였습니다.");
@@ -279,7 +310,6 @@ const showPopularPlaces = async () => {
     }
 };
 
-// 토글 버튼으로 사이드바 열기/닫기
 const toggleSidebar = () => {
     isSidebarOpen.value = !isSidebarOpen.value;
 };
@@ -300,6 +330,7 @@ const getCityListByProvinceList = async function () {
     }
 }
 
+// Watchers
 watch(province, async (newValue) => {
     try {
         city.value = '';
@@ -314,20 +345,18 @@ watch(province, async (newValue) => {
     }
 });
 
+// Lifecycle hooks
 onMounted(() => {
     const start = new Date(props.startDate);
     const end = new Date(props.endDate);
 
-    // selectedPlaces 초기화
     selectedPlaces.value = {};
 
-    // 각 날짜별로 빈 배열 초기화
     for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
         const dateString = dt.toISOString().split('T')[0];
         selectedPlaces.value[dateString] = [];
     }
 
-    // 기존 spots가 있다면 초기화
     if (props.spots && props.spots.length > 0) {
         props.spots.forEach(spot => {
             initPlace(spot, new Date(spot.tripDate));
@@ -348,16 +377,21 @@ onMounted(async () => {
         console.error('Failed to fetch data:', error);
     }
 });
-
 </script>
 
 <template>
     <div class="trip-planner">
-        <input v-model="title" placeholder="여행 제목" class="title-input">
+        <input
+            v-model="title"
+            placeholder="여행 제목"
+            class="title-input"
+            ref="titleInput"
+        >
         <div class="location-selectors">
             <select
                 v-model="province"
                 class="location-select"
+                ref="provinceSelect"
             >
                 <option value="">지역을 선택하세요</option>
                 <option
@@ -371,6 +405,7 @@ onMounted(async () => {
             <select
                 v-model="city"
                 class="location-select"
+                ref="citySelect"
                 :disabled="!province"
             >
                 <option value="">도시를 선택하세요</option>
@@ -390,20 +425,31 @@ onMounted(async () => {
                 핫플 추천
             </button>
         </div>
+
         <div class="date-navigation">
-            <button @click="goToPreviousDate" :disabled="currentDateIndex === 0"
-                    class="nav-button prev-button">&lt; 이전
+            <button
+                @click="goToPreviousDate"
+                :disabled="currentDateIndex === 0"
+                class="nav-button prev-button"
+            >&lt; 이전
             </button>
             <h3>{{ currentDate }} {{ currentDateWeekDay }}</h3>
-            <button @click="goToNextDate" :disabled="currentDateIndex === dates.length - 1"
-                    class="nav-button next-button">다음 &gt;
+            <button
+                @click="goToNextDate"
+                :disabled="currentDateIndex === dates.length - 1"
+                class="nav-button next-button"
+            >다음 &gt;
             </button>
         </div>
+
+        <div class="error-message places-error" v-if="placesError">{{ placesError }}</div>
+
         <SidebarToggleButton
             v-if="popularPlaces.length > 0"
             :is-open="isSidebarOpen"
             @toggle="toggleSidebar"
         />
+
         <PopularPlacesSideBar
             v-if="city"
             :is-open="isSidebarOpen"
@@ -412,6 +458,7 @@ onMounted(async () => {
             @close="isSidebarOpen = false"
             @select-place="place => addPlace(place, dates[currentDateIndex])"
         />
+
         <div class="main-content">
             <div class="map-section">
                 <GoogleMapComponent
@@ -437,20 +484,21 @@ onMounted(async () => {
                 />
             </div>
         </div>
+
         <div class="button-container">
             <button @click="handleBack" class="back-button">이전</button>
             <button
                 v-if="props.mode==='create'"
                 @click="createCourse"
                 class="save-plan-button"
-                :disabled="!isSaveButtonEnabled"
+                :disabled="!hasAnyPlace"
             >일정 저장
             </button>
             <button
                 v-else-if="props.mode==='update'"
                 @click="updatePlan"
                 class="save-plan-button"
-                :disabled="!isSaveButtonEnabled"
+                :disabled="!hasAnyPlace"
             >일정 수정
             </button>
         </div>
@@ -506,8 +554,8 @@ onMounted(async () => {
 }
 
 .title-input {
+    width: 100%;
     font-size: 1.5em;
-    margin-bottom: 20px;
     padding: 10px;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -583,6 +631,15 @@ onMounted(async () => {
 .save-plan-button:disabled {
     background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 비활성화 상태에서는 호버 효과도 제거 */
+.save-plan-button:disabled:hover {
+    background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
+    transform: none;
+    box-shadow: none;
 }
 
 @media (max-width: 1024px) {
@@ -600,11 +657,14 @@ onMounted(async () => {
         max-width: 100%;
     }
 }
+
 .location-selectors {
     display: flex;
     gap: 12px;
     margin-bottom: 20px;
+    margin-top: 20px;
 }
+
 
 .location-select {
     flex: 1;
@@ -621,6 +681,7 @@ onMounted(async () => {
     background-position: right 16px center;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(92, 106, 196, 0.05);
+    width: 100%;
 }
 
 .location-select:hover:not(:disabled) {
@@ -670,6 +731,20 @@ onMounted(async () => {
 .recommend-button:disabled {
     background: linear-gradient(135deg, rgba(92, 106, 196, 0.5) 0%, rgba(135, 148, 216, 0.5) 100%);
     cursor: not-allowed;
+}
+
+/* 에러 메시지 스타일 추가 */
+.error-message {
+    color: #ff4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-left: 16px;
+}
+
+.places-error {
+    text-align: center;
+    margin: 1rem 0;
+    color: #ff4444;
 }
 
 @media (max-width: 600px) {
