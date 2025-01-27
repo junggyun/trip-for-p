@@ -177,25 +177,51 @@ watch(
                 <p v-else class="no-results">검색 결과가 없습니다.</p>
 
                 <div class="pagination">
+                    <!-- 첫 페이지로 이동 -->
+                    <button @click="changePage(1)"
+                            :disabled="currentPage === 1"
+                            class="page-button">
+                        &lt;&lt;
+                    </button>
+                    <!-- 이전 페이지로 이동 -->
                     <button @click="changePage(currentPage - 1)"
                             :disabled="currentPage === 1"
                             class="page-button">
                         <ChevronLeft size="18"/>
                     </button>
-                    <button
-                        v-for="page in totalPages"
-                        :key="page"
-                        @click="changePage(page)"
-                        :class="{ active: page === currentPage }"
-                        class="page-button"
-                        v-show="!isMobile || (page >= currentPage - 1 && page <= currentPage + 1) || page === 1 || page === totalPages"
-                    >
-                        {{ page }}
-                    </button>
+                    <template v-for="page in totalPages" :key="page">
+                        <button
+                            v-if="!isMobile &&
+                  (page >= Math.max(1, currentPage - 4) &&
+                   page <= Math.min(totalPages, Math.max(currentPage - 4, 1) + 9))"
+                            @click="changePage(page)"
+                            :class="{ active: page === currentPage }"
+                            class="page-button"
+                        >
+                            {{ page }}
+                        </button>
+                        <button
+                            v-if="isMobile &&
+                  (page >= currentPage - 1 &&
+                   page <= currentPage + 1)"
+                            @click="changePage(page)"
+                            :class="{ active: page === currentPage }"
+                            class="page-button"
+                        >
+                            {{ page }}
+                        </button>
+                    </template>
+                    <!-- 다음 페이지로 이동 -->
                     <button @click="changePage(currentPage + 1)"
                             :disabled="currentPage === totalPages"
                             class="page-button">
                         <ChevronRight size="18"/>
+                    </button>
+                    <!-- 마지막 페이지로 이동 -->
+                    <button @click="changePage(totalPages)"
+                            :disabled="currentPage === totalPages"
+                            class="page-button">
+                        &gt;&gt;
                     </button>
                 </div>
             </div>
