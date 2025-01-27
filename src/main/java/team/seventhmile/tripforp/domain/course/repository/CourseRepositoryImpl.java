@@ -50,6 +50,8 @@ public class CourseRepositoryImpl implements CourseRepositoryCustom {
                     .where(qCourseLike.course.eq(qCourse))
             ))
             .from(qCourse)
+            .leftJoin(qCourse.creator)
+            .leftJoin(qCourse.region)
             .where(eqRegion(keyword.trim()))
             .orderBy(qCourse.createdAt.desc())
             .limit(pageable.getPageSize())
