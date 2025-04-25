@@ -78,6 +78,13 @@ const getMyLikedCoursesAPI = function (request) {
     });
 }
 
+// 동선 최적화
+const optimizeRouteAPI = function (request) {
+    return authInstance.post(
+        `/api/courses/route-optimize`, request
+    )
+};
+
 /**
  * Region API
  */
@@ -115,5 +122,6 @@ export {
     getMyLikedCoursesAPI,
     getProvinceListAPI,
     getCityListByProvinceAPI,
-    getPopularRegionsAPI
+    getPopularRegionsAPI,
+    optimizeRouteAPI
 }
