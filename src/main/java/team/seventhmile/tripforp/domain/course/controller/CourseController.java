@@ -23,6 +23,7 @@ import team.seventhmile.tripforp.domain.course.dto.CreateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.CreateCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseListResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseResponse;
+import team.seventhmile.tripforp.domain.course.dto.OptimizeRouteRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseResponse;
 import team.seventhmile.tripforp.domain.course.service.CourseService;
@@ -103,5 +104,13 @@ public class CourseController {
         Integer size
     ) {
         return ResponseEntity.ok(spotService.getPopularPlaces(city, size));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/route-optimize")
+    public ResponseEntity<String> optimizeRoute(
+        @RequestBody OptimizeRouteRequest request
+    ) {
+        return ResponseEntity.ok(courseService.optimizeRoute(request));
     }
 }
