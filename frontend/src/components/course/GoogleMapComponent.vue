@@ -159,6 +159,7 @@ watch(() => props.places, () => {
         isPolylineVisible.value = false;  // 폴리라인 일시적으로 숨기기
         nextTick(() => {
             createMarkers();
+            isPolylineVisible.value = true;
         });
     }
 }, {deep: true});
@@ -179,7 +180,6 @@ onMounted(() => {
             :center="mapCenter"
             :zoom="mapZoom"
             class="map"
-            @load="handleMapLoad"
         >
             <template v-if="isMapReady">
                 <Marker

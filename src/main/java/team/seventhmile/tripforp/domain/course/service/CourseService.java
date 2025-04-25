@@ -1,5 +1,6 @@
 package team.seventhmile.tripforp.domain.course.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,9 @@ import team.seventhmile.tripforp.domain.course.dto.CreateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.CreateCourseResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseListResponse;
 import team.seventhmile.tripforp.domain.course.dto.GetCourseResponse;
+import team.seventhmile.tripforp.domain.course.dto.OptimizeRouteRequest;
+import team.seventhmile.tripforp.domain.course.dto.OptimizeRouteRequest.Place;
+import team.seventhmile.tripforp.domain.course.dto.RouteResult;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseRequest;
 import team.seventhmile.tripforp.domain.course.dto.UpdateCourseResponse;
 import team.seventhmile.tripforp.domain.course.entity.Course;
@@ -109,8 +113,54 @@ public class CourseService {
         return new PageResponse<>(courseRepository.getCourses(keyword, pageable));
     }
 
-    public PageResponse<GetCourseListResponse> getMyCourseList(UserDetails user, Pageable pageable) {
+    public PageResponse<GetCourseListResponse> getMyCourseList(UserDetails user,
+        Pageable pageable) {
         return new PageResponse<>(courseRepository.getMyCourses(user.getUsername(), pageable));
+    }
+
+    public String optimizeRoute(OptimizeRouteRequest request) {
+
+        RouteResult result = new RouteResult();
+        List<Place> places = request.getPlaces();
+        boolean[] visited = new boolean[request.getPlaces().size()];
+        visited[0] = true;
+        dfs(1, places.get(0), places, visited, 0.0, String.valueOf(places.get(0).getSequence()), result);
+
+        return result.getMinRoute();
+    }
+
+    private void dfs(int depth, Place current, List<Place> places, boolean[] visited,
+        double totalDistance, String route, RouteResult result) {
+        if (depth == places.size()) {
+            if (result.getMinTotalDistance() > totalDistance) {
+                result.setMinTotalDistance(totalDistance);
+                result.setMinRoute(route);
+            }
+            return;
+        }
+        for (int i = 0; i < places.size(); i++) {
+            if (!visited[i]) {
+                Place next = places.get(i);
+                double distance = haversine(current.getLocation().getLat(), current.getLocation().getLng(),
+                    next.getLocation().getLat(),
+                    next.getLocation().getLng());
+                visited[i] = true;
+                dfs(depth + 1, next, places, visited, totalDistance + distance, route + ", " + next.getSequence(), result);
+                visited[i] = false;
+            }
+        }
+
+    }
+
+    private double haversine(double lat1, double lng1, double lat2, double lng2) {
+        double R = 6371; // 지구 반지름 (km)
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
     private void checkUpdateAuthorization(UserDetails user, Course course) {

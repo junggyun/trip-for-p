@@ -45,7 +45,9 @@ const searchPlace = async () => {
         searchedQuery.value = searchQuery.value;
 
     } catch (error) {
-        console.error('검색 중 오류 발생:', error);
+        if (error.status === 429) {
+            alert("일일한도량을 초과하였습니다.");
+        }
         searchResults.value = [];
     } finally {
         isSearching.value = false;

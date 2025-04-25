@@ -1,11 +1,9 @@
 <script setup>
 // script 부분은 동일하게 유지
-import {defineEmits, defineProps, onMounted, ref} from 'vue';
+import {defineEmits, defineProps, ref} from 'vue';
 import draggable from 'vuedraggable';
 import DistanceDisplay from "@/components/course/DistanceDisplay.vue";
-import {getChanceAPI, recommendRouteAPI} from "@/api/gemini";
-
-const chance = ref();
+import {optimizeRouteAPI} from "@/api/course";
 
 const props = defineProps({
     places: {
@@ -43,22 +41,24 @@ const openPlaceUrl = (uri) => {
         window?.open(uri, '_blank');
     }
 };
-const recommendRoute = async (places) => {
-    let prompt = '';
+const optimizeRoute = async (places) => {
+
+    const requestPlaces = [];
     for (const place of places) {
-        prompt = prompt + '[' +
-            place.sequence + ',' +
-            place.place.name + ',' +
-            place.place.address + ',' +
-            place.place.latitude + ',' +
-            place.place.longitude + ',' +
-            (place.place.category || '알 수 없음') + '] ';
+        console.log(place);
+        requestPlaces.push({
+            sequence: place.sequence,
+            location: {
+                lat: place.place.latitude,
+                lng: place.place.longitude
+            }
+        })
     }
     const request = {
-        prompt: prompt
+        places: requestPlaces
     }
     try {
-        const response = await recommendRouteAPI(request);
+        const response = await optimizeRouteAPI(request);
         console.log(response.data);
 
         // 추천 순서에 따라 sequence 재정렬
@@ -81,26 +81,12 @@ const recommendRoute = async (places) => {
 
             // places 배열 업데이트
             places.splice(0, places.length, ...reorderedPlaces);
-            const chanceResponse = await getChanceAPI();
-            chance.value = chanceResponse.data;
+            alert("동선 최적화 완료");
         }
-    } catch (error) {
-        if (error.status === 429) {
-            alert("일일한도량을 초과하였습니다.");
-        }
-    }
-}
-const getChance = async function () {
-    try {
-        const response = await getChanceAPI();
-        chance.value = response.data;
     } catch (error) {
         console.log(error);
     }
-};
-onMounted(() => {
-    getChance();
-})
+}
 </script>
 
 <template>
@@ -180,11 +166,10 @@ onMounted(() => {
         </draggable>
         <div v-if="places.length >= 2" class="recommend-router-button-wrapper">
             <button
-                @click="recommendRoute(places)"
-                :disabled="chance === 0"
+                @click="optimizeRoute(places)"
                 class="recommend-router-button"
             >
-                AI 동선 최적화
+                동선 최적화
             </button>
         </div>
     </div>
