@@ -131,6 +131,10 @@ public class CourseService {
 
     private void dfs(int depth, Place current, List<Place> places, boolean[] visited,
         double totalDistance, String route, RouteResult result) {
+        if (totalDistance > result.getMinTotalDistance()) {
+            return;
+        }
+
         if (depth == places.size()) {
             if (result.getMinTotalDistance() > totalDistance) {
                 result.setMinTotalDistance(totalDistance);
